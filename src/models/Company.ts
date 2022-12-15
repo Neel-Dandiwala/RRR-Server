@@ -1,4 +1,4 @@
-import { Waste } from "./Waste";
+// import { Waste } from "./Waste";
 import { CompanyInfo } from "../types/CompanyInfo";
 import { model, Schema } from "mongoose";
 

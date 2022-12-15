@@ -13,6 +13,7 @@ declare module 'express-session' {
   }
 
 const main = async () => {
+    const PORT= process.env.PORT || 4000;
 
     // appDataSource.initialize();
 
@@ -71,7 +72,7 @@ const main = async () => {
 
     app.use(
         cors({
-            origin: 'http://localhost:4000',
+            origin: 'https://rrr-server.onrender.com',
             credentials: true,
             
         })
@@ -99,8 +100,12 @@ const main = async () => {
     app.use(require('./routes/AgentRoutes'));
     app.use(require('./routes/CompanyRoutes'));
 
+    app.get("/healthz", (_, res) => {
+        res.send("Health Checkup");
+    })
 
-    app.listen(4000, () => {
+
+    app.listen(PORT, () => {
         console.log("Server started on localhost:4000")
     });
 

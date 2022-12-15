@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import Company from '../models/Company';
 import { CompanyInfo } from '../types/CompanyInfo';
-import { serverContext } from "../context";
 import { ResponseFormat } from "../resolvers/Format";
 import { validation } from "../utils/validation";
 import argon2 from "argon2";
@@ -19,7 +18,7 @@ const collection = connection.db('rrrdatabase').collection('company');
 // @desc   Get company
 // @route  GET /company/login
 // @access Private
-const getCompanies = async(req: Request, res: Response):Promise<CompanyResponse> => {
+const getCompanies = async(res: Response):Promise<CompanyResponse> => {
         
     try {
         let result;
@@ -161,14 +160,14 @@ const setCompany = async(req: Request, res: Response):Promise<CompanyResponse> =
 // @desc   Get company
 // @route  GET /company/login
 // @access Private
-const updateCompany = async(req: Request, res: Response) => {
+const updateCompany = async( res: Response) => {
     res.status(200).json({ message: 'company Update'});
 }
 
 // @desc   Get company
 // @route  GET /company/login
 // @access Private
-const deleteCompany = async(req: Request, res: Response) => {
+const deleteCompany = async(res: Response) => {
     res.status(200).json({ message: 'company Delete'});
 }
 

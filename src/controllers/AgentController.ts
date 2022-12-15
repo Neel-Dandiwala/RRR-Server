@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import Agent from '../models/Agent';
 import { AgentInfo } from '../types/AgentInfo';
-import { serverContext } from "../context";
 import { ResponseFormat } from "../resolvers/Format";
 import { validation } from "../utils/validation";
 import argon2 from "argon2";
@@ -19,7 +18,7 @@ const collection = connection.db('rrrdatabase').collection('agent');
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
-const getAgents = async(req: Request, res: Response):Promise<AgentResponse> => {
+const getAgents = async(res: Response):Promise<AgentResponse> => {
         
     try {
         let result;
@@ -159,14 +158,14 @@ const setAgent = async(req: Request, res: Response):Promise<AgentResponse> => {
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
-const updateAgent = async(req: Request, res: Response) => {
+const updateAgent = async(res: Response) => {
     res.status(200).json({ message: 'agent Update'});
 }
 
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
-const deleteAgent = async(req: Request, res: Response) => {
+const deleteAgent = async(res: Response) => {
     res.status(200).json({ message: 'agent Delete'});
 }
 

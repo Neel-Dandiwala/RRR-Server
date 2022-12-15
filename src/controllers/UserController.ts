@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
 import { UserInfo } from '../types/UserInfo';
-import { serverContext } from "../context";
 import { ResponseFormat } from "../resolvers/Format";
 import { validation } from "../utils/validation";
 import argon2 from "argon2";
@@ -19,7 +18,7 @@ const collection = connection.db('rrrdatabase').collection('test');
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const getUsers = async({req, res}:serverContext):Promise<UserResponse> => {
+const getUsers = async(res:Response):Promise<UserResponse> => {
         
     try {
         let result;
@@ -161,14 +160,14 @@ const setUser = async(req: Request, res: Response):Promise<UserResponse> => {
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const updateUser = async({req, res}:serverContext) => {
+const updateUser = async(res:Response) => {
     res.status(200).json({ message: 'User Update'});
 }
 
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const deleteUser = async({req, res}:serverContext) => {
+const deleteUser = async(res:Response) => {
     res.status(200).json({ message: 'User Delete'});
 }
 
