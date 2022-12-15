@@ -17,7 +17,7 @@ const main = async () => {
 
     // appDataSource.initialize();
 
-    await connection.connect();
+    console.log(connection);
 
     // const mongodb = require('mongodb');
     // const MongoClient = mongodb.MongoClient;

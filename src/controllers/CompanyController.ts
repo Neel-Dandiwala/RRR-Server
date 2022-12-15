@@ -18,7 +18,7 @@ const collection = connection.db('rrrdatabase').collection('company');
 // @desc   Get company
 // @route  GET /company/login
 // @access Private
-const getCompanies = async(res: Response):Promise<CompanyResponse> => {
+const getCompanies = async(res: Response) => {
         
     try {
         let result;
@@ -77,7 +77,7 @@ const getCompanies = async(res: Response):Promise<CompanyResponse> => {
 // @desc   Get company
 // @route  GET /company/login
 // @access Private
-const setCompany = async(req: Request, res: Response):Promise<CompanyResponse> => {
+const setCompany = async(req: Request, res: Response) => {
     // console.log(req.body)
     try {
         const companyData = req.body as Pick<CompanyInfo, "companyName" | "companyEmail" | "companyPassword" | "companyPaperPrice" | "companyPlasticPrice" | "companyElectronicPrice" | "companyAddress" | "companyCity" | "companyState" | "companyPincode">

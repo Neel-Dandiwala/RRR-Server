@@ -18,7 +18,7 @@ const collection = connection.db('rrrdatabase').collection('test');
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const getUsers = async(res:Response):Promise<UserResponse> => {
+const getUsers = async(res:Response) => {
         
     try {
         let result;
@@ -77,7 +77,7 @@ const getUsers = async(res:Response):Promise<UserResponse> => {
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const setUser = async(req: Request, res: Response):Promise<UserResponse> => {
+const setUser = async(req: Request, res: Response) => {
     console.log(req)
     try {
         const userData = req.body  as Pick<UserInfo, "userName" | "userEmail" | "userPassword" | "userAge" | "userAddress" | "userPincode" | "userMobile" | "userCity" | "userState">

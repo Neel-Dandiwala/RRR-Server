@@ -18,7 +18,7 @@ const collection = connection.db('rrrdatabase').collection('agent');
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
-const getAgents = async(res: Response):Promise<AgentResponse> => {
+const getAgents = async(res: Response) => {
         
     try {
         let result;
@@ -77,7 +77,7 @@ const getAgents = async(res: Response):Promise<AgentResponse> => {
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
-const setAgent = async(req: Request, res: Response):Promise<AgentResponse> => {
+const setAgent = async(req: Request, res: Response) => {
     // console.log(req.body)
     try {
         const agentData = req.body as Pick<AgentInfo, "agentName" | "agentEmail" | "agentPassword" | "agentAge" | "agentPincode" | "agentMobile" | "agentCity" | "agentState">

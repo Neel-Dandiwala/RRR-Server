@@ -20,7 +20,7 @@ const cors_1 = __importDefault(require("cors"));
 const connection_1 = require("./connection");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const PORT = process.env.PORT || 4000;
-    yield connection_1.connection.connect();
+    console.log(connection_1.connection);
     const MongoDBStore = (0, connect_mongodb_session_1.default)(express_session_1.default);
     const sessionStore = new MongoDBStore({
         uri: 'mongodb+srv://mongodb:mongodb@rrrcluster.nluljzi.mongodb.net/rrrdatabase?retryWrites=true&w=majority',
