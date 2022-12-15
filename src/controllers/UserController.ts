@@ -4,7 +4,7 @@ import { UserInfo } from '../types/UserInfo';
 import { ResponseFormat } from "../resolvers/Format";
 import { validation } from "../utils/validation";
 import argon2 from "argon2";
-import { connection } from "../connection";
+import {connection} from "../connection";
 import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
 
@@ -13,13 +13,17 @@ class UserResponse {
     user?: UserInfo;
 }
 
-const collection = connection.db('rrrdatabase').collection('test');
+// const collection = connection.db('rrrdatabase').collection('test');
 
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const getUsers = async(res:Response) => {
+const getUsers = async(req:Request, res:Response) => {
         
+    var db = await connection.getDb();
+
+    const collection = db.collection( 'test' );
+
     try {
         let result;
         let logs;
@@ -79,6 +83,10 @@ const getUsers = async(res:Response) => {
 // @access Private
 const setUser = async(req: Request, res: Response) => {
     console.log(req)
+    var db = await connection.getDb();
+
+    const collection = db.collection( 'test' );
+    
     try {
         const userData = req.body  as Pick<UserInfo, "userName" | "userEmail" | "userPassword" | "userAge" | "userAddress" | "userPincode" | "userMobile" | "userCity" | "userState">
         console.log(userData);

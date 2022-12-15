@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -18,9 +9,13 @@ const express_session_1 = __importDefault(require("express-session"));
 const connect_mongodb_session_1 = __importDefault(require("connect-mongodb-session"));
 const cors_1 = __importDefault(require("cors"));
 const connection_1 = require("./connection");
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
+const main = async () => {
     const PORT = process.env.PORT || 4000;
-    console.log(connection_1.connection);
+    await connection_1.connection.connectToServer(function (err, client) {
+        if (err)
+            console.log(err);
+        console.log("Database Connected");
+    });
     const MongoDBStore = (0, connect_mongodb_session_1.default)(express_session_1.default);
     const sessionStore = new MongoDBStore({
         uri: 'mongodb+srv://mongodb:mongodb@rrrcluster.nluljzi.mongodb.net/rrrdatabase?retryWrites=true&w=majority',
@@ -59,7 +54,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.listen(PORT, () => {
         console.log("Server started on localhost:4000");
     });
-});
+};
 main().catch((err) => {
     console.error(err);
 });

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,13 +11,14 @@ const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 class UserResponse {
 }
-const collection = connection_1.connection.db('rrrdatabase').collection('test');
-const getUsers = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUsers = async (req, res) => {
+    var db = await connection_1.connection.getDb();
+    const collection = db.collection('test');
     try {
         let result;
         let logs;
         try {
-            result = yield collection.find({}).toArray();
+            result = await collection.find({}).toArray();
         }
         catch (err) {
             if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
@@ -70,9 +62,11 @@ const getUsers = (res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).json({ e });
         throw e;
     }
-});
-const setUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const setUser = async (req, res) => {
     console.log(req);
+    var db = await connection_1.connection.getDb();
+    const collection = db.collection('test');
     try {
         const userData = req.body;
         console.log(userData);
@@ -85,7 +79,7 @@ const setUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(400).json({ logs });
             return { logs };
         }
-        const hashedPassword = yield argon2_1.default.hash(userData.userPassword);
+        const hashedPassword = await argon2_1.default.hash(userData.userPassword);
         const _user = new User_1.default({
             userName: userData.userName,
             userEmail: userData.userEmail,
@@ -99,7 +93,7 @@ const setUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         let result;
         try {
-            result = yield collection.insertOne(_user);
+            result = await collection.insertOne(_user);
         }
         catch (err) {
             if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
@@ -143,13 +137,13 @@ const setUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).json({ e });
         throw e;
     }
-});
-const updateUser = (res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const updateUser = async (res) => {
     res.status(200).json({ message: 'User Update' });
-});
-const deleteUser = (res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const deleteUser = async (res) => {
     res.status(200).json({ message: 'User Delete' });
-});
+};
 module.exports = {
     getUsers, setUser, updateUser, deleteUser
 };

@@ -13,12 +13,15 @@ class CompanyResponse {
     company?: CompanyInfo;
 }
 
-const collection = connection.db('rrrdatabase').collection('company');
+// const collection = connection.db('rrrdatabase').collection('company');
 
 // @desc   Get company
 // @route  GET /company/login
 // @access Private
-const getCompanies = async(res: Response) => {
+const getCompanies = async(req:Request, res: Response) => {
+    var db = await connection.getDb();
+
+    const collection = db.collection( 'test' );
         
     try {
         let result;
@@ -78,6 +81,9 @@ const getCompanies = async(res: Response) => {
 // @route  GET /company/login
 // @access Private
 const setCompany = async(req: Request, res: Response) => {
+    var db = await connection.getDb();
+
+    const collection = db.collection( 'test' );
     // console.log(req.body)
     try {
         const companyData = req.body as Pick<CompanyInfo, "companyName" | "companyEmail" | "companyPassword" | "companyPaperPrice" | "companyPlasticPrice" | "companyElectronicPrice" | "companyAddress" | "companyCity" | "companyState" | "companyPincode">
@@ -107,6 +113,7 @@ const setCompany = async(req: Request, res: Response) => {
         })
 
         let result;
+
         try {
             result = await collection.insertOne(_company);
         } catch (err) {

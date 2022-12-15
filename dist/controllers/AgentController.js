@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,13 +11,14 @@ const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 class AgentResponse {
 }
-const collection = connection_1.connection.db('rrrdatabase').collection('agent');
-const getAgents = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAgents = async (req, res) => {
+    var db = await connection_1.connection.getDb();
+    const collection = db.collection('test');
     try {
         let result;
         let logs;
         try {
-            result = yield collection.find({}).toArray();
+            result = await collection.find({}).toArray();
         }
         catch (err) {
             if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
@@ -70,8 +62,10 @@ const getAgents = (res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).json({ e });
         throw e;
     }
-});
-const setAgent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const setAgent = async (req, res) => {
+    var db = await connection_1.connection.getDb();
+    const collection = db.collection('test');
     try {
         const agentData = req.body;
         console.log(agentData);
@@ -83,7 +77,7 @@ const setAgent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (logs) {
             return { logs };
         }
-        const hashedPassword = yield argon2_1.default.hash(credentials.password);
+        const hashedPassword = await argon2_1.default.hash(credentials.password);
         const _agent = new Agent_1.default({
             agentName: agentData.agentName,
             agentEmail: agentData.agentEmail,
@@ -96,7 +90,7 @@ const setAgent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         let result;
         try {
-            result = yield collection.insertOne(_agent);
+            result = await collection.insertOne(_agent);
         }
         catch (err) {
             if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
@@ -140,13 +134,13 @@ const setAgent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).json({ e });
         throw e;
     }
-});
-const updateAgent = (res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const updateAgent = async (res) => {
     res.status(200).json({ message: 'agent Update' });
-});
-const deleteAgent = (res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const deleteAgent = async (res) => {
     res.status(200).json({ message: 'agent Delete' });
-});
+};
 module.exports = {
     getAgents, setAgent, updateAgent, deleteAgent
 };

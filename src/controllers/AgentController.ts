@@ -13,13 +13,18 @@ class AgentResponse {
     agent?: AgentInfo;
 }
 
-const collection = connection.db('rrrdatabase').collection('agent');
+
+// const collection = connection.db('rrrdatabase').collection('agent');
 
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
-const getAgents = async(res: Response) => {
+const getAgents = async(req:Request, res: Response) => {
         
+    var db = await connection.getDb();
+
+    const collection = db.collection( 'test' );
+
     try {
         let result;
         let logs;
@@ -78,6 +83,10 @@ const getAgents = async(res: Response) => {
 // @route  GET /agent/login
 // @access Private
 const setAgent = async(req: Request, res: Response) => {
+
+    var db = await connection.getDb();
+
+    const collection = db.collection( 'test' );
     // console.log(req.body)
     try {
         const agentData = req.body as Pick<AgentInfo, "agentName" | "agentEmail" | "agentPassword" | "agentAge" | "agentPincode" | "agentMobile" | "agentCity" | "agentState">

@@ -16,8 +16,11 @@ const main = async () => {
     const PORT= process.env.PORT || 4000;
 
     // appDataSource.initialize();
-
-    console.log(connection);
+    // let connection = require( 'connection' );
+    await connection.connectToServer( function( err:any, client:any ) {
+        if (err) console.log(err);
+        console.log("Database Connected")
+    } );
 
     // const mongodb = require('mongodb');
     // const MongoClient = mongodb.MongoClient;

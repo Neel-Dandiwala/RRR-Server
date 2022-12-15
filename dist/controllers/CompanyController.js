@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,13 +11,14 @@ const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 class CompanyResponse {
 }
-const collection = connection_1.connection.db('rrrdatabase').collection('company');
-const getCompanies = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const getCompanies = async (req, res) => {
+    var db = await connection_1.connection.getDb();
+    const collection = db.collection('test');
     try {
         let result;
         let logs;
         try {
-            result = yield collection.find({}).toArray();
+            result = await collection.find({}).toArray();
         }
         catch (err) {
             if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
@@ -70,8 +62,10 @@ const getCompanies = (res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).json({ e });
         throw e;
     }
-});
-const setCompany = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const setCompany = async (req, res) => {
+    var db = await connection_1.connection.getDb();
+    const collection = db.collection('test');
     try {
         const companyData = req.body;
         console.log(companyData);
@@ -83,7 +77,7 @@ const setCompany = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (logs) {
             return { logs };
         }
-        const hashedPassword = yield argon2_1.default.hash(credentials.password);
+        const hashedPassword = await argon2_1.default.hash(credentials.password);
         const _company = new Company_1.default({
             companyName: companyData.companyName,
             companyEmail: companyData.companyEmail,
@@ -98,7 +92,7 @@ const setCompany = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
         let result;
         try {
-            result = yield collection.insertOne(_company);
+            result = await collection.insertOne(_company);
         }
         catch (err) {
             if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
@@ -142,13 +136,13 @@ const setCompany = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(400).json({ e });
         throw e;
     }
-});
-const updateCompany = (res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const updateCompany = async (res) => {
     res.status(200).json({ message: 'company Update' });
-});
-const deleteCompany = (res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const deleteCompany = async (res) => {
     res.status(200).json({ message: 'company Delete' });
-});
+};
 module.exports = {
     getCompanies, setCompany, updateCompany, deleteCompany
 };
