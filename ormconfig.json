@@ -1,0 +1,21 @@
+{
+    "type": "mongodb",
+    "url": "mongodb+srv://mongodb:mongodb@rrrcluster.nluljzi.mongodb.net/rrrdatabase?retryWrites=true&w=majority",
+    "useNewUrlParser": true,
+    "synchronize": true,
+    "logging": false,
+    "entities": [
+        "src/entities/**/*.tsx"
+    ],
+    "migrations": [
+        "src/migrations/**/*.tsx"
+    ],
+    "subscribers": [
+        "src/subscribers/**/*.tsx"
+    ],
+    "cli": {
+        "entitiesDir": "src/entities",
+        "migrationsDir": "src/migrations",
+        "subscribersDir": "src/subscribers"
+    }
+}
