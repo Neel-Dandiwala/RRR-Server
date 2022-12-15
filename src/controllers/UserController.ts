@@ -20,7 +20,7 @@ class UserResponse {
 // @access Private
 const getUsers = async(req:Request, res:Response) => {
         
-    var db = await connection.getDb();
+    const db = await connection.getDb();
 
     const collection = db.collection( 'test' );
 
@@ -83,7 +83,7 @@ const getUsers = async(req:Request, res:Response) => {
 // @access Private
 const setUser = async(req: Request, res: Response) => {
     console.log(req)
-    var db = await connection.getDb();
+    const db = await connection.getDb();
 
     const collection = db.collection( 'test' );
     

@@ -12,7 +12,7 @@ const mongodb_1 = require("mongodb");
 class UserResponse {
 }
 const getUsers = async (req, res) => {
-    var db = await connection_1.connection.getDb();
+    const db = await connection_1.connection.getDb();
     const collection = db.collection('test');
     try {
         let result;
@@ -65,7 +65,7 @@ const getUsers = async (req, res) => {
 };
 const setUser = async (req, res) => {
     console.log(req);
-    var db = await connection_1.connection.getDb();
+    const db = await connection_1.connection.getDb();
     const collection = db.collection('test');
     try {
         const userData = req.body;

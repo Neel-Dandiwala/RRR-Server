@@ -21,9 +21,9 @@ class AgentResponse {
 // @access Private
 const getAgents = async(req:Request, res: Response) => {
         
-    var db = await connection.getDb();
+    const db = await connection.getDb();
 
-    const collection = db.collection( 'test' );
+    const collection = db.collection( 'agent' );
 
     try {
         let result;
@@ -84,9 +84,9 @@ const getAgents = async(req:Request, res: Response) => {
 // @access Private
 const setAgent = async(req: Request, res: Response) => {
 
-    var db = await connection.getDb();
+    const db = await connection.getDb();
 
-    const collection = db.collection( 'test' );
+    const collection = db.collection( 'agent' );
     // console.log(req.body)
     try {
         const agentData = req.body as Pick<AgentInfo, "agentName" | "agentEmail" | "agentPassword" | "agentAge" | "agentPincode" | "agentMobile" | "agentCity" | "agentState">

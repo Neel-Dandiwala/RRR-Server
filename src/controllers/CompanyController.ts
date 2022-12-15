@@ -21,7 +21,7 @@ class CompanyResponse {
 const getCompanies = async(req:Request, res: Response) => {
     const db = await connection.getDb();
 
-    const collection = db.collection( 'test' );
+    const collection = db.collection( 'company' );
         
     try {
         let result;
@@ -81,9 +81,9 @@ const getCompanies = async(req:Request, res: Response) => {
 // @route  GET /company/login
 // @access Private
 const setCompany = async(req: Request, res: Response) => {
-    var db = await connection.getDb();
+    const db = await connection.getDb();
 
-    const collection = db.collection( 'test' );
+    const collection = db.collection( 'company' );
     // console.log(req.body)
     try {
         const companyData = req.body as Pick<CompanyInfo, "companyName" | "companyEmail" | "companyPassword" | "companyPaperPrice" | "companyPlasticPrice" | "companyElectronicPrice" | "companyAddress" | "companyCity" | "companyState" | "companyPincode">

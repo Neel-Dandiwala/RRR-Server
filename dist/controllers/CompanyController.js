@@ -13,7 +13,7 @@ class CompanyResponse {
 }
 const getCompanies = async (req, res) => {
     const db = await connection_1.connection.getDb();
-    const collection = db.collection('test');
+    const collection = db.collection('company');
     try {
         let result;
         let logs;
@@ -64,8 +64,8 @@ const getCompanies = async (req, res) => {
     }
 };
 const setCompany = async (req, res) => {
-    var db = await connection_1.connection.getDb();
-    const collection = db.collection('test');
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('company');
     try {
         const companyData = req.body;
         console.log(companyData);

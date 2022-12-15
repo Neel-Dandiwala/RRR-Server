@@ -12,8 +12,8 @@ const mongodb_1 = require("mongodb");
 class AgentResponse {
 }
 const getAgents = async (req, res) => {
-    var db = await connection_1.connection.getDb();
-    const collection = db.collection('test');
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('agent');
     try {
         let result;
         let logs;
@@ -64,8 +64,8 @@ const getAgents = async (req, res) => {
     }
 };
 const setAgent = async (req, res) => {
-    var db = await connection_1.connection.getDb();
-    const collection = db.collection('test');
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('agent');
     try {
         const agentData = req.body;
         console.log(agentData);
