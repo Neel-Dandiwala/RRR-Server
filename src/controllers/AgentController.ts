@@ -97,6 +97,7 @@ const setAgent = async(req: Request, res: Response) => {
         credentials.password = agentData.agentPassword;
         let logs = validation(credentials);
         if(logs){
+            res.status(400).json({ logs });
             return { logs };
         }
 

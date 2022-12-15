@@ -12,7 +12,7 @@ const mongodb_1 = require("mongodb");
 class CompanyResponse {
 }
 const getCompanies = async (req, res) => {
-    var db = await connection_1.connection.getDb();
+    const db = await connection_1.connection.getDb();
     const collection = db.collection('test');
     try {
         let result;
@@ -75,6 +75,7 @@ const setCompany = async (req, res) => {
         credentials.password = companyData.companyPassword;
         let logs = (0, validation_1.validation)(credentials);
         if (logs) {
+            res.status(400).json({ logs });
             return { logs };
         }
         const hashedPassword = await argon2_1.default.hash(credentials.password);

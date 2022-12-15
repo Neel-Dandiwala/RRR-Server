@@ -75,6 +75,7 @@ const setAgent = async (req, res) => {
         credentials.password = agentData.agentPassword;
         let logs = (0, validation_1.validation)(credentials);
         if (logs) {
+            res.status(400).json({ logs });
             return { logs };
         }
         const hashedPassword = await argon2_1.default.hash(credentials.password);

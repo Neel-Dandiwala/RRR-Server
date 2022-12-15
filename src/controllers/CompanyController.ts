@@ -19,7 +19,7 @@ class CompanyResponse {
 // @route  GET /company/login
 // @access Private
 const getCompanies = async(req:Request, res: Response) => {
-    var db = await connection.getDb();
+    const db = await connection.getDb();
 
     const collection = db.collection( 'test' );
         
@@ -94,6 +94,7 @@ const setCompany = async(req: Request, res: Response) => {
         credentials.password = companyData.companyPassword;
         let logs = validation(credentials);
         if(logs){
+            res.status(400).json({ logs });
             return { logs };
         }
 
