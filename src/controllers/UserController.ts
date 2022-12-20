@@ -22,7 +22,7 @@ const getUsers = async(req:Request, res:Response) => {
         
     const db = await connection.getDb();
 
-    const collection = db.collection( 'test' );
+    const collection = db.collection( 'user' );
 
     try {
         let result;
@@ -85,7 +85,7 @@ const setUser = async(req: Request, res: Response) => {
     console.log(req)
     const db = await connection.getDb();
 
-    const collection = db.collection( 'test' );
+    const collection = db.collection( 'user' );
     
     try {
         const userData = req.body  as Pick<UserInfo, "userName" | "userEmail" | "userPassword" | "userAge" | "userAddress" | "userPincode" | "userMobile" | "userCity" | "userState">

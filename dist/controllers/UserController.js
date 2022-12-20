@@ -13,7 +13,7 @@ class UserResponse {
 }
 const getUsers = async (req, res) => {
     const db = await connection_1.connection.getDb();
-    const collection = db.collection('test');
+    const collection = db.collection('user');
     try {
         let result;
         let logs;
@@ -65,7 +65,7 @@ const getUsers = async (req, res) => {
 const setUser = async (req, res) => {
     console.log(req);
     const db = await connection_1.connection.getDb();
-    const collection = db.collection('test');
+    const collection = db.collection('user');
     try {
         const userData = req.body;
         console.log(userData);
