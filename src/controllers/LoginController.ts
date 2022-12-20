@@ -141,7 +141,7 @@ const loginEntity = async(req: Request, res: Response) => {
                     throw new Error(err)
                 }
             }
-            const valid = await argon2.verify(result.companyName, loginEntity.loginPassword);
+            const valid = await argon2.verify(result.companyPassword, loginEntity.loginPassword);
         if(valid){
             console.log(result);
             // req.session.authenticationID = loginEntity._id;

@@ -127,7 +127,7 @@ const loginEntity = async (req, res) => {
                     throw new Error(err);
                 }
             }
-            const valid = await argon2_1.default.verify(result.companyName, loginEntity.loginPassword);
+            const valid = await argon2_1.default.verify(result.companyPassword, loginEntity.loginPassword);
             if (valid) {
                 console.log(result);
                 logs = [
