@@ -35,7 +35,6 @@ const getUsers = async (req, res) => {
                 throw new Error(err);
             }
         }
-        result = JSON.stringify(result, null, 2);
         if (result) {
             console.log(result);
             logs = [

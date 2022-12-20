@@ -27,8 +27,9 @@ const main = async () => {
     const app = (0, express_1.default)();
     app.set("trust proxy", true);
     app.use((0, cors_1.default)({
-        origin: 'https://rrr-server.onrender.com',
+        origin: '*',
         credentials: true,
+        methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
     }));
     app.use((0, express_session_1.default)({
         name: 'rrrid',
@@ -37,10 +38,10 @@ const main = async () => {
             maxAge: 1000 * 60 * 60 * 24 * 7,
             httpOnly: true,
             sameSite: 'lax',
-            secure: false,
+            domain: "http://localhost:8080/",
         },
         store: sessionStore,
-        saveUninitialized: false,
+        saveUninitialized: true,
         resave: false,
     }));
     app.use(express_1.default.json());
@@ -48,6 +49,8 @@ const main = async () => {
     app.use(require('./routes/UserRoutes'));
     app.use(require('./routes/AgentRoutes'));
     app.use(require('./routes/CompanyRoutes'));
+    app.use(require('./routes/AdminRoutes'));
+    app.use(require('./routes/LoginRoutes'));
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");
     });

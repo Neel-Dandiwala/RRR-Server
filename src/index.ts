@@ -7,10 +7,10 @@ import { connection } from "./connection";
 import { ObjectID } from "typeorm";
 
 declare module 'express-session' {
-    export interface SessionData {
-      authenticationID: { [key: string]: ObjectID };
+    interface SessionData {
+            authenticationID: string
     }
-  }
+}
 
 const main = async () => {
     const PORT= process.env.PORT || 4000;
@@ -75,9 +75,9 @@ const main = async () => {
 
     app.use(
         cors({
-            origin: 'https://rrr-server.onrender.com',
+            origin: '*',
             credentials: true,
-            
+            methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
         })
     );
 
@@ -89,10 +89,11 @@ const main = async () => {
                 maxAge: 1000 * 60 * 60 * 24 * 7,
                 httpOnly: true,
                 sameSite: 'lax',
-                secure: false,
+                // secure: false,
+                domain: "http://localhost:8080/",
             },
             store: sessionStore,
-            saveUninitialized: false,
+            saveUninitialized: true,
             resave: false,
         }
     ));
@@ -102,6 +103,8 @@ const main = async () => {
     app.use(require('./routes/UserRoutes'));
     app.use(require('./routes/AgentRoutes'));
     app.use(require('./routes/CompanyRoutes'));
+    app.use(require('./routes/AdminRoutes'));
+    app.use(require('./routes/LoginRoutes'));
 
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");

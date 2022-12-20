@@ -45,7 +45,7 @@ const getCompanies = async(req:Request, res: Response) => {
                 throw new Error(err)
             }
         }
-        result = JSON.stringify(result, null, 2);
+        // result = JSON.stringify(result, null, 2);
         if(result){
             console.log(result);
             logs = [

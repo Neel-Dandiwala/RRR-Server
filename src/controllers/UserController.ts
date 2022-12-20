@@ -46,7 +46,7 @@ const getUsers = async(req:Request, res:Response) => {
                 throw new Error(err)
             }
         }
-        result = JSON.stringify(result, null, 2);
+        // result = JSON.stringify(result, null, 2);
         if(result){
             console.log(result);
             logs = [
@@ -164,6 +164,7 @@ const setUser = async(req: Request, res: Response) => {
         throw e;
     }
 }
+
 
 // @desc   Get User
 // @route  GET /user/login

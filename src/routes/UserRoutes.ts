@@ -7,8 +7,6 @@ router.get('/users', getUsers)
 
 router.post('/user/signup', setUser)
 
-router.put('/user/login', updateUser)
-
 router.delete('/user/login', deleteUser)
 
 module.exports = router;

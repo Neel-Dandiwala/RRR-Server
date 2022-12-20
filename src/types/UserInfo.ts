@@ -11,3 +11,4 @@ export interface UserInfo extends Document {
     userCity: string;
     userState: string;
 }
+

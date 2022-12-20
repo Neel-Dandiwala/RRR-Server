@@ -1,11 +1,23 @@
 import { Request, Response } from "express";
 import { Session } from "express-session";
-import { ObjectID } from "typeorm";
+import mongoose from "mongoose"
+import { Types } from "mongoose"
+
+class Authentication {
+    authenticationID: string = ''
+}
+
+// declare module 'express-session' {
+//     interface SessionData {
+//             authenticationID: string
+//     }
+// }
 
 export type serverContext = {
-    req: Request  & {
-        body?: any,
-        session?: Session & {authenticationID? : ObjectID }
+    req: Request & {
+        session?: Session & {
+            authenticationID? : string ;
+        }
     }
     res: Response 
 }
