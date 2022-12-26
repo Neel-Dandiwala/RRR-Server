@@ -89,7 +89,7 @@ const setAgent = async(req: Request, res: Response) => {
     const collection = db.collection( 'agent' );
     // console.log(req.body)
     try {
-        const agentData = req.body as Pick<AgentInfo, "agentName" | "agentEmail" | "agentPassword" | "agentAge" | "agentPincode" | "agentMobile" | "agentCity" | "agentState">
+        const agentData = req.body as Pick<AgentInfo, "agentName" | "agentEmail" | "agentPassword" | "agentAge" | "agentPincode" | "agentMobile" | "agentCity" | "agentState" | "agentAddress">
         console.log(agentData);
         let credentials = new CredentialsInput();
         credentials.email = agentData.agentEmail;
@@ -111,6 +111,7 @@ const setAgent = async(req: Request, res: Response) => {
             agentCity: agentData.agentCity,
             agentState: agentData.agentState,
             agentPincode: agentData.agentPincode,
+            agentAddress: agentData.agentAddress
             
         })
 

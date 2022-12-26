@@ -11,6 +11,8 @@ export class AgentInfo {
 
     agentMobile: string;
 
+    agentAddress: string;
+
     agentCity: string;
 
     agentState: string;

@@ -29,6 +29,11 @@ const AgentSchema: Schema = new Schema({
         required: true
     },
 
+    agentAddress:  {
+        type: String,
+        required: true
+    },
+
     agentCity:  {
         type: String,
         required: true
