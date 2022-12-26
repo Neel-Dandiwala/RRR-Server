@@ -13,6 +13,8 @@ export class CompanyInfo {
 
     companyElectronicPrice: number;
 
+    companyMobile: string;
+
     companyAddress: string;
 
     companyCity: string;

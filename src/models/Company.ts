@@ -36,6 +36,11 @@ const CompanySchema: Schema = new Schema({
         required: true
     },
 
+    companyMobile: {
+        type: String,
+        required: true
+    },
+
     companyAddress: {
         type: String,
         required: true

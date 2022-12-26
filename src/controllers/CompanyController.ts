@@ -86,7 +86,7 @@ const setCompany = async(req: Request, res: Response) => {
     const collection = db.collection( 'company' );
     // console.log(req.body)
     try {
-        const companyData = req.body as Pick<CompanyInfo, "companyName" | "companyEmail" | "companyPassword" | "companyPaperPrice" | "companyPlasticPrice" | "companyElectronicPrice" | "companyAddress" | "companyCity" | "companyState" | "companyPincode">
+        const companyData = req.body as Pick<CompanyInfo, "companyName" | "companyEmail" | "companyPassword" | "companyPaperPrice" | "companyPlasticPrice" | "companyElectronicPrice" | "companyMobile" | "companyAddress" | "companyCity" | "companyState" | "companyPincode">
         console.log(companyData);
         let credentials = new CredentialsInput();
         credentials.email = companyData.companyEmail;
@@ -110,7 +110,7 @@ const setCompany = async(req: Request, res: Response) => {
             companyCity: companyData.companyCity,
             companyState: companyData.companyState,
             companyPincode: companyData.companyPincode,
-            
+            companyMobile: companyData.companyMobile
         })
 
         let result;
