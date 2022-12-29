@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >0.5.0 <0.9.0;
+pragma solidity ^0.8.16;
+import "./ValidationInterface.sol";
 
 /**
  * @title Tracking
@@ -7,6 +8,9 @@ pragma solidity >0.5.0 <0.9.0;
  */
 
 contract Tracking {
+    address private constant VALIDATION_CONTRACT = 0x4Dc8A0f5773bc796Ff36cBfc003C4a5027D7fc16;
+    ValidationInterface private Validation = ValidationInterface(VALIDATION_CONTRACT);
+
     /**
      * @dev Define the structure for a waste submission
      */
@@ -29,10 +33,6 @@ contract Tracking {
      * @dev Mapping that define the storage of a product
      */
     mapping(string => Waste) private wasteStorage;
-
-    mapping(string => bool) private userValidation;
-    mapping(string => bool) private agentValidation;
-    mapping(string => bool) private companyValidation;
 
     mapping(string => mapping(string => uint256)) private userStorage;
     mapping(string => mapping(string => uint256)) private agentStorage;
@@ -84,7 +84,7 @@ contract Tracking {
             return;
         }
 
-        if (!userValidation[user]) {
+        if (!Validation.validateUser(user)) {
             emit CreationReject(msg.sender, id, "User does not exist");
             return;
         }
@@ -122,7 +122,7 @@ contract Tracking {
             return;
         }
 
-        if (!agentValidation[agent]) {
+        if (!Validation.validateAgent(agent)) {
             emit TransferReject(msg.sender, agent, id, "Agent does not exist");
             return;
         }
@@ -146,7 +146,7 @@ contract Tracking {
             return;
         }
 
-        if (!companyValidation[company]) {
+        if (!Validation.validateCompany(company)) {
             emit TransferReject(
                 msg.sender,
                 company,
@@ -197,7 +197,7 @@ contract Tracking {
         view
         returns (bool)
     {
-        if (userValidation[user] && userStorage[user][id] != 0) {
+        if (Validation.validateUser(user) && userStorage[user][id] != 0) {
             return true;
         }
 
@@ -212,7 +212,7 @@ contract Tracking {
         view
         returns (bool)
     {
-        if (agentValidation[agent] && agentStorage[agent][id] != 0) {
+        if (Validation.validateAgent(agent) && agentStorage[agent][id] != 0) {
             return true;
         }
 
@@ -227,7 +227,7 @@ contract Tracking {
         view
         returns (bool)
     {
-        if (companyValidation[company] && companyStorage[company][id] != 0) {
+        if (Validation.validateCompany(company) && companyStorage[company][id] != 0) {
             return true;
         }
 

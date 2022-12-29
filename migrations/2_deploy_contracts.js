@@ -1,8 +1,8 @@
-var Reward = artifacts.require("../contracts/Reward.sol");
-var Tracking = artifacts.require("../contracts/Tracking.sol");
+const Reward = artifacts.require("Reward");
+const Validation = artifacts.require("Validation");
+const Tracking = artifacts.require("Tracking");
 
 module.exports = function(deployer) {
-  // deployment steps
   deployer.deploy(Reward);
   deployer.deploy(Tracking);
 };

@@ -1,8 +1,91 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >0.4.25 <0.9.0;
-import "./SafeMath.sol";
+pragma solidity ^0.8.16;
+// import "./SafeMath.sol";
+import "./ValidationInterface.sol";
+
+library SafeMath {
+    
+    /**
+     * @dev Returns the addition of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `+` operator.
+     *
+     * Requirements:
+     *
+     * - Addition cannot overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a + b;
+    }
+
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     *
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a - b;
+    }
+
+    /**
+     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `*` operator.
+     *
+     * Requirements:
+     *
+     * - Multiplication cannot overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a * b;
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers, reverting on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator.
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a / b;
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * reverting when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a % b;
+    }
+
+    
+}
 
 contract Reward {
+
+    address private constant VALIDATION_CONTRACT = 0x4Dc8A0f5773bc796Ff36cBfc003C4a5027D7fc16;
+    ValidationInterface private Validation = ValidationInterface(VALIDATION_CONTRACT);
+
+
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
      * another (`to`).
@@ -43,8 +126,7 @@ contract Reward {
     }
 
     mapping(string => uint256) private _balances;
-    mapping(string => mapping(string => mapping(uint256 => TransactionData)))
-        private _transactionsData;
+    mapping(string => mapping(string => mapping(uint256 => TransactionData))) private _transactionsData;
     mapping(uint256 => Transaction) private _transactions;
     mapping(uint256 => Token) private _tokens;
 
@@ -81,7 +163,7 @@ contract Reward {
     /**
      * @dev Returns the name of the token.
      */
-    function name(uint256 index_) public view virtual onlyOwner returns (string memory) {
+    function name(uint256 index_) public view onlyOwner returns (string memory) {
         return _tokens[index_].name;
     }
 
@@ -92,7 +174,6 @@ contract Reward {
     function symbol(uint256 index_)
         public
         view
-        virtual
         onlyOwner
         returns (string memory)
     {
@@ -105,7 +186,6 @@ contract Reward {
     function balanceOf(string memory account)
         public
         view
-        virtual
         onlyOwner
         returns (uint256)
     {
@@ -122,10 +202,10 @@ contract Reward {
      */
     function transfer(string memory to, uint256 amount)
         public
-        virtual
         onlyOwner
         returns (bool)
     {
+        require(Validation.validateUser(to) || Validation.validateAgent(to));
         uint256 tempBalance;
         tempBalance = _balances[to];
         _balances[to] = tempBalance.add(amount);
@@ -181,7 +261,8 @@ contract Reward {
         string memory from,
         string memory to,
         uint256 amount
-    ) public virtual onlyOwner amountThreshold(from, amount) returns (bool) {
+    ) public onlyOwner amountThreshold(from, amount) returns (bool) {
+        require(Validation.validateUser(to) && Validation.validateAgent(from));
         uint256 userBalance;
         uint256 agentBalance;
         userBalance = _balances[to];
@@ -235,14 +316,14 @@ contract Reward {
      *
      * - `account` cannot be the zero address.
      */
-    function _mint(string memory account, uint256 amount) internal virtual onlyOwner {
+    function _mint(string memory account, uint256 amount) internal onlyOwner {
         _beforeTokenTransfer(_self, account, amount);
-
+        require(Validation.validateAgent(account));
         _totalSupply += amount;
-        unchecked {
+        // unchecked {
             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
             _balances[account] = (_balances[account]).add(amount);
-        }
+        // }
         emit Transfer(account, amount, "Minting");
 
         _afterTokenTransfer(_self, account, amount);
@@ -259,16 +340,16 @@ contract Reward {
      * - `account` cannot be the non-existing entity.
      * - `account` must have at least `amount` tokens.
      */
-    function _burn(string memory account, uint256 amount) internal virtual onlyOwner {
+    function _burn(string memory account, uint256 amount) internal onlyOwner {
         _beforeTokenTransfer(account, _self, amount);
-
+        require(Validation.validateUser(account));
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
-        unchecked {
+        // unchecked {
             _balances[account] = accountBalance.sub(amount);
             // Overflow not possible: amount <= accountBalance <= totalSupply.
             _totalSupply = _totalSupply.sub(amount);
-        }
+        // }
 
         emit Transfer(account, amount, "Burning");
 
@@ -292,7 +373,7 @@ contract Reward {
         string memory from,
         string memory to,
         uint256 amount
-    ) internal virtual onlyOwner {}
+    ) internal onlyOwner {}
 
     /**
      * @dev Hook that is called after any transfer of tokens. This includes
@@ -311,5 +392,5 @@ contract Reward {
         string memory from,
         string memory to,
         uint256 amount
-    ) internal virtual onlyOwner {}
+    ) internal onlyOwner {}
 }
