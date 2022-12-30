@@ -89,6 +89,7 @@ const setCompany = async (req, res) => {
             companyCity: companyData.companyCity,
             companyState: companyData.companyState,
             companyPincode: companyData.companyPincode,
+            companyMobile: companyData.companyMobile
         });
         let result;
         try {

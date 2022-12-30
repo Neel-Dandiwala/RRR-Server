@@ -4,7 +4,8 @@ import session from "express-session";
 import { default as connectMongoDBSession } from 'connect-mongodb-session';
 import cors from "cors";
 import { connection } from "./connection";
-import { ObjectID } from "typeorm";
+import { web3 } from "./web3";
+require('dotenv').config()
 
 declare module 'express-session' {
     interface SessionData {
@@ -21,6 +22,22 @@ const main = async () => {
         if (err) console.log(err);
         console.log("Database Connected")
     } );
+
+    try {
+    
+        // Creating an instance of the Provider
+        if(web3) {
+            console.log("Connection Successful");
+        }
+        
+        console.log("Latest Block Number: ");
+    
+        // Querying the Blockchain using the Provider and Web3.js
+        console.log(await web3.eth.getBlockNumber());
+    } 
+    catch (error) {
+        console.log("Connection Error! ", error);
+    }
 
     // const mongodb = require('mongodb');
     // const MongoClient = mongodb.MongoClient;

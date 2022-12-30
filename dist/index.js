@@ -9,6 +9,8 @@ const express_session_1 = __importDefault(require("express-session"));
 const connect_mongodb_session_1 = __importDefault(require("connect-mongodb-session"));
 const cors_1 = __importDefault(require("cors"));
 const connection_1 = require("./connection");
+const web3_1 = require("./web3");
+require('dotenv').config();
 const main = async () => {
     const PORT = process.env.PORT || 4000;
     await connection_1.connection.connectToServer(function (err, client) {
@@ -16,6 +18,16 @@ const main = async () => {
             console.log(err);
         console.log("Database Connected");
     });
+    try {
+        if (web3_1.web3) {
+            console.log("Connection Successful");
+        }
+        console.log("Latest Block Number: ");
+        console.log(await web3_1.web3.eth.getBlockNumber());
+    }
+    catch (error) {
+        console.log("Connection Error! ", error);
+    }
     const MongoDBStore = (0, connect_mongodb_session_1.default)(express_session_1.default);
     const sessionStore = new MongoDBStore({
         uri: 'mongodb+srv://mongodb:mongodb@rrrcluster.nluljzi.mongodb.net/rrrdatabase?retryWrites=true&w=majority',

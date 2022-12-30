@@ -9,6 +9,8 @@ const argon2_1 = __importDefault(require("argon2"));
 const connection_1 = require("../connection");
 const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
+const web3_1 = require("../web3");
+require('dotenv').config();
 class UserResponse {
 }
 const getUsers = async (req, res) => {
@@ -112,9 +114,24 @@ const setUser = async (req, res) => {
         console.log(result);
         if (result.acknowledged) {
             console.log(result);
+            let validationContract = new web3_1.web3.eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+            validationContract.methods.addUser(result.insertedId.toString()).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+                .then(function (blockchain_result) {
+                console.log(blockchain_result);
+            }).catch((err) => {
+                console.log(err);
+                logs = [
+                    {
+                        field: "Blockchain Error",
+                        message: err,
+                    }
+                ];
+                res.status(400).json({ logs });
+                return { logs };
+            });
             logs = [
                 {
-                    field: "Successful Retrieval",
+                    field: "Successful Insertion",
                     message: "Done",
                 }
             ];
@@ -137,6 +154,28 @@ const setUser = async (req, res) => {
         throw e;
     }
 };
+const validationUser = async (req, res) => {
+    const userKey = req.body.userKey;
+    console.log(req.body);
+    let logs;
+    var validationContract = new web3_1.web3.eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(userKey).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        res.status(200).json({ blockchain_result });
+        return { blockchain_result };
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return { logs };
+    });
+};
 const updateUser = async (res) => {
     res.status(200).json({ message: 'User Update' });
 };
@@ -144,6 +183,6 @@ const deleteUser = async (res) => {
     res.status(200).json({ message: 'User Delete' });
 };
 module.exports = {
-    getUsers, setUser, updateUser, deleteUser
+    getUsers, setUser, updateUser, deleteUser, validationUser
 };
 //# sourceMappingURL=UserController.js.map

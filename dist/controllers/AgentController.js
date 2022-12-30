@@ -87,6 +87,7 @@ const setAgent = async (req, res) => {
             agentCity: agentData.agentCity,
             agentState: agentData.agentState,
             agentPincode: agentData.agentPincode,
+            agentAddress: agentData.agentAddress
         });
         let result;
         try {

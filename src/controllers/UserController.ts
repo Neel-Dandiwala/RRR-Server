@@ -7,6 +7,8 @@ import argon2 from "argon2";
 import {connection} from "../connection";
 import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
+import { web3, ValidationABI } from "../web3"
+require('dotenv').config()
 
 class UserResponse {
     logs?: ResponseFormat[];
@@ -49,6 +51,7 @@ const getUsers = async(req:Request, res:Response) => {
         // result = JSON.stringify(result, null, 2);
         if(result){
             console.log(result);
+            
             logs = [
                 {
                     field: "Successful Insertion",
@@ -137,9 +140,25 @@ const setUser = async(req: Request, res: Response) => {
         console.log(result);
         if(result.acknowledged){
             console.log(result);
+            let validationContract = new web3.eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+            validationContract.methods.addUser(result.insertedId.toString()).send({from: process.env.OWNER_ADDRESS, gasPrice: '3000000'})
+            .then(function(blockchain_result: any){
+                console.log(blockchain_result)
+            }).catch((err: any) => {
+                console.log(err)
+                logs = [
+                    {
+                        field: "Blockchain Error",
+                        message: err,
+                    }
+                ]
+    
+                res.status(400).json({ logs });
+                return {logs};
+            });
             logs = [
                 {
-                    field: "Successful Retrieval",
+                    field: "Successful Insertion",
                     message: "Done",
                 }
             ]
@@ -165,6 +184,32 @@ const setUser = async(req: Request, res: Response) => {
     }
 }
 
+// @desc  Validate user using Blockchain
+// @route GET /validation/user
+// @access Private
+const validationUser = async(req: Request, res: Response) => {
+    const userKey = req.body.userKey;
+    console.log(req.body);
+    let logs;
+    var validationContract = new web3.eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+            await validationContract.methods.validateUser(userKey).send({from: process.env.OWNER_ADDRESS, gasPrice: '3000000'})
+            .then(function(blockchain_result: any){
+                console.log(blockchain_result)
+                res.status(200).json({ blockchain_result });
+                return {blockchain_result};
+            }).catch((err: any) => {
+                console.log(err)
+                logs = [
+                    {
+                        field: "Blockchain Error",
+                        message: err,
+                    }
+                ]
+    
+                res.status(400).json({ logs });
+                return {logs};
+            });
+}
 
 // @desc   Get User
 // @route  GET /user/login
@@ -181,5 +226,5 @@ const deleteUser = async(res:Response) => {
 }
 
 module.exports = {
-    getUsers, setUser, updateUser, deleteUser
+    getUsers, setUser, updateUser, deleteUser, validationUser
 }

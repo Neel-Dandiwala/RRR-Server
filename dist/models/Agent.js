@@ -22,6 +22,10 @@ const AgentSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    agentAddress: {
+        type: String,
+        required: true
+    },
     agentCity: {
         type: String,
         required: true

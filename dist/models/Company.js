@@ -26,6 +26,10 @@ const CompanySchema = new mongoose_1.Schema({
         type: Number,
         required: true
     },
+    companyMobile: {
+        type: String,
+        required: true
+    },
     companyAddress: {
         type: String,
         required: true
