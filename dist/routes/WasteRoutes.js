@@ -4,10 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const { loginEntity, me, logoutEntity } = require('../controllers/LoginController');
+const { wasteUser, wasteAgent, wasteCompany, wasteBlockchain } = require('../controllers/WasteController');
 const router = express_1.default.Router();
-router.post('/login', loginEntity);
-router.get('/me', me);
-router.get('/logout', logoutEntity);
+router.post('/waste/user', wasteUser);
+router.post('/waste/agent', wasteAgent);
+router.post('/waste/company', wasteCompany);
+router.post('/waste', wasteBlockchain);
 module.exports = router;
-//# sourceMappingURL=LoginRoutes.js.map
+//# sourceMappingURL=WasteRoutes.js.map

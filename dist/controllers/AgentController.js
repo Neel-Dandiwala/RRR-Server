@@ -9,6 +9,8 @@ const argon2_1 = __importDefault(require("argon2"));
 const connection_1 = require("../connection");
 const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
+const web3_1 = require("../web3");
+require('dotenv').config();
 class AgentResponse {
 }
 const getAgents = async (req, res) => {
@@ -111,6 +113,21 @@ const setAgent = async (req, res) => {
         console.log(result);
         if (result.acknowledged) {
             console.log(result);
+            let validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+            validationContract.methods.addAgent(result.insertedId.toString()).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+                .then(function (blockchain_result) {
+                console.log(blockchain_result);
+            }).catch((err) => {
+                console.log(err);
+                logs = [
+                    {
+                        field: "Blockchain Error",
+                        message: err,
+                    }
+                ];
+                res.status(400).json({ logs });
+                return { logs };
+            });
             logs = [
                 {
                     field: "Successful Insertion",
@@ -136,6 +153,28 @@ const setAgent = async (req, res) => {
         throw e;
     }
 };
+const validationAgent = async (req, res) => {
+    const key = req.body.key;
+    console.log(req.body);
+    let logs;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(key).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        res.status(200).json({ blockchain_result });
+        return { blockchain_result };
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return { logs };
+    });
+};
 const updateAgent = async (res) => {
     res.status(200).json({ message: 'agent Update' });
 };
@@ -143,6 +182,6 @@ const deleteAgent = async (res) => {
     res.status(200).json({ message: 'agent Delete' });
 };
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent
 };
 //# sourceMappingURL=AgentController.js.map

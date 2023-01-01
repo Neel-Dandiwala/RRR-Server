@@ -18,26 +18,25 @@ const main = async () => {
 
     // appDataSource.initialize();
     // let connection = require( 'connection' );
-    await connection.connectToServer( function( err:any, client:any ) {
+    await connection.connectToServer(async function( err:any, client:any ) {
         if (err) console.log(err);
-        console.log("Database Connected")
-    } );
-
-    try {
-    
-        // Creating an instance of the Provider
-        if(web3) {
-            console.log("Connection Successful");
+        console.log("Database Connected");
+        try {
+            let bc_conn = await web3.connectToServer( function() {
+                console.log("Connection Successful");
+            })
+            console.log(bc_conn)
+        } 
+        catch (error) {
+            console.log("Connection Error! ", error);
         }
-        
-        console.log("Latest Block Number: ");
-    
         // Querying the Blockchain using the Provider and Web3.js
-        console.log(await web3.eth.getBlockNumber());
-    } 
-    catch (error) {
-        console.log("Connection Error! ", error);
-    }
+        console.log("Latest Block Number: ");
+        console.log(await web3.getWeb3().eth.getBlockNumber());
+    });
+
+    
+
 
     // const mongodb = require('mongodb');
     // const MongoClient = mongodb.MongoClient;
@@ -80,7 +79,7 @@ const main = async () => {
     const MongoDBStore = connectMongoDBSession(session);
     const sessionStore = new MongoDBStore({
         uri: 'mongodb+srv://mongodb:mongodb@rrrcluster.nluljzi.mongodb.net/rrrdatabase?retryWrites=true&w=majority',
-        collection: 'sessions'
+        collection: 'session'
     });
 
     sessionStore.on('error', function(error){
@@ -107,10 +106,11 @@ const main = async () => {
                 httpOnly: true,
                 sameSite: 'lax',
                 // secure: false,
-                domain: "http://localhost:8080/",
+                // domain: "http://localhost:8080/",
             },
             store: sessionStore,
-            saveUninitialized: true,
+            unset: 'destroy',
+            saveUninitialized: false,
             resave: false,
         }
     ));
@@ -122,6 +122,7 @@ const main = async () => {
     app.use(require('./routes/CompanyRoutes'));
     app.use(require('./routes/AdminRoutes'));
     app.use(require('./routes/LoginRoutes'));
+    app.use(require('./routes/WasteRoutes'));
 
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");

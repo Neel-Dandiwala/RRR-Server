@@ -114,7 +114,7 @@ const setUser = async (req, res) => {
         console.log(result);
         if (result.acknowledged) {
             console.log(result);
-            let validationContract = new web3_1.web3.eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+            let validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
             validationContract.methods.addUser(result.insertedId.toString()).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
                 .then(function (blockchain_result) {
                 console.log(blockchain_result);
@@ -155,11 +155,11 @@ const setUser = async (req, res) => {
     }
 };
 const validationUser = async (req, res) => {
-    const userKey = req.body.userKey;
+    const key = req.body.key;
     console.log(req.body);
     let logs;
-    var validationContract = new web3_1.web3.eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
-    await validationContract.methods.validateUser(userKey).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(key).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
         .then(function (blockchain_result) {
         console.log(blockchain_result);
         res.status(200).json({ blockchain_result });

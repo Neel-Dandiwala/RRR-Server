@@ -1,9 +1,11 @@
-import { ArgsType, Field, InputType } from "type-graphql";
-
-@ArgsType()
-@InputType()
 export class WasteInfo {
-    @Field()
-    wasteContent: string;
-    
+    wasteDescription: string;
+    wasteWeight: number;
+    wasteUser: string;
+    wasteUserDate: string;
+    wasteAgent: string;
+    wasteAgentDate: string;
+    wasteCompany: string;
+    wasteCompanyDate: string;
 }
+

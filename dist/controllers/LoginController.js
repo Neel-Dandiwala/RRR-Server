@@ -40,6 +40,7 @@ const loginEntity = async (req, res) => {
             const valid = await argon2_1.default.verify(result.userPassword, loginEntity.loginPassword);
             if (valid) {
                 console.log(result);
+                req.session.authenticationID = (result._id).toString();
                 logs = [
                     {
                         field: "Successful Log In",
@@ -85,6 +86,7 @@ const loginEntity = async (req, res) => {
             const valid = await argon2_1.default.verify(result.agentPassword, loginEntity.loginPassword);
             if (valid) {
                 console.log(result);
+                req.session.authenticationID = (result._id).toString();
                 logs = [
                     {
                         field: "Successful Log In",
@@ -130,6 +132,7 @@ const loginEntity = async (req, res) => {
             const valid = await argon2_1.default.verify(result.companyPassword, loginEntity.loginPassword);
             if (valid) {
                 console.log(result);
+                req.session.authenticationID = (result._id).toString();
                 logs = [
                     {
                         field: "Successful Log In",
@@ -156,7 +159,66 @@ const loginEntity = async (req, res) => {
         throw e;
     }
 };
+const me = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    logs = [
+        {
+            field: "Logged in",
+            message: req.session.authenticationID,
+        }
+    ];
+    res.status(200).json({ logs });
+    return req.session.authenticationID;
+};
+const logoutEntity = async (req, res) => {
+    let logs;
+    try {
+        req.session.destroy((err) => {
+            res.clearCookie('rrrid');
+            if (err) {
+                console.log(err);
+                logs = [
+                    {
+                        field: "Error in Clearing Cookie",
+                        message: "Please contact the administrator",
+                    }
+                ];
+                res.status(400).json({ logs });
+                return;
+            }
+            logs = [
+                {
+                    field: "Successful Logout",
+                    message: "Logged out",
+                }
+            ];
+            res.status(200).json({ logs });
+            return;
+        });
+    }
+    catch (e) {
+        console.log(e);
+        logs = [
+            {
+                field: "Error in Clearing Cookie",
+                message: "Please contact the administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        throw e;
+    }
+};
 module.exports = {
-    loginEntity
+    loginEntity, me, logoutEntity
 };
 //# sourceMappingURL=LoginController.js.map

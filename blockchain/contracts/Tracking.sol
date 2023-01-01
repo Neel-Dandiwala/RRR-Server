@@ -17,6 +17,7 @@ contract Tracking {
     struct Waste {
         string id;
         string description;
+        string weight;
         string user;
         string agent;
         string company;
@@ -24,13 +25,8 @@ contract Tracking {
         bool exist;
     }
 
-    //   struct EntityWasteData {
-    //     string id;
-    //     uint256 transferDate;
-    //   }
-
     /**
-     * @dev Mapping that define the storage of a product
+     * @dev Mapping that define the storage of waste
      */
     mapping(string => Waste) private wasteStorage;
 
@@ -38,33 +34,36 @@ contract Tracking {
     mapping(string => mapping(string => uint256)) private agentStorage;
     mapping(string => mapping(string => uint256)) private companyStorage;
 
-    /**
-     * @dev Declare events according the supply chain operations:
-     */
     event CreateWaste(
-        address addressProducer,
         string id,
         string entity,
         uint256 CreationDate,
         string AcceptMessage
     );
     event TransferWaste(
-        address addressProducer,
         string entity,
         string id,
         string AcceptMessage
     );
-    //event setPrice(string id, uint32 salePrice);
+    
     event TransferReject(
-        address addressProducer,
         string entity,
         string id,
         string RejectMessage
     );
     event CreationReject(
-        address addressProducer,
         string id,
         string RejectMessage
+    );
+
+    event WasteData(
+        string description,
+        string weight,
+        string user,
+        string agent,
+        string company,
+        uint256 submitDate,
+        bool exist
     );
 
     /**
@@ -73,25 +72,26 @@ contract Tracking {
     function creationWaste(
         string memory id,
         string memory description,
+        string memory weight,
         string memory user
     ) public {
         if (wasteStorage[id].exist) {
             emit CreationReject(
-                msg.sender,
                 id,
                 "Waste for this id already exist"
             );
-            return;
+            revert('Waste Duplicate found');
         }
 
         if (!Validation.validateUser(user)) {
-            emit CreationReject(msg.sender, id, "User does not exist");
-            return;
+            emit CreationReject( id, "User does not exist");
+            revert('User Not found');
         }
 
         wasteStorage[id] = Waste(
             id,
             description,
+            weight,
             user,
             "-",
             "-",
@@ -100,7 +100,6 @@ contract Tracking {
         );
         userStorage[user][id] = block.timestamp;
         emit CreateWaste(
-            msg.sender,
             id,
             user,
             block.timestamp,
@@ -114,22 +113,21 @@ contract Tracking {
     function agentOwnWaste(string memory agent, string memory id) public {
         if (!wasteStorage[id].exist) {
             emit TransferReject(
-                msg.sender,
                 agent,
                 id,
                 "Waste does not exist with this id"
             );
-            return;
+            revert('Waste Not found');
         }
 
         if (!Validation.validateAgent(agent)) {
-            emit TransferReject(msg.sender, agent, id, "Agent does not exist");
-            return;
+            emit TransferReject(agent, id, "Agent does not exist");
+            revert('Agent Not found');
         }
 
         wasteStorage[id].agent = agent;
         agentStorage[agent][id] = block.timestamp;
-        emit TransferWaste(msg.sender, agent, id, "Waste transported to Agent");
+        emit TransferWaste(agent, id, "Waste transported to Agent");
     }
 
     /**
@@ -138,28 +136,25 @@ contract Tracking {
     function companyOwnWaste(string memory company, string memory id) public {
         if (!wasteStorage[id].exist) {
             emit TransferReject(
-                msg.sender,
                 company,
                 id,
                 "Waste does not exist with this id"
             );
-            return;
+            revert('Waste Not found');
         }
 
         if (!Validation.validateCompany(company)) {
             emit TransferReject(
-                msg.sender,
                 company,
                 id,
                 "Company does not exist"
             );
-            return;
+            revert('Company Not found');
         }
 
         wasteStorage[id].company = company;
         companyStorage[company][id] = block.timestamp;
         emit TransferWaste(
-            msg.sender,
             company,
             id,
             "Waste transported to Company"
@@ -169,23 +164,35 @@ contract Tracking {
     /**
      * @dev Getter of the characteristic of waste:
      */
-    function getProduct(string memory id)
+    function getWaste(string memory id)
         public
-        view
         returns (
             string memory,
             string memory,
             string memory,
             string memory,
-            uint256
+            string memory,
+            uint256,
+            bool
         )
     {
-        return (
+        emit WasteData(
             wasteStorage[id].description,
+            wasteStorage[id].weight,
             wasteStorage[id].user,
             wasteStorage[id].agent,
             wasteStorage[id].company,
-            wasteStorage[id].submitDate
+            wasteStorage[id].submitDate,
+            wasteStorage[id].exist
+            );
+        return (
+            wasteStorage[id].description,
+            wasteStorage[id].weight,
+            wasteStorage[id].user,
+            wasteStorage[id].agent,
+            wasteStorage[id].company,
+            wasteStorage[id].submitDate,
+            wasteStorage[id].exist
         );
     }
 

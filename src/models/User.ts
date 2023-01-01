@@ -1,4 +1,3 @@
-// import { Waste } from "./Waste";
 import { UserInfo } from "../types/UserInfo";
 import { model, Schema } from "mongoose";
 

@@ -1,30 +1,48 @@
-// import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, ObjectIdColumn, ObjectID } from "typeorm";
-// import { User } from "./User";
-// import { Agent } from "./Agent";
-// import { Field, ID, ObjectType } from "type-graphql";
+import { WasteInfo } from "../types/WasteInfo";
+import { model, Schema } from "mongoose";
 
-// @ObjectType()
-// @Entity()
-// export class Waste {
 
-//     @Field(() => ID)
-//     @ObjectIdColumn()
-//     _id: ObjectID;
+const WasteSchema: Schema = new Schema({
+    wasteDescription: {
+        type: String,
+        required: true
+    },
 
-//     @Field()
-//     @Column()
-//     wasteContent!: string;
+    wasteWeight: {
+        type: Number,
+        required: true
+    },
 
-//     @Field(() => User)
-//     @ManyToOne(() => User, (user) => user.userWaste)
-//     wasteUser: User;
+    wasteUser:  {
+        type: String,
+        required: true
+    },
 
-//     @Field(() => Agent)
-//     @ManyToOne(() => Agent, (agent) => agent.agentWaste)
-//     wasteAgent: Agent;
+    wasteUserDate: {
+        type: String,
+        required: true
+    },
 
-//     @Field()
-//     @CreateDateColumn()
-//     wasteSubmittedAt: Date;
+    wasteAgent:  {
+        type: String,
+        required: true
+    },
 
-// }
+    wasteAgentDate: {
+        type: String,
+        required: true
+    },
+
+    wasteCompany:  {
+        type: Number,
+        required: true
+    },
+
+    wasteCompanyDate: {
+        type: String,
+        required: true
+    },
+
+}, {timestamps: true})
+
+export default model<WasteInfo>("Waste", WasteSchema);

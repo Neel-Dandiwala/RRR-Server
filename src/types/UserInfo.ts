@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 
-export interface UserInfo extends Document {
+export class UserInfo {
     userName: string;
     userEmail: string;
     userPassword: string;

@@ -7,13 +7,13 @@ import argon2 from "argon2";
 import { connection } from "../connection";
 import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
+import { web3, ValidationABI } from "../web3"
+require('dotenv').config()
 
 class AgentResponse {
     logs?: ResponseFormat[];
     agent?: AgentInfo;
 }
-
-
 // const collection = connection.db('rrrdatabase').collection('agent');
 
 // @desc   Get agent
@@ -138,6 +138,22 @@ const setAgent = async(req: Request, res: Response) => {
         console.log(result);
         if(result.acknowledged){
             console.log(result);
+            let validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+            validationContract.methods.addAgent(result.insertedId.toString()).send({from: process.env.OWNER_ADDRESS, gasPrice: '3000000'})
+            .then(function(blockchain_result: any){
+                console.log(blockchain_result)
+            }).catch((err: any) => {
+                console.log(err)
+                logs = [
+                    {
+                        field: "Blockchain Error",
+                        message: err,
+                    }
+                ]
+    
+                res.status(400).json({ logs });
+                return {logs};
+            });
             logs = [
                 {
                     field: "Successful Insertion",
@@ -166,6 +182,33 @@ const setAgent = async(req: Request, res: Response) => {
     }
 }
 
+// @desc  Validate Agent using Blockchain
+// @route GET /validation/agent
+// @access Private
+const validationAgent = async(req: Request, res: Response) => {
+    const key = req.body.key;
+    console.log(req.body);
+    let logs;
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+            await validationContract.methods.validateAgent(key).send({from: process.env.OWNER_ADDRESS, gasPrice: '3000000'})
+            .then(function(blockchain_result: any){
+                console.log(blockchain_result)
+                res.status(200).json({ blockchain_result });
+                return {blockchain_result};
+            }).catch((err: any) => {
+                console.log(err)
+                logs = [
+                    {
+                        field: "Blockchain Error",
+                        message: err,
+                    }
+                ]
+    
+                res.status(400).json({ logs });
+                return {logs};
+            });
+}
+
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
@@ -181,5 +224,5 @@ const deleteAgent = async(res: Response) => {
 }
 
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent
 }

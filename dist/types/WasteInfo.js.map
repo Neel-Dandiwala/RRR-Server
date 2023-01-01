@@ -1,1 +1,1 @@
-{"version":3,"file":"WasteInfo.js","sourceRoot":"","sources":["../../src/types/WasteInfo.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,+CAA0D;AAInD,IAAM,SAAS,GAAf,MAAM,SAAS;CAIrB,CAAA;AAHG;IAAC,IAAA,oBAAK,GAAE;;+CACa;AAFZ,SAAS;IAFrB,IAAA,uBAAQ,GAAE;IACV,IAAA,wBAAS,GAAE;GACC,SAAS,CAIrB;AAJY,8BAAS"}
+{"version":3,"file":"WasteInfo.js","sourceRoot":"","sources":["../../src/types/WasteInfo.ts"],"names":[],"mappings":";;;AAAA,MAAa,SAAS;CASrB;AATD,8BASC"}
