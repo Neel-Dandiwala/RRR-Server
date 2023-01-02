@@ -98,26 +98,25 @@ contract Reward {
     event TransactionEvent(
         string from,
         string to,
+        uint256[] tokens,
         uint256 amount,
         uint256 timestamp,
         bool successful,
         string eventMessage
     );
     event TransactionDataEvent(
+        uint256[] tokens,
         uint256 amount,
         uint256 timestamp,
         bool successful,
         string eventMessage
     );
     event TokenEvent( 
-        uint256 id,
-        uint256 userTokenId,
         string name,
         string symbol,
         uint256 expires,
-        bool consumed,
         string eventMessage
-    );
+        );
 
     address private owner;
     using SafeMath for uint256;
@@ -125,20 +124,17 @@ contract Reward {
     uint256 private _selfCount;
     uint256 private _transactionsCount;
     uint256 private _totalSupply;
-    uint256 private _tokenTotalSupply;
 
     string private _self = "rrr-vrikrisannee";
 
     struct Token {
-        uint256 id;
-        uint256 userTokenId;
         string name;
         string symbol;
         uint256 expires;
-        bool consumed;
     }
 
     struct TransactionData {
+        uint256[] tokens;
         uint256 amount;
         uint256 timestamp;
         bool successful;
@@ -147,6 +143,7 @@ contract Reward {
     struct Transaction {
         string from;
         string to;
+        uint256[] tokens;
         uint256 amount;
         uint256 timestamp;
         bool successful;
@@ -155,8 +152,6 @@ contract Reward {
     mapping(string => uint256) private _balances;
     mapping(string => mapping(string => mapping(uint256 => TransactionData))) private _transactionsData;
     mapping(uint256 => Transaction) private _transactions;
-    mapping(string => uint256) private _userTokensCount;
-    mapping(string => mapping(uint256 => uint256)) private _userTokens;
     mapping(uint256 => Token) private _tokens;
 
     mapping(string => uint256) private _agentCount;
@@ -171,7 +166,6 @@ contract Reward {
         _tokenCount = 0;
         _selfCount = 0;
         _transactionsCount = 0;
-        _tokenTotalSupply = 0;
         owner = msg.sender;
     }
 
@@ -194,7 +188,7 @@ contract Reward {
     /**
      * @dev Function that sets the new owner:
      */
-    function setOwner(address newOwner) external onlyOwner {
+    function setOwner(address newOwner) onlyOwner external {
         owner = newOwner;
     }
 
@@ -267,79 +261,6 @@ contract Reward {
     }
 
     /**
-     * @dev Get Token Count
-     */
-    function countToken()
-        public
-        onlyOwner
-        returns (uint256)
-    {
-        emit Counter(_tokenCount, "countToken");
-        return _tokenCount;
-    }
-
-    /**
-     * @dev Get Self Count
-     */
-    function countSelf()
-        public
-        onlyOwner
-        returns (uint256)
-    {
-        emit Counter(_selfCount, "countSelf");
-        return _selfCount;
-    }
-
-    /**
-     * @dev Get Transaction Count
-     */
-    function countTransactions()
-        public
-        onlyOwner
-        returns (uint256)
-    {
-        emit Counter(_transactionsCount, "countTransactions");
-        return _transactionsCount;
-    }
-
-    /**
-     * @dev Get Total Supply
-     */
-    function countTotalSupply()
-        public
-        onlyOwner
-        returns (uint256)
-    {
-        emit Counter(_totalSupply, "countTotalSupply");
-        return _totalSupply;
-    }
-
-    /**
-     * @dev Get User Tokens Count
-     */
-    function countUserTokens(string memory user)
-        public
-        onlyOwner
-        returns (uint256)
-    {
-        emit Counter(_userTokensCount[user], "countUserTokens");
-        return _userTokensCount[user];
-    }
-
-    /**
-     * @dev Get User Token Id
-     */
-    function getUserToken(string memory user, uint256 userTokenCount)
-        public
-        onlyOwner
-        returns (uint256)
-    {
-        emit Counter(_userTokens[user][userTokenCount], "getUserToken");
-        return _userTokens[user][userTokenCount];
-    }
-
-
-    /**
      * @dev Get Token Data
      */
     function getToken(uint256 tokenId)
@@ -347,45 +268,7 @@ contract Reward {
         onlyOwner
     {
         require(_tokens[tokenId].expires != 0);
-        emit TokenEvent(_tokens[tokenId].id, _tokens[tokenId].userTokenId, _tokens[tokenId].name, _tokens[tokenId].symbol, _tokens[tokenId].expires, _tokens[tokenId].consumed, "getToken");
-    }
-
-    /**
-     * @dev Get Transactions Data 
-     */
-    function getTransactionData(string memory agent, string memory user, uint256 agentUserCount)
-        public
-        onlyOwner
-    {
-        require(_transactionsData[agent][user][agentUserCount].timestamp != 0);
-        emit TransactionDataEvent(_transactionsData[agent][user][agentUserCount].amount, _transactionsData[agent][user][agentUserCount].timestamp, _transactionsData[agent][user][agentUserCount].successful, "getTransactionData");
-    }
-
-    /**
-     * @dev Get Transaction 
-     */
-    function getTransaction(uint256 transactionId)
-        public
-        onlyOwner
-    {
-        require(_transactions[transactionId].timestamp != 0);
-        emit TransactionEvent(_transactions[transactionId].from,
-        _transactions[transactionId].to,
-        _transactions[transactionId].amount,
-        _transactions[transactionId].timestamp,
-        _transactions[transactionId].successful, "getTransaction");
-    }
-
-    /**
-     * @dev Get User Token Count
-     */
-    function countTokenTotalSupply()
-        public
-        onlyOwner
-        returns (uint256)
-    {
-        emit Counter(_tokenTotalSupply, "countTokenTotalSupply");
-        return _tokenTotalSupply;
+        emit TokenEvent(_tokens[tokenId].name, _tokens[tokenId].symbol, _tokens[tokenId].expires, "getToken");
     }
 
     /**
@@ -405,9 +288,21 @@ contract Reward {
         uint256 tempBalance;
         tempBalance = _balances[to];
         _balances[to] = tempBalance.add(amount);
+        uint256[] memory tokens_ = new uint256[](amount);
+
+        for (uint256 i = 0; i < amount; i++) {
+            _tokenCount = _tokenCount.add(1);
+            _tokens[_tokenCount] = Token({
+                name: string.concat(_self, to),
+                symbol: "SELFUSER",
+                expires: (block.timestamp).add(7890000)
+            });
+            tokens_[i] = (_tokenCount);
+        }
 
         _selfCount = _selfCount.add(1);
         _transactionsData[_self][to][_selfCount] = TransactionData({
+            tokens: tokens_,
             amount: amount,
             timestamp: block.timestamp,
             successful: true
@@ -417,6 +312,7 @@ contract Reward {
         _transactions[_transactionsCount] = Transaction({
             from: _self,
             to: to,
+            tokens: tokens_,
             amount: amount,
             timestamp: block.timestamp,
             successful: true
@@ -452,6 +348,17 @@ contract Reward {
         agentBalance = _balances[from];
         _balances[to] = userBalance.add(amount);
         _balances[from] = agentBalance.sub(amount);
+        uint256[] memory tokens_ = new uint256[](amount);
+
+        for (uint256 i = 0; i < amount; i++) {
+            _tokenCount = _tokenCount.add(1);
+            _tokens[_tokenCount] = Token({
+                name: string.concat(from, to),
+                symbol: "AGENUSER",
+                expires: (block.timestamp).add(7890000)
+            });
+            tokens_[i] = (_tokenCount);
+        }
 
         _userCount[to] = (_userCount[to]).add(1);
         _agentCount[from] = (_agentCount[from]).add(1);
@@ -460,6 +367,7 @@ contract Reward {
         _transactionsData[from][to][
             _agentUserCount[from][to]
         ] = TransactionData({
+            tokens: tokens_,
             amount: amount,
             timestamp: block.timestamp,
             successful: true
@@ -469,6 +377,7 @@ contract Reward {
         _transactions[_transactionsCount] = Transaction({
             from: from,
             to: to,
+            tokens: tokens_,
             amount: amount,
             timestamp: block.timestamp,
             successful: true
@@ -477,26 +386,30 @@ contract Reward {
         return true;
     }
 
-    /** @dev Creates `amount` and assigns them to `account`, increasing
+    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
      * the total supply.
      *
      * Emits a {Transfer} event with `from` set to self.
      *
      * Requirements:
      *
-     * - `account` cannot be the self address.
+     * - `account` cannot be the zero address.
      */
-    function _mint(string memory account, uint256 amount) public onlyOwner {
+    function _mint(string memory account, uint256 amount) internal onlyOwner {
+        _beforeTokenTransfer(_self, account, amount);
         require(Validation.validateAgent(account));
         _totalSupply += amount;
-        // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
-        _balances[account] = (_balances[account]).add(amount);
-        
+        // unchecked {
+            // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
+            _balances[account] = (_balances[account]).add(amount);
+        // }
         emit Transfer(account, "self", amount, "Minting");
+
+        _afterTokenTransfer(_self, account, amount);
     }
 
     /**
-     * @dev Destroys `amount` from `account`, reducing the
+     * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
      *
      * Emits a {Transfer} event with `to` set to the existing entity.
@@ -504,65 +417,22 @@ contract Reward {
      * Requirements:
      *
      * - `account` cannot be the non-existing entity.
-     * - `account` must have at least `amount`.
+     * - `account` must have at least `amount` tokens.
      */
-    function _burn(string memory account, uint256 amount) public onlyOwner {
+    function _burn(string memory account, uint256 amount) internal onlyOwner {
+        _beforeTokenTransfer(account, _self, amount);
         require(Validation.validateUser(account));
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
-        
-        _balances[account] = accountBalance.sub(amount);
-        // Overflow not possible: amount <= accountBalance <= totalSupply.
-        _totalSupply = _totalSupply.sub(amount);
+        // unchecked {
+            _balances[account] = accountBalance.sub(amount);
+            // Overflow not possible: amount <= accountBalance <= totalSupply.
+            _totalSupply = _totalSupply.sub(amount);
+        // }
 
         emit Transfer("self", account, amount, "Burning");
-    }
 
-    /** @dev Creates token and assigns them to `account`, increasing
-     * the token total supply.
-     *
-     * Emits a {Transfer} event with `from` set to self.
-     *
-     * Requirements:
-     *
-     * - `account` cannot be the self address.
-     */
-    function mintToken(string memory account, string memory _name, string memory _symbol, uint256 amount) public onlyOwner {
-        _burn(account, amount);
-        _tokenCount = _tokenCount.add(1);
-        _tokens[_tokenCount] = Token({
-            id: _tokenCount,
-            userTokenId: _userTokensCount[account],
-            name: _name,
-            symbol: _symbol,
-            expires: (block.timestamp).add(7890000),
-            consumed: false
-        });
-        _tokenTotalSupply = _tokenTotalSupply.add(1);
-        _userTokens[account][_userTokensCount[account]] = _tokenCount;
-        _userTokensCount[account] = _userTokensCount[account].add(1);
-        
-        emit Transfer(account, "self", amount, "Token Minting");
-        getToken(_tokenCount);
-    }
-
-    /**
-     * @dev Destroys token from `account`, reducing the token
-     * total supply.
-     *
-     * Emits a {Transfer} event with `to` set to the existing entity.
-     *
-     * Requirements:
-     *
-     * - `account` cannot be the non-existing entity.
-     * - `account` must have at least `amount`.
-     */
-    function burnToken(string memory account, uint256 tokenId) public onlyOwner {
-        require(_tokens[tokenId].expires > block.timestamp);
-        require(_tokens[tokenId].consumed == false);
-        _tokens[tokenId].consumed = true;
-        _tokenTotalSupply = _tokenTotalSupply.sub(1);
-        emit Transfer("self", account, 0, "Token Burning");
+        _afterTokenTransfer(account, _self, amount);
     }
 
     /**
@@ -578,7 +448,7 @@ contract Reward {
      * - `from` and `to` are never both non-existing entities.
      *
      */
-    function _beforeTransfer(
+    function _beforeTokenTransfer(
         string memory from,
         string memory to,
         uint256 amount
@@ -597,7 +467,7 @@ contract Reward {
      * - `from` and `to` are never both non-existing entities.
      *
      */
-    function _afterTransfer(
+    function _afterTokenTransfer(
         string memory from,
         string memory to,
         uint256 amount

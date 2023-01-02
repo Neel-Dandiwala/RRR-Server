@@ -10,6 +10,7 @@ import "./ValidationInterface.sol";
 contract Tracking {
     address private constant VALIDATION_CONTRACT = 0x5df848c79F19e9a8Ff59F83eD1A862da26aEbA3E;
     ValidationInterface private Validation = ValidationInterface(VALIDATION_CONTRACT);
+    address private owner;
 
     /**
      * @dev Define the structure for a waste submission
@@ -66,6 +67,22 @@ contract Tracking {
         bool exist
     );
 
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    /**
+     * @dev Function that sets the new owner:
+     */
+    function setOwner(address newOwner) onlyOwner external {
+        owner = newOwner;
+    }
+
     /**
      * @dev Function that create the Waste Entry:
      */
@@ -74,7 +91,7 @@ contract Tracking {
         string memory description,
         string memory weight,
         string memory user
-    ) public {
+    ) public onlyOwner {
         if (wasteStorage[id].exist) {
             emit CreationReject(
                 id,
@@ -110,7 +127,7 @@ contract Tracking {
     /**
      * @dev Function that makes the transfer of ownership of waste to agent:
      */
-    function agentOwnWaste(string memory agent, string memory id) public {
+    function agentOwnWaste(string memory agent, string memory id) public onlyOwner {
         if (!wasteStorage[id].exist) {
             emit TransferReject(
                 agent,
@@ -133,7 +150,7 @@ contract Tracking {
     /**
      * @dev Function that makes the transfer of ownership of waste to company:
      */
-    function companyOwnWaste(string memory company, string memory id) public {
+    function companyOwnWaste(string memory company, string memory id) public onlyOwner {
         if (!wasteStorage[id].exist) {
             emit TransferReject(
                 company,
@@ -165,7 +182,7 @@ contract Tracking {
      * @dev Getter of the characteristic of waste:
      */
     function getWaste(string memory id)
-        public
+        public onlyOwner
         returns (
             string memory,
             string memory,
@@ -202,6 +219,7 @@ contract Tracking {
     function isUserOwner(string memory user, string memory id)
         public
         view
+        onlyOwner
         returns (bool)
     {
         if (Validation.validateUser(user) && userStorage[user][id] != 0) {
@@ -217,6 +235,7 @@ contract Tracking {
     function isAgentOwner(string memory agent, string memory id)
         public
         view
+        onlyOwner
         returns (bool)
     {
         if (Validation.validateAgent(agent) && agentStorage[agent][id] != 0) {
@@ -232,6 +251,7 @@ contract Tracking {
     function isCompanyOwner(string memory company, string memory id)
         public
         view
+        onlyOwner
         returns (bool)
     {
         if (Validation.validateCompany(company) && companyStorage[company][id] != 0) {
@@ -239,5 +259,42 @@ contract Tracking {
         }
 
         return false;
+    }
+
+    /**
+     * @dev Conclude the lifecycle of waste so rewards can be imbursed
+     */
+    function concludeWaste(string memory company, string memory id)
+        public
+        onlyOwner
+    {
+        if (!wasteStorage[id].exist) {
+            emit TransferReject(
+                company,
+                id,
+                "Waste does not exist with this id"
+            );
+            revert('Waste Not found');
+        }
+
+        if (!Validation.validateCompany(company)) {
+            emit TransferReject(
+                company,
+                id,
+                "Company does not exist"
+            );
+            revert('Company Not found');
+        }
+
+        wasteStorage[id].exist = false;
+        emit WasteData(
+            wasteStorage[id].description,
+            wasteStorage[id].weight,
+            wasteStorage[id].user,
+            wasteStorage[id].agent,
+            wasteStorage[id].company,
+            wasteStorage[id].submitDate,
+            wasteStorage[id].exist
+            );
     }
 }

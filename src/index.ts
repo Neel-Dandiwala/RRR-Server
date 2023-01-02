@@ -32,7 +32,11 @@ const main = async () => {
         }
         // Querying the Blockchain using the Provider and Web3.js
         console.log("Latest Block Number: ");
-        console.log(await web3.getWeb3().eth.getBlockNumber());
+        try{
+            console.log(await web3.getWeb3().eth.getBlockNumber());
+        } catch(err) {
+            console.log("Change the ngrok link! ", err);
+        }
     });
 
     
@@ -123,6 +127,7 @@ const main = async () => {
     app.use(require('./routes/AdminRoutes'));
     app.use(require('./routes/LoginRoutes'));
     app.use(require('./routes/WasteRoutes'));
+    app.use(require('./routes/RewardRoutes'));
 
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");

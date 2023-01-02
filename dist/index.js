@@ -27,7 +27,12 @@ const main = async () => {
             console.log("Connection Error! ", error);
         }
         console.log("Latest Block Number: ");
-        console.log(await web3_1.web3.getWeb3().eth.getBlockNumber());
+        try {
+            console.log(await web3_1.web3.getWeb3().eth.getBlockNumber());
+        }
+        catch (err) {
+            console.log("Change the ngrok link! ", err);
+        }
     });
     const MongoDBStore = (0, connect_mongodb_session_1.default)(express_session_1.default);
     const sessionStore = new MongoDBStore({
@@ -65,6 +70,7 @@ const main = async () => {
     app.use(require('./routes/AdminRoutes'));
     app.use(require('./routes/LoginRoutes'));
     app.use(require('./routes/WasteRoutes'));
+    app.use(require('./routes/RewardRoutes'));
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");
     });
