@@ -10,6 +10,7 @@ const connection_1 = require("../connection");
 const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
+const searchNearby_1 = require("../utils/searchNearby");
 require('dotenv').config();
 class UserResponse {
 }
@@ -41,7 +42,7 @@ const getUsers = async (req, res) => {
             console.log(result);
             logs = [
                 {
-                    field: "Successful Insertion",
+                    field: "Successful Extraction",
                     message: "Done",
                 }
             ];
@@ -176,13 +177,101 @@ const validationUser = async (req, res) => {
         return { logs };
     });
 };
+const getNearbyAgents = async (req, res) => {
+    const lat = req.body.lat;
+    const lon = req.body.lon;
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('agent');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let validUser = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validUser = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validUser) {
+        try {
+            let result;
+            let _agents = [];
+            result = await collection.find({}).toArray();
+            result.forEach(function (agent) {
+                console.log(agent);
+                let _distance = (0, searchNearby_1.calculateDistance)(lat, lon, agent.agentLatitude, agent.agentLongitude);
+                console.log(_distance);
+                if (_distance <= 5.0) {
+                    console.log("Distance is good");
+                    if (_agents.length < 10) {
+                        console.log("Hereeee");
+                        _agents.push({
+                            agent: agent,
+                            distance: _distance
+                        });
+                    }
+                    else {
+                        for (let i = 0; i < 10; i++) {
+                            if (_distance < _agents[i].distance) {
+                                _agents[i] = {
+                                    agent: agent,
+                                    distance: _distance
+                                };
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            });
+            res.status(200).json({ _agents });
+            return _agents;
+        }
+        catch (e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }
+            ];
+            res.status(400).json({ logs });
+            return null;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
 const updateUser = async (res) => {
     res.status(200).json({ message: 'User Update' });
 };
-const deleteUser = async (res) => {
-    res.status(200).json({ message: 'User Delete' });
-};
 module.exports = {
-    getUsers, setUser, updateUser, deleteUser, validationUser
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents
 };
 //# sourceMappingURL=UserController.js.map

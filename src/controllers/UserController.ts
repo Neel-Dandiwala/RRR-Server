@@ -8,6 +8,8 @@ import {connection} from "../connection";
 import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
 import { web3, ValidationABI } from "../web3"
+import { calculateDistance, isNearby } from '../utils/searchNearby';
+import { AgentInfo } from '../types/AgentInfo';
 require('dotenv').config()
 
 class UserResponse {
@@ -54,7 +56,7 @@ const getUsers = async(req:Request, res:Response) => {
             
             logs = [
                 {
-                    field: "Successful Insertion",
+                    field: "Successful Extraction",
                     message: "Done",
                 }
             ]
@@ -214,17 +216,119 @@ const validationUser = async(req: Request, res: Response) => {
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const updateUser = async(res:Response) => {
-    res.status(200).json({ message: 'User Update'});
+const getNearbyAgents = async(req:Request, res:Response) => {
+    const lat = req.body.lat;
+    const lon = req.body.lon;
+    const db = await connection.getDb();
+    const collection = db.collection('agent');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }        
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    let validUser: boolean = false;
+
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validUser = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
+
+    if (validUser) {
+        try {
+            let result;
+            type agentData = {
+                agent: AgentInfo;
+                distance: number;
+            };
+            // let _agentsCount = 0;
+            // let _agents = new Array<agentData>(10);
+            let _agents: agentData[] = [];
+            result = await collection.find({}).toArray();
+            // console.log(result)
+            result.forEach(function (agent: AgentInfo) {
+                console.log(agent);
+                let _distance = calculateDistance(lat,lon, agent.agentLatitude, agent.agentLongitude);
+                console.log(_distance)
+                if (_distance <= 5.0) {
+                    console.log("Distance is good")
+                    if(_agents.length < 10){
+                        console.log("Hereeee")
+                        _agents.push({
+                            agent: agent,
+                            distance: _distance
+                        });
+                        
+                    } else {
+                        // let maxDistanceFound = Math.max.apply(Math, _agents.map(function(obj) { return obj.distance; }))
+                        for(let i = 0; i < 10; i++){
+                            if(_distance < _agents[i].distance){
+                                _agents[i] = {
+                                    agent: agent,
+                                    distance: _distance
+                                }
+                            } else {
+                                continue
+                            }
+                        }
+                    }
+                }
+                
+            }); 
+            res.status(200).json({ _agents });
+            return _agents;
+        }
+        catch(e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }        
+            ]
+            res.status(400).json({ logs });
+            return null;
+        }
+    } else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ]
+
+        res.status(400).json({ logs });
+        return;
+    }
 }
 
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
-const deleteUser = async(res:Response) => {
-    res.status(200).json({ message: 'User Delete'});
+const updateUser = async(res:Response) => {
+    res.status(200).json({ message: 'User Update'});
 }
 
+
+
 module.exports = {
-    getUsers, setUser, updateUser, deleteUser, validationUser
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents
 }

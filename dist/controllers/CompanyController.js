@@ -10,6 +10,7 @@ const connection_1 = require("../connection");
 const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
+const axios_1 = __importDefault(require("axios"));
 require('dotenv').config();
 class CompanyResponse {
 }
@@ -93,6 +94,39 @@ const setCompany = async (req, res) => {
             companyPincode: companyData.companyPincode,
             companyMobile: companyData.companyMobile
         });
+        let geoLocationResponse;
+        var API_KEY = process.env.LOCATIONIQ_API_KEY;
+        var BASE_URL = "https://us1.locationiq.com/v1/search?format=json&limit=1";
+        let address = _company.companyAddress + ' ' + _company.companyPincode;
+        var url = BASE_URL + "&key=" + API_KEY + "&q=" + address;
+        let config = {
+            method: 'get',
+            url: url,
+            headers: {}
+        };
+        await (0, axios_1.default)(config).then(function (response) {
+            console.log(response.data[0]);
+            geoLocationResponse = response.data[0];
+        }).catch(function (error) {
+            console.log(error);
+            geoLocationResponse = null;
+        });
+        if (geoLocationResponse === null) {
+            logs = [
+                {
+                    field: "Company LocationIQ Error",
+                    message: "Better check with administrator",
+                }
+            ];
+            res.status(400).json({ logs });
+            return;
+        }
+        else {
+            console.log(geoLocationResponse);
+            console.log(typeof geoLocationResponse);
+            _company.companyLatitude = geoLocationResponse.lat * 1;
+            _company.companyLongitude = geoLocationResponse.lon * 1;
+        }
         let result;
         try {
             result = await collection.insertOne(_company);

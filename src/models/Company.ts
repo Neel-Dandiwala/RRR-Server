@@ -64,7 +64,15 @@ const CompanySchema: Schema = new Schema({
         required: true
     },
 
+    companyLatitude:  {
+        type: Number,
+        required: true
+    },
 
+    companyLongitude:  {
+        type: Number,
+        required: true
+    },
 }, {timestamps: true})
 
 export default model<CompanyInfo>("Company", CompanySchema);

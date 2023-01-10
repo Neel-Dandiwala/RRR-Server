@@ -19,4 +19,8 @@ export class AgentInfo {
 
     agentPincode: string;
 
+    agentLatitude: number;
+
+    agentLongitude: number;
+
 }

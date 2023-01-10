@@ -342,7 +342,7 @@ const rewardMintToken = async (req: Request, res: Response) => {
                 tokenId: '',
                 tokenUserId: req.session.authenticationID,
                 tokenName: tokenData.tokenName,
-                tokenSymbol: tokenData.tokenSymbol
+                tokenSymbol: tokenData.tokenSymbol,
                 tokenExpires: '',
                 tokenUsed: false,
                 tokenAmount: tokenData.tokenAmount

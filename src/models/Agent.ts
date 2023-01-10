@@ -48,6 +48,16 @@ const AgentSchema: Schema = new Schema({
         type: String,
         required: true
     },
+
+    agentLatitude:  {
+        type: Number,
+        required: true
+    },
+
+    agentLongitude:  {
+        type: Number,
+        required: true
+    },
 }, {timestamps: true})
 
 export default model<AgentInfo>("Agent", AgentSchema);

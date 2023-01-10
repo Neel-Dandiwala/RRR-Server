@@ -38,6 +38,14 @@ const AgentSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    agentLatitude: {
+        type: Number,
+        required: true
+    },
+    agentLongitude: {
+        type: Number,
+        required: true
+    },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("Agent", AgentSchema);
 //# sourceMappingURL=Agent.js.map

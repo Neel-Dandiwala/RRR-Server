@@ -10,6 +10,9 @@ const connection_1 = require("../connection");
 const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
+const axios_1 = __importDefault(require("axios"));
+const searchNearby_1 = require("../utils/searchNearby");
+const mongoose_1 = __importDefault(require("mongoose"));
 require('dotenv').config();
 class AgentResponse {
 }
@@ -89,8 +92,43 @@ const setAgent = async (req, res) => {
             agentCity: agentData.agentCity,
             agentState: agentData.agentState,
             agentPincode: agentData.agentPincode,
-            agentAddress: agentData.agentAddress
+            agentAddress: agentData.agentAddress,
+            agentLatitude: '',
+            agentLongitude: ''
         });
+        let geoLocationResponse;
+        var API_KEY = process.env.LOCATIONIQ_API_KEY;
+        var BASE_URL = "https://us1.locationiq.com/v1/search?format=json&limit=1";
+        let address = _agent.agentAddress + ' ' + _agent.agentPincode;
+        var url = BASE_URL + "&key=" + API_KEY + "&q=" + address;
+        let config = {
+            method: 'get',
+            url: url,
+            headers: {}
+        };
+        await (0, axios_1.default)(config).then(function (response) {
+            console.log(response.data[0]);
+            geoLocationResponse = response.data[0];
+        }).catch(function (error) {
+            console.log(error);
+            geoLocationResponse = null;
+        });
+        if (geoLocationResponse === null) {
+            logs = [
+                {
+                    field: "LocationIQ Error",
+                    message: "Better check with administrator",
+                }
+            ];
+            res.status(400).json({ logs });
+            return;
+        }
+        else {
+            console.log(geoLocationResponse);
+            console.log(typeof geoLocationResponse);
+            _agent.agentLatitude = geoLocationResponse.lat * 1;
+            _agent.agentLongitude = geoLocationResponse.lon * 1;
+        }
         let result;
         try {
             result = await collection.insertOne(_agent);
@@ -175,6 +213,99 @@ const validationAgent = async (req, res) => {
         return { logs };
     });
 };
+const getNearbyCompanies = async (req, res) => {
+    const db = await connection_1.connection.getDb();
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let validAgent = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validAgent = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validAgent) {
+        try {
+            const searchAgent = db.collection('agent');
+            let _agent = await searchAgent.findOne({ _id: new mongoose_1.default.Types.ObjectId(req.session.authenticationID) });
+            const lat = _agent.agentLatitude;
+            const lon = _agent.agentLongitude;
+            const collection = db.collection('company');
+            let result;
+            let _companies = [];
+            result = await collection.find({}).toArray();
+            result.forEach(function (company) {
+                console.log(company);
+                let _distance = (0, searchNearby_1.calculateDistance)(lat, lon, company.companyLatitude, company.companyLongitude);
+                console.log(_distance);
+                if (_distance <= 5.0) {
+                    console.log("Distance is good");
+                    if (_companies.length < 10) {
+                        console.log("Hereeee");
+                        _companies.push({
+                            company: company,
+                            distance: _distance
+                        });
+                    }
+                    else {
+                        for (let i = 0; i < 10; i++) {
+                            if (_distance < _companies[i].distance) {
+                                _companies[i] = {
+                                    company: company,
+                                    distance: _distance
+                                };
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            });
+            res.status(200).json({ _companies });
+            return _companies;
+        }
+        catch (e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }
+            ];
+            res.status(400).json({ logs });
+            return null;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid Agent",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
 const updateAgent = async (res) => {
     res.status(200).json({ message: 'agent Update' });
 };
@@ -182,6 +313,6 @@ const deleteAgent = async (res) => {
     res.status(200).json({ message: 'agent Delete' });
 };
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent, validationAgent
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies
 };
 //# sourceMappingURL=AgentController.js.map

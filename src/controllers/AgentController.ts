@@ -8,6 +8,12 @@ import { connection } from "../connection";
 import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
 import { web3, ValidationABI } from "../web3"
+import { getCoordinates } from '../utils/GeoLocation';
+import axios from 'axios';
+import { CompanyInfo } from '../types/CompanyInfo';
+import { calculateDistance } from '../utils/searchNearby';
+import mongoose from 'mongoose';
+
 require('dotenv').config()
 
 class AgentResponse {
@@ -101,6 +107,7 @@ const setAgent = async(req: Request, res: Response) => {
             return { logs };
         }
 
+
         const hashedPassword = await argon2.hash(credentials.password);
         const _agent: AgentInfo = new Agent({
             agentName: agentData.agentName,
@@ -111,9 +118,48 @@ const setAgent = async(req: Request, res: Response) => {
             agentCity: agentData.agentCity,
             agentState: agentData.agentState,
             agentPincode: agentData.agentPincode,
-            agentAddress: agentData.agentAddress
-            
+            agentAddress: agentData.agentAddress,
+            agentLatitude:'',
+            agentLongitude: ''
         })
+
+        // let geoLocationResponse: any = await getCoordinates(_agent.agentAddress + ' ' + _agent.agentPincode);
+        let geoLocationResponse: any;
+        var API_KEY = process.env.LOCATIONIQ_API_KEY;
+        var BASE_URL = "https://us1.locationiq.com/v1/search?format=json&limit=1";
+        let address = _agent.agentAddress + ' ' + _agent.agentPincode
+        var url = BASE_URL + "&key=" + API_KEY + "&q=" + address;
+
+        let config = {
+            method: 'get',
+            url: url,
+            headers: { }
+          };
+        await axios(config).then( function (response: any) {
+            // console.log('Here')
+            console.log(response.data[0])
+            geoLocationResponse = response.data[0]
+        }).catch(function (error: any) {
+            console.log(error);
+            geoLocationResponse = null
+        });
+
+        if (geoLocationResponse === null) {
+            logs = [
+                {
+                    field: "LocationIQ Error",
+                    message: "Better check with administrator",
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return
+        } else{
+            console.log(geoLocationResponse)
+            console.log(typeof geoLocationResponse)
+            _agent.agentLatitude = geoLocationResponse.lat * 1;
+            _agent.agentLongitude = geoLocationResponse.lon * 1;
+        }
 
         let result;
         try {
@@ -209,6 +255,118 @@ const validationAgent = async(req: Request, res: Response) => {
             });
 }
 
+// @desc   Get User
+// @route  GET /user/login
+// @access Private
+const getNearbyCompanies = async(req:Request, res:Response) => {
+    const db = await connection.getDb();
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }        
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    let validAgent: boolean = false;
+
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validAgent = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
+
+    if (validAgent) {
+
+        try {
+            const searchAgent = db.collection('agent');
+            let _agent = await searchAgent.findOne({ _id:  new mongoose.Types.ObjectId(req.session.authenticationID) });
+            
+            const lat = _agent.agentLatitude;
+            const lon = _agent.agentLongitude;
+            
+            const collection = db.collection('company');
+            let result;
+            type companyData = {
+                company: CompanyInfo;
+                distance: number;
+            };
+            // let _agentsCount = 0;
+            // let _agents = new Array<companyData>(10);
+            let _companies: companyData[] = [];
+            result = await collection.find({}).toArray();
+            // console.log(result)
+            result.forEach(function (company: CompanyInfo) {
+                console.log(company);
+                let _distance = calculateDistance(lat,lon, company.companyLatitude, company.companyLongitude);
+                console.log(_distance)
+                if (_distance <= 5.0) {
+                    console.log("Distance is good")
+                    if(_companies.length < 10){
+                        console.log("Hereeee")
+                        _companies.push({
+                            company: company,
+                            distance: _distance
+                        });
+                        
+                    } else {
+                        // let maxDistanceFound = Math.max.apply(Math, _agents.map(function(obj) { return obj.distance; }))
+                        for(let i = 0; i < 10; i++){
+                            if(_distance < _companies[i].distance){
+                                _companies[i] = {
+                                    company: company,
+                                    distance: _distance
+                                }
+                            } else {
+                                continue
+                            }
+                        }
+                    }
+                }
+                
+            }); 
+            res.status(200).json({ _companies });
+            return _companies;
+        }
+        catch(e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }        
+            ]
+            res.status(400).json({ logs });
+            return null;
+        }
+    } else {
+        logs = [
+            {
+                field: "Invalid Agent",
+                message: "Better check with administrator",
+            }
+        ]
+
+        res.status(400).json({ logs });
+        return;
+    }
+}
+
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private
@@ -224,5 +382,5 @@ const deleteAgent = async(res: Response) => {
 }
 
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent, validationAgent
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies
 }

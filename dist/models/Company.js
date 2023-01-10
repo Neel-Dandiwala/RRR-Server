@@ -46,6 +46,14 @@ const CompanySchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    companyLatitude: {
+        type: Number,
+        required: true
+    },
+    companyLongitude: {
+        type: Number,
+        required: true
+    },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("Company", CompanySchema);
 //# sourceMappingURL=Company.js.map

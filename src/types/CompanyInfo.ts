@@ -22,4 +22,8 @@ export class CompanyInfo {
     companyState: string;
 
     companyPincode: string;
+
+    companyLatitude: number;
+
+    companyLongitude: number;
 }
