@@ -13,6 +13,7 @@ import axios from 'axios';
 import { CompanyInfo } from '../types/CompanyInfo';
 import { calculateDistance } from '../utils/searchNearby';
 import mongoose from 'mongoose';
+import { CompanyDetails } from '../types/CompanyDetails';
 
 require('dotenv').config()
 
@@ -304,7 +305,7 @@ const getNearbyCompanies = async(req:Request, res:Response) => {
             const collection = db.collection('company');
             let result;
             type companyData = {
-                company: CompanyInfo;
+                company: CompanyDetails;
                 distance: number;
             };
             // let _agentsCount = 0;
@@ -319,9 +320,33 @@ const getNearbyCompanies = async(req:Request, res:Response) => {
                 if (_distance <= 5.0) {
                     console.log("Distance is good")
                     if(_companies.length < 10){
-                        console.log("Hereeee")
+                        let _company:CompanyDetails = {
+                            companyName: company.companyName,
+
+                            companyEmail: company.companyEmail,
+                        
+                            companyPaperPrice: company.companyPaperPrice,
+                        
+                            companyPlasticPrice: company.companyPlasticPrice,
+                        
+                            companyElectronicPrice: company.companyElectronicPrice,
+                        
+                            companyMobile: company.companyMobile,
+                        
+                            companyAddress: company.companyAddress,
+                        
+                            companyCity: company.companyCity,
+                        
+                            companyState: company.companyState,
+                        
+                            companyPincode: company.companyState,
+
+                            companyLatitude: company.companyLatitude,
+
+                            companyLongitude: company.companyLongitude,
+                        }
                         _companies.push({
-                            company: company,
+                            company: _company,
                             distance: _distance
                         });
                         

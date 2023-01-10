@@ -9,6 +9,7 @@ import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
 import { web3, ValidationABI } from "../web3"
 import { calculateDistance, isNearby } from '../utils/searchNearby';
+import { AgentDetails } from '../types/AgentDetails';
 import { AgentInfo } from '../types/AgentInfo';
 require('dotenv').config()
 
@@ -257,7 +258,7 @@ const getNearbyAgents = async(req:Request, res:Response) => {
         try {
             let result;
             type agentData = {
-                agent: AgentInfo;
+                agent: AgentDetails;
                 distance: number;
             };
             // let _agentsCount = 0;
@@ -272,9 +273,29 @@ const getNearbyAgents = async(req:Request, res:Response) => {
                 if (_distance <= 5.0) {
                     console.log("Distance is good")
                     if(_agents.length < 10){
-                        console.log("Hereeee")
+                        let _agent:AgentDetails = {
+                            agentName: agent.agentName,
+
+                            agentEmail: agent.agentEmail,
+
+                            agentAge: agent.agentAge,
+
+                            agentMobile: agent.agentMobile,
+
+                            agentAddress: agent.agentAddress,
+
+                            agentCity: agent.agentCity,
+
+                            agentState: agent.agentState,
+
+                            agentPincode: agent.agentPincode,
+
+                            agentLatitude: agent.agentLatitude,
+
+                            agentLongitude: agent.agentLongitude,
+                        }
                         _agents.push({
-                            agent: agent,
+                            agent: _agent,
                             distance: _distance
                         });
                         

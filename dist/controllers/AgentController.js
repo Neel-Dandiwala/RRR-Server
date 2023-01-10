@@ -260,9 +260,22 @@ const getNearbyCompanies = async (req, res) => {
                 if (_distance <= 5.0) {
                     console.log("Distance is good");
                     if (_companies.length < 10) {
-                        console.log("Hereeee");
+                        let _company = {
+                            companyName: company.companyName,
+                            companyEmail: company.companyEmail,
+                            companyPaperPrice: company.companyPaperPrice,
+                            companyPlasticPrice: company.companyPlasticPrice,
+                            companyElectronicPrice: company.companyElectronicPrice,
+                            companyMobile: company.companyMobile,
+                            companyAddress: company.companyAddress,
+                            companyCity: company.companyCity,
+                            companyState: company.companyState,
+                            companyPincode: company.companyState,
+                            companyLatitude: company.companyLatitude,
+                            companyLongitude: company.companyLongitude,
+                        };
                         _companies.push({
-                            company: company,
+                            company: _company,
                             distance: _distance
                         });
                     }

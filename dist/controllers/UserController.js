@@ -222,9 +222,20 @@ const getNearbyAgents = async (req, res) => {
                 if (_distance <= 5.0) {
                     console.log("Distance is good");
                     if (_agents.length < 10) {
-                        console.log("Hereeee");
+                        let _agent = {
+                            agentName: agent.agentName,
+                            agentEmail: agent.agentEmail,
+                            agentAge: agent.agentAge,
+                            agentMobile: agent.agentMobile,
+                            agentAddress: agent.agentAddress,
+                            agentCity: agent.agentCity,
+                            agentState: agent.agentState,
+                            agentPincode: agent.agentPincode,
+                            agentLatitude: agent.agentLatitude,
+                            agentLongitude: agent.agentLongitude,
+                        };
                         _agents.push({
-                            agent: agent,
+                            agent: _agent,
                             distance: _distance
                         });
                     }
