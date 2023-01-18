@@ -11,6 +11,7 @@ const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
 const searchNearby_1 = require("../utils/searchNearby");
+const AgentDetails_1 = require("../types/AgentDetails");
 const UserAgentForm_1 = __importDefault(require("../models/UserAgentForm"));
 require('dotenv').config();
 class UserResponse {
@@ -252,6 +253,8 @@ const getNearbyAgents = async (req, res) => {
     if (validUser) {
         try {
             let result;
+            class _AgentDetails extends AgentDetails_1.AgentDetails {
+            }
             let _agents = [];
             result = await collection.find({}).toArray();
             result.forEach(function (agent) {
@@ -262,6 +265,7 @@ const getNearbyAgents = async (req, res) => {
                     console.log("Distance is good");
                     if (_agents.length < 10) {
                         let _agent = {
+                            agentId: (agent._id).toString(),
                             agentName: agent.agentName,
                             agentEmail: agent.agentEmail,
                             agentAge: agent.agentAge,

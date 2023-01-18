@@ -306,8 +306,13 @@ const getNearbyAgents = async (req: Request, res: Response) => {
     if (validUser) {
         try {
             let result;
+
+            class _AgentDetails extends AgentDetails {
+                agentId: string
+            }
+
             type agentData = {
-                agent: AgentDetails;
+                agent: _AgentDetails;
                 distance: number;
             };
             // let _agentsCount = 0;
@@ -315,14 +320,16 @@ const getNearbyAgents = async (req: Request, res: Response) => {
             let _agents: agentData[] = [];
             result = await collection.find({}).toArray();
             // console.log(result)
-            result.forEach(function (agent: AgentInfo) {
+            result.forEach(function (agent: any) {
                 console.log(agent);
                 let _distance = calculateDistance(lat, lon, agent.agentLatitude, agent.agentLongitude);
                 console.log(_distance)
                 if (_distance <= 5.0) {
                     console.log("Distance is good")
                     if (_agents.length < 10) {
-                        let _agent: AgentDetails = {
+                        let _agent: _AgentDetails = {
+                            agentId: (agent._id).toString(),
+
                             agentName: agent.agentName,
 
                             agentEmail: agent.agentEmail,
