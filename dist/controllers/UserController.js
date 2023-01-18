@@ -13,6 +13,7 @@ const web3_1 = require("../web3");
 const searchNearby_1 = require("../utils/searchNearby");
 const AgentDetails_1 = require("../types/AgentDetails");
 const UserAgentForm_1 = __importDefault(require("../models/UserAgentForm"));
+const mongoose_1 = __importDefault(require("mongoose"));
 require('dotenv').config();
 class UserResponse {
 }
@@ -375,11 +376,32 @@ const getUserBookings = async (req, res) => {
                     throw new Error(err);
                 }
             }
-            result.forEach(function (booking) {
+            for (const booking of result) {
                 console.log('here');
+                const agentCollection = db.collection('agent');
+                let _agent;
+                try {
+                    _agent = await agentCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(booking.bookingAgent) });
+                }
+                catch (err) {
+                    if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err);
+                        logs = [{
+                                field: "Unexpected Mongo Error",
+                                message: "Default Message"
+                            }];
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                    else {
+                        res.status(400).json({ err });
+                        throw new Error(err);
+                    }
+                }
                 let _booking = {
                     bookingUser: booking.bookingUser,
                     bookingAgent: booking.bookingAgent,
+                    bookingAgentName: _agent.agentName,
                     bookingDate: booking.bookingDate,
                     bookingTimeSlot: booking.bookingTimeSlot,
                     bookingAddress: booking.bookingAddress,
@@ -388,7 +410,8 @@ const getUserBookings = async (req, res) => {
                 };
                 console.log(_booking);
                 _bookings.push(_booking);
-            });
+            }
+            ;
             console.log(_bookings);
             res.status(200).json(_bookings);
             return _bookings;

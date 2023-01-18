@@ -13,6 +13,7 @@ import { AgentDetails } from '../types/AgentDetails';
 import { AgentInfo } from '../types/AgentInfo';
 import { UserAgentFormInfo } from '../types/UserAgentFormInfo';
 import UserAgentForm from '../models/UserAgentForm';
+import mongoose from 'mongoose';
 require('dotenv').config()
 
 class UserResponse {
@@ -440,6 +441,7 @@ const getUserBookings = async (req: Request, res: Response) => {
             type bookingData = {
                 bookingUser: string,
                 bookingAgent: string,
+                bookingAgentName?: string,
                 bookingDate: string,
                 bookingTimeSlot: string,
                 bookingAddress: string,
@@ -469,12 +471,37 @@ const getUserBookings = async (req: Request, res: Response) => {
                     throw new Error(err)
                 }
             }
-            result.forEach(function (booking: bookingData) {
+            for (const booking of result) {
                 console.log('here')
+
+                const agentCollection = db.collection('agent');
+                let _agent;
+                try {
+                    _agent = await agentCollection.findOne({ _id:  new mongoose.Types.ObjectId(booking.bookingAgent) })
+                } catch (err) {
+                    if (err instanceof MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err)
+                        logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }]
+                        res.status(400).json({ logs });
+                        return { logs };
+    
+                    }
+                    else {
+                        res.status(400).json({ err });
+    
+                        throw new Error(err)
+                    }
+                }
+
                 let _booking: any = {
                     bookingUser: booking.bookingUser,
 
                     bookingAgent: booking.bookingAgent,
+
+                    bookingAgentName: _agent.agentName,
 
                     bookingDate: booking.bookingDate,
 
