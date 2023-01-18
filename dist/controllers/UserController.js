@@ -352,9 +352,27 @@ const getUserBookings = async (req, res) => {
     if (validUser) {
         try {
             let result;
-            let _bookings;
-            result = await collection.find({ bookingUser: req.session.authenticationID }).toArray();
+            let _bookings = [];
+            try {
+                result = await collection.find({ bookingUser: req.session.authenticationID }).toArray();
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
             result.forEach(function (booking) {
+                console.log('here');
                 let _booking = {
                     bookingUser: booking.bookingUser,
                     bookingAgent: booking.bookingAgent,
@@ -364,8 +382,10 @@ const getUserBookings = async (req, res) => {
                     bookingPincode: booking.bookingPincode,
                     bookingStatus: booking.bookingStatus,
                 };
+                console.log(_booking);
                 _bookings.push(_booking);
             });
+            console.log(_bookings);
             res.status(200).json(_bookings);
             return _bookings;
         }
@@ -427,7 +447,7 @@ const setUserAgentForm = async (req, res) => {
             const formData = req.body;
             const _formData = new UserAgentForm_1.default({
                 bookingUser: req.session.authenticationID,
-                bookingAgent: '',
+                bookingAgent: formData.bookingAgent,
                 bookingDate: new Date(formData.bookingDate).toISOString(),
                 bookingTimeSlot: formData.bookingTimeSlot,
                 bookingAddress: formData.bookingAddress,

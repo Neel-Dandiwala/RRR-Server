@@ -430,34 +430,63 @@ const getUserBookings = async (req: Request, res: Response) => {
 
     if (validUser) {
         try {
+            type bookingData = {
+                bookingUser: string,
+                bookingAgent: string,
+                bookingDate: string,
+                bookingTimeSlot: string,
+                bookingAddress: string,
+                bookingPincode: string,
+                bookingStatus: string,
+            };
             let result;
-            let _bookings;
-            
-            result = await collection.find({ bookingUser: req.session.authenticationID }).toArray();
-        
-            result.forEach(function (booking: any) {
-                
-                        let _booking = {
-                            bookingUser: booking.bookingUser,
+            let _bookings: bookingData[] = [];
 
-                            bookingAgent: booking.bookingAgent,
 
-                            bookingDate: booking.bookingDate,
+            try {
+                result = await collection.find({ bookingUser: req.session.authenticationID }).toArray();
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }]
+                    res.status(400).json({ logs });
+                    return { logs };
 
-                            bookingTimeSlot: booking.bookingTimeSlot,
+                }
+                else {
+                    res.status(400).json({ err });
 
-                            bookingAddress: booking.bookingAddress,
+                    throw new Error(err)
+                }
+            }
+            result.forEach(function (booking: bookingData) {
+                console.log('here')
+                let _booking: any = {
+                    bookingUser: booking.bookingUser,
 
-                            bookingPincode: booking.bookingPincode,
+                    bookingAgent: booking.bookingAgent,
 
-                            bookingStatus: booking.bookingStatus,
+                    bookingDate: booking.bookingDate,
 
-                        }
-                        _bookings.push(
-                            _booking,
-                        );
+                    bookingTimeSlot: booking.bookingTimeSlot,
+
+                    bookingAddress: booking.bookingAddress,
+
+                    bookingPincode: booking.bookingPincode,
+
+                    bookingStatus: booking.bookingStatus,
+
+                }
+                console.log(_booking)
+                _bookings.push(
+                    _booking
+                );
 
             });
+            console.log(_bookings)
             res.status(200).json(_bookings);
             return _bookings;
         }
@@ -524,12 +553,12 @@ const setUserAgentForm = async (req: Request, res: Response) => {
 
     if (validUser) {
         try {
-            const formData = req.body as Pick<UserAgentFormInfo, "bookingDate" | "bookingTimeSlot" | "bookingAddress" | "bookingPincode">
+            const formData = req.body as Pick<UserAgentFormInfo, "bookingDate" | "bookingTimeSlot" | "bookingAddress" | "bookingPincode" | "bookingAgent">
 
             const _formData: UserAgentFormInfo = new UserAgentForm({
                 bookingUser: req.session.authenticationID,
 
-                bookingAgent: '',
+                bookingAgent: formData.bookingAgent,
 
                 bookingDate: new Date(formData.bookingDate).toISOString(),
 
@@ -566,13 +595,13 @@ const setUserAgentForm = async (req: Request, res: Response) => {
             if (result.acknowledged) {
                 console.log(result);
                 logs =
-                    {
-                        field: "Successful Insertion of Form",
-                        message: "Done",
-                    }
-                
+                {
+                    field: "Successful Insertion of Form",
+                    message: "Done",
+                }
 
-                res.status(200).json( logs);
+
+                res.status(200).json(logs);
                 return { logs };
             } else {
                 logs = [
@@ -604,15 +633,15 @@ const setUserAgentForm = async (req: Request, res: Response) => {
     }
 }
 
-    // @desc   Get User
-    // @route  GET /user/login
-    // @access Private
-    const updateUser = async (res: Response) => {
-        res.status(200).json({ message: 'User Update' });
-    }
+// @desc   Get User
+// @route  GET /user/login
+// @access Private
+const updateUser = async (res: Response) => {
+    res.status(200).json({ message: 'User Update' });
+}
 
 
 
-    module.exports = {
-        getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings
-    }
+module.exports = {
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings
+}
