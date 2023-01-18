@@ -11,7 +11,7 @@ require('dotenv').config()
 
 const wasteUser = async (req: Request, res: Response) => {
     const db = await connection.getDb();
-    const collection = db.collection('waste');
+    let collection = db.collection('waste');
     let logs;
     if (!req.session.authenticationID) {
         logs = [
@@ -46,6 +46,9 @@ const wasteUser = async (req: Request, res: Response) => {
 
     if (validUser) {
         try {
+            // collection = db.collection('user');
+            // let _user = await collection.findOne({ _id:  new mongoose.Types.ObjectId(req.session.authenticationID) });
+            // collection = db.collection('waste');
             const wasteData = req.body as Pick<WasteInfo, "wasteDescription" | "wasteWeight">
             console.log(wasteData);
             const _waste: WasteInfo = new Waste({

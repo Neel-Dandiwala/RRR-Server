@@ -11,7 +11,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 require('dotenv').config();
 const wasteUser = async (req, res) => {
     const db = await connection_1.connection.getDb();
-    const collection = db.collection('waste');
+    let collection = db.collection('waste');
     let logs;
     if (!req.session.authenticationID) {
         logs = [

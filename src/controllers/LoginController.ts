@@ -51,14 +51,21 @@ const loginEntity = async (req: Request, res: Response) => {
             if (valid) {
                 console.log(result);
                 req.session.authenticationID = (result._id).toString();
-                logs = [
+                logs = 
                     {
                         field: "Successful Log In",
-                        message: result.userName,
+                        userName: result.userName,
+                        userEmail: result.userEmail,
+                        userAge: result.userAge,
+                        userAddress: result.userAddress,
+                        userPincode: result.userPincode,
+                        userMobile: result.userMobile,
+                        userCity: result.userCity,
+                        userState: result.userState,
                     }
-                ]
+                
 
-                res.status(200).json({ logs });
+                res.status(200).json(logs);
                 return { logs };
             } else {
                 logs = [
