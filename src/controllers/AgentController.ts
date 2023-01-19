@@ -13,7 +13,7 @@ import axios from 'axios';
 import { CompanyInfo } from '../types/CompanyInfo';
 import { calculateDistance } from '../utils/searchNearby';
 import mongoose from 'mongoose';
-import { CompanyDetails } from '../types/CompanyDetails';
+
 
 require('dotenv').config()
 
@@ -304,47 +304,83 @@ const getNearbyCompanies = async(req:Request, res:Response) => {
             
             const collection = db.collection('company');
             let result;
+            class CompanyDetails {
+
+                companyId: string;
+
+                companyName: string;
+            
+                companyEmail: string;
+            
+                companyPaperPrice: number;
+            
+                companyPlasticPrice: number;
+            
+                companyElectronicPrice: number;
+            
+                companyMobile: string;
+            
+                companyAddress: string;
+            
+                companyCity: string;
+            
+                companyState: string;
+            
+                companyPincode: string;
+            
+                companyLatitude: number;
+            
+                companyLongitude: number;
+            
+            }
             type companyData = {
                 company: CompanyDetails;
                 distance: number;
             };
+
+            class _CompanyInfo extends CompanyInfo {
+                _id: string;
+            }
             // let _agentsCount = 0;
             // let _agents = new Array<companyData>(10);
             let _companies: companyData[] = [];
             result = await collection.find({}).toArray();
             // console.log(result)
-            result.forEach(function (company: CompanyInfo) {
+            result.forEach(function (company: _CompanyInfo) {
                 console.log(company);
                 let _distance = calculateDistance(lat,lon, company.companyLatitude, company.companyLongitude);
                 console.log(_distance)
                 if (_distance <= 5.0) {
                     console.log("Distance is good")
+                    let _company:CompanyDetails = {
+
+                        companyId: company._id,
+
+                        companyName: company.companyName,
+
+                        companyEmail: company.companyEmail,
+                    
+                        companyPaperPrice: company.companyPaperPrice,
+                    
+                        companyPlasticPrice: company.companyPlasticPrice,
+                    
+                        companyElectronicPrice: company.companyElectronicPrice,
+                    
+                        companyMobile: company.companyMobile,
+                    
+                        companyAddress: company.companyAddress,
+                    
+                        companyCity: company.companyCity,
+                    
+                        companyState: company.companyState,
+                    
+                        companyPincode: company.companyState,
+
+                        companyLatitude: company.companyLatitude,
+
+                        companyLongitude: company.companyLongitude,
+                    }
                     if(_companies.length < 10){
-                        let _company:CompanyDetails = {
-                            companyName: company.companyName,
-
-                            companyEmail: company.companyEmail,
-                        
-                            companyPaperPrice: company.companyPaperPrice,
-                        
-                            companyPlasticPrice: company.companyPlasticPrice,
-                        
-                            companyElectronicPrice: company.companyElectronicPrice,
-                        
-                            companyMobile: company.companyMobile,
-                        
-                            companyAddress: company.companyAddress,
-                        
-                            companyCity: company.companyCity,
-                        
-                            companyState: company.companyState,
-                        
-                            companyPincode: company.companyState,
-
-                            companyLatitude: company.companyLatitude,
-
-                            companyLongitude: company.companyLongitude,
-                        }
                         _companies.push({
                             company: _company,
                             distance: _distance
@@ -355,7 +391,7 @@ const getNearbyCompanies = async(req:Request, res:Response) => {
                         for(let i = 0; i < 10; i++){
                             if(_distance < _companies[i].distance){
                                 _companies[i] = {
-                                    company: company,
+                                    company: _company,
                                     distance: _distance
                                 }
                             } else {

@@ -93,13 +93,21 @@ const loginEntity = async (req, res) => {
             if (valid) {
                 console.log(result);
                 req.session.authenticationID = (result._id).toString();
-                logs = [
+                logs =
                     {
                         field: "Successful Log In",
-                        message: result.agentName,
-                    }
-                ];
-                res.status(200).json({ logs });
+                        agentName: result.agentName,
+                        agentEmail: result.agentEmail,
+                        agentAge: result.agentAge,
+                        agentAddress: result.agentAddress,
+                        agentPincode: result.agentPincode,
+                        agentMobile: result.agentMobile,
+                        agentCity: result.agentCity,
+                        agentState: result.agentState,
+                        agentLatitude: result.agentLatitude,
+                        agentLongitude: result.agentLongitude
+                    };
+                res.status(200).json(logs);
                 return { logs };
             }
             else {
@@ -139,13 +147,23 @@ const loginEntity = async (req, res) => {
             if (valid) {
                 console.log(result);
                 req.session.authenticationID = (result._id).toString();
-                logs = [
+                logs =
                     {
                         field: "Successful Log In",
-                        message: result.companyName,
-                    }
-                ];
-                res.status(200).json({ logs });
+                        companyName: result.companyName,
+                        companyEmail: result.companyEmail,
+                        companyPaperPrice: result.companyPaperPrice,
+                        companyPlasticPrice: result.companyPlasticPrice,
+                        companyElectronicPrice: result.companyElectronicPrice,
+                        companyAddress: result.companyAddress,
+                        companyPincode: result.companyPincode,
+                        companyMobile: result.companyMobile,
+                        companyCity: result.companyCity,
+                        companyState: result.companyState,
+                        companyLatitude: result.companyLatitude,
+                        companyLongitude: result.companyLongitude
+                    };
+                res.status(200).json(logs);
                 return { logs };
             }
             else {
