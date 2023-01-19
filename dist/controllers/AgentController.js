@@ -319,6 +319,259 @@ const getNearbyCompanies = async (req, res) => {
         return;
     }
 };
+const getAgentBookings = async (req, res) => {
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('user_agent_booking');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let validUser = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validUser = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validUser) {
+        try {
+            let result;
+            let _bookings = [];
+            try {
+                result = await collection.find({ bookingAgent: req.session.authenticationID }).toArray();
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            for (const booking of result) {
+                const userCollection = db.collection('user');
+                let _user;
+                try {
+                    _user = await userCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(booking.bookingUser) });
+                }
+                catch (err) {
+                    if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err);
+                        logs = [{
+                                field: "Unexpected Mongo Error",
+                                message: "Default Message"
+                            }];
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                    else {
+                        res.status(400).json({ err });
+                        throw new Error(err);
+                    }
+                }
+                let _booking = {
+                    bookingId: booking._id,
+                    bookingUser: booking.bookingUser,
+                    bookingAgent: booking.bookingAgent,
+                    bookingUserName: _user.userName,
+                    bookingDate: booking.bookingDate,
+                    bookingTimeSlot: booking.bookingTimeSlot,
+                    bookingAddress: booking.bookingAddress,
+                    bookingPincode: booking.bookingPincode,
+                    bookingStatus: booking.bookingStatus,
+                };
+                console.log(_booking);
+                _bookings.push(_booking);
+            }
+            ;
+            console.log(_bookings);
+            res.status(200).json(_bookings);
+            return _bookings;
+        }
+        catch (e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }
+            ];
+            res.status(400).json({ logs });
+            return null;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid Agent",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
+const agentRejectBooking = async (req, res) => {
+    const bookingId = req.body.key;
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('user_agent_booking');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let result;
+    try {
+        result = await collection.findOne({ _id: new mongoose_1.default.Types.ObjectId(bookingId) });
+    }
+    catch (err) {
+        if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+            console.error("# Duplicate Data Found:\n", err);
+            logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }];
+            res.status(400).json({ logs });
+            return { logs };
+        }
+        else {
+            res.status(400).json({ err });
+            throw new Error(err);
+        }
+    }
+    if (result.bookingAgent !== req.session.authenticationID) {
+        logs = [
+            {
+                field: "Invalid Agent",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+    try {
+        await collection.updateOne({ _id: new mongoose_1.default.Types.ObjectId(bookingId) }, { $set: { bookingStatus: 'Rejected' } });
+        logs = {
+            field: "Succesful Updation",
+            message: "Booking Rejected by Agent"
+        };
+        res.status(200).json(logs);
+        return { logs };
+    }
+    catch (err) {
+        if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+            console.error("# Duplicate Data Found:\n", err);
+            logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }];
+            res.status(400).json({ logs });
+            return { logs };
+        }
+        else {
+            res.status(400).json({ err });
+            throw new Error(err);
+        }
+    }
+};
+const agentAcceptBooking = async (req, res) => {
+    const bookingId = req.body.key;
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('user_agent_booking');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let result;
+    try {
+        result = await collection.findOne({ _id: new mongoose_1.default.Types.ObjectId(bookingId) });
+    }
+    catch (err) {
+        if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+            console.error("# Duplicate Data Found:\n", err);
+            logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }];
+            res.status(400).json({ logs });
+            return { logs };
+        }
+        else {
+            res.status(400).json({ err });
+            throw new Error(err);
+        }
+    }
+    if (result.bookingAgent !== req.session.authenticationID) {
+        logs = [
+            {
+                field: "Invalid Agent",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+    try {
+        await collection.updateOne({ _id: new mongoose_1.default.Types.ObjectId(bookingId) }, { $set: { bookingStatus: 'Accepted' } });
+        logs = {
+            field: "Succesful Updation",
+            message: "Booking Accepted by Agent"
+        };
+        res.status(200).json(logs);
+        return { logs };
+    }
+    catch (err) {
+        if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+            console.error("# Duplicate Data Found:\n", err);
+            logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }];
+            res.status(400).json({ logs });
+            return { logs };
+        }
+        else {
+            res.status(400).json({ err });
+            throw new Error(err);
+        }
+    }
+};
 const updateAgent = async (res) => {
     res.status(200).json({ message: 'agent Update' });
 };
@@ -326,6 +579,6 @@ const deleteAgent = async (res) => {
     res.status(200).json({ message: 'agent Delete' });
 };
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking
 };
 //# sourceMappingURL=AgentController.js.map

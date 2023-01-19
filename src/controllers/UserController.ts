@@ -472,7 +472,7 @@ const getUserBookings = async (req: Request, res: Response) => {
                 }
             }
             for (const booking of result) {
-                console.log('here')
+                // console.log('here')
 
                 const agentCollection = db.collection('agent');
                 let _agent;
@@ -514,13 +514,13 @@ const getUserBookings = async (req: Request, res: Response) => {
                     bookingStatus: booking.bookingStatus,
 
                 }
-                console.log(_booking)
+                // console.log(_booking)
                 _bookings.push(
                     _booking
                 );
 
-            });
-            console.log(_bookings)
+            };
+            // console.log(_bookings)
             res.status(200).json(_bookings);
             return _bookings;
         }

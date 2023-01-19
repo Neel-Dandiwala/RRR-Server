@@ -377,7 +377,6 @@ const getUserBookings = async (req, res) => {
                 }
             }
             for (const booking of result) {
-                console.log('here');
                 const agentCollection = db.collection('agent');
                 let _agent;
                 try {
@@ -408,11 +407,9 @@ const getUserBookings = async (req, res) => {
                     bookingPincode: booking.bookingPincode,
                     bookingStatus: booking.bookingStatus,
                 };
-                console.log(_booking);
                 _bookings.push(_booking);
             }
             ;
-            console.log(_bookings);
             res.status(200).json(_bookings);
             return _bookings;
         }
