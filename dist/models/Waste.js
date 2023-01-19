@@ -34,6 +34,18 @@ const WasteSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    wasteElectronicWeight: {
+        type: Number,
+        required: true
+    },
+    wastePaperWeight: {
+        type: Number,
+        required: true
+    },
+    wastePlasticWeight: {
+        type: Number,
+        required: true
+    },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("Waste", WasteSchema);
 //# sourceMappingURL=Waste.js.map

@@ -1,44 +1,61 @@
-import { Request, Response } from 'express';
-import Waste from '../models/Waste';
+import { Request, Response } from "express";
+import Waste from "../models/Waste";
 import { ResponseFormat } from "../resolvers/Format";
 import { connection } from "../connection";
-import { MongoServerError } from 'mongodb'
-import { web3, ValidationABI, TrackingABI } from "../web3"
-import { isNullableType } from 'graphql';
-import { WasteInfo } from '../types/WasteInfo';
-import mongoose from 'mongoose';
-require('dotenv').config()
+import { MongoServerError } from "mongodb";
+import { web3, ValidationABI, TrackingABI } from "../web3";
+import { isNullableType } from "graphql";
+import { WasteInfo } from "../types/WasteInfo";
+import mongoose from "mongoose";
+import { uploadOnImgur } from "../utils/ImgurUpload";
+const { QRCodeGeneratorFunction } = require("../controllers/QRController");
+require("dotenv").config();
 
 const wasteUser = async (req: Request, res: Response) => {
     const db = await connection.getDb();
-    let collection = db.collection('waste');
+    let collection = db.collection("waste");
     let logs;
     if (!req.session.authenticationID) {
         logs = [
             {
                 field: "Not logged in",
                 message: "Please log in",
-            }
-        ]
+            },
+        ];
         res.status(400).json({ logs });
         return null;
     }
 
     let validUser: boolean = false;
+    const wasteData = req.body as Pick<
+        WasteInfo,
+        | "wasteUser"
+        | "wasteElectronicWeight"
+        | "wastePaperWeight"
+        | "wastePlasticWeight"
+    >;
+    console.log(wasteData);
 
-    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
-    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+    var validationContract = new (web3.getWeb3().eth.Contract)(
+        ValidationABI.abi,
+        process.env.VALIDATION_ADDRESS,
+        {}
+    );
+    await validationContract.methods
+        .validateUser(wasteData.wasteUser)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
         .then(function (blockchain_result: any) {
-            console.log(blockchain_result)
+            console.log(blockchain_result);
             validUser = true;
-        }).catch((err: any) => {
-            console.log(err)
+        })
+        .catch((err: any) => {
+            console.log(err);
             logs = [
                 {
                     field: "Blockchain Error - Validation",
                     message: err,
-                }
-            ]
+                },
+            ];
 
             res.status(400).json({ logs });
             return;
@@ -49,101 +66,121 @@ const wasteUser = async (req: Request, res: Response) => {
             // collection = db.collection('user');
             // let _user = await collection.findOne({ _id:  new mongoose.Types.ObjectId(req.session.authenticationID) });
             // collection = db.collection('waste');
-            const wasteData = req.body as Pick<WasteInfo, "wasteDescription" | "wasteWeight">
-            console.log(wasteData);
-            const _waste: WasteInfo = new Waste({
-                wasteDescription: wasteData.wasteDescription,
-                wasteWeight: wasteData.wasteWeight,
-                wasteUser: req.session.authenticationID,
-                wasteUserDate: new Date(Date.now()).toISOString(),
-                wasteAgent: '',
-                wasteAgentDate: null,
-                wasteCompany: '',
-                wasteCompanyDate: null,
+            const _wasteWeight =
+                wasteData.wasteElectronicWeight +
+                wasteData.wastePaperWeight +
+                wasteData.wastePlasticWeight;
 
-            })
+            const _waste: WasteInfo = new Waste({
+                wasteDescription:
+                    "wasteElectronicWeight: " +
+                    wasteData.wasteElectronicWeight +
+                    ", wastePaperWeight: " +
+                    wasteData.wastePaperWeight +
+                    ", wastePlasticWeight: " +
+                    wasteData.wastePlasticWeight,
+                wasteWeight: _wasteWeight,
+                wasteUser: wasteData.wasteUser,
+                wasteUserDate: new Date(Date.now()).toISOString(),
+                wasteAgent: req.session.authenticationID,
+                wasteAgentDate: null,
+                wasteCompany: "",
+                wasteCompanyDate: null,
+                wasteElectronicWeight: wasteData.wasteElectronicWeight,
+                wastePaperWeight: wasteData.wastePaperWeight,
+                wastePlasticWeight: wasteData.wastePlasticWeight,
+            });
 
             let result: any;
             try {
                 result = await collection.insertOne(_waste);
             } catch (err) {
                 if (err instanceof MongoServerError && err.code === 11000) {
-                    console.error("# Duplicate Data Found:\n", err)
-                    logs = [{
-                        field: "Unexpected Mongo Error",
-                        message: "Default Message"
-                    }]
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [
+                        {
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message",
+                        },
+                    ];
                     res.status(400).json({ logs });
                     return { logs };
-
-                }
-                else {
+                } else {
                     res.status(400).json({ err });
 
-                    throw new Error(err)
+                    throw new Error(err);
                 }
             }
             console.log(result);
             if (result.acknowledged) {
                 console.log(result);
-                var trackingContract = new (web3.getWeb3()).eth.Contract(TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
+                var trackingContract = new (web3.getWeb3().eth.Contract)(
+                    TrackingABI.abi,
+                    process.env.TRACKING_ADDRESS,
+                    {}
+                );
 
-                let id_ = (result.insertedId).toString();
-                console.log(id_ + typeof (id_))
-                let description_ = wasteData.wasteDescription;
-                console.log(description_ + typeof (description_))
-                let weight_ = wasteData.wasteWeight.toString();
-                console.log(weight_ + typeof (weight_))
-                let user_ = req.session.authenticationID;
-                console.log(user_ + typeof (user_))
+                let id_ = result.insertedId.toString();
+                let description_ = _waste.wasteDescription;
+                console.log(description_);
+                let weight_ = _wasteWeight.toString();
+                let user_ = wasteData.wasteUser;
 
-                await trackingContract.methods.creationWaste(id_, description_, weight_, user_).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' }).then(function (blockchain_result: any) {
-                    console.log(blockchain_result)
-                    logs = [
-                        {
-                            field: "Successful Insertion",
-                            message: blockchain_result,
+                await trackingContract.methods
+                    .creationWaste(id_, description_, weight_, user_)
+                    .send({
+                        from: process.env.OWNER_ADDRESS,
+                        gas: "1000000",
+                        gasPrice: "3000000",
+                    })
+                    .then(function (blockchain_result: any) {
+                        console.log(blockchain_result);
+                        logs = [
+                            {
+                                field: "Successful Insertion",
+                                message: blockchain_result,
+                            },
+                        ];
+
+                        res.status(200).json({ logs });
+                        return { logs };
+                    })
+                    .catch(async (err: any) => {
+                        console.log(err);
+                        let deleted = await collection.deleteOne({
+                            _id: result.insertedId,
+                        });
+                        if (deleted.acknowledged) {
+                            logs = [
+                                {
+                                    field: "Blockchain Error - Waste Insertion",
+                                    message: err,
+                                },
+                            ];
+                            res.status(400).json({ logs });
+                            return;
+                        } else {
+                            logs = [
+                                {
+                                    field: "Blockchain Error and MongoDB Error",
+                                    message: err,
+                                },
+                            ];
+                            res.status(400).json({ logs });
+                            return;
                         }
-                    ]
-
-                    res.status(200).json({ logs });
-                    return { logs };
-                }).catch(async (err: any) => {
-                    console.log(err)
-                    let deleted = await collection.deleteOne({ _id: result.insertedId });
-                    if (deleted.acknowledged) {
-                        logs = [
-                            {
-                                field: "Blockchain Error - Waste Insertion",
-                                message: err,
-                            }
-                        ]
-                        res.status(400).json({ logs });
-                        return;
-                    } else {
-                        logs = [
-                            {
-                                field: "Blockchain Error and MongoDB Error",
-                                message: err,
-                            }
-                        ]
-                        res.status(400).json({ logs });
-                        return;
-                    }
-                });
+                    });
             } else {
                 logs = [
                     {
                         field: "Unknown Error Occurred",
                         message: "Better check with administrator",
-                    }
-                ]
+                    },
+                ];
 
                 res.status(400).json({ logs });
                 return { logs };
             }
-
-
         } catch (e) {
             res.status(400).json({ e });
             throw e;
@@ -151,46 +188,53 @@ const wasteUser = async (req: Request, res: Response) => {
     } else {
         logs = [
             {
-                field: "Invalid User",
+                field: "Invalid User Submitted",
                 message: "Better check with administrator",
-            }
-        ]
+            },
+        ];
 
         res.status(400).json({ logs });
         return;
     }
-}
+};
 
 const wasteAgent = async (req: Request, res: Response) => {
     const db = await connection.getDb();
-    const collection = db.collection('waste');
+    const collection = db.collection("waste");
     let logs;
     if (!req.session.authenticationID) {
         logs = [
             {
                 field: "Not logged in",
                 message: "Please log in",
-            }
-        ]
+            },
+        ];
         res.status(400).json({ logs });
         return null;
     }
 
     let validAgent: boolean = false;
 
-    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
-    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+    var validationContract = new (web3.getWeb3().eth.Contract)(
+        ValidationABI.abi,
+        process.env.VALIDATION_ADDRESS,
+        {}
+    );
+    await validationContract.methods
+        .validateAgent(req.session.authenticationID)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
         .then(function (blockchain_result: any) {
-            console.log(blockchain_result)
+            console.log(blockchain_result);
             validAgent = true;
-        }).catch((err: any) => {
-            console.log(err)
+        })
+        .catch((err: any) => {
+            console.log(err);
             logs = [
                 {
                     field: "Blockchain Error - Validation",
                     message: err,
-                }
-            ]
+                },
+            ];
 
             res.status(400).json({ logs });
             return;
@@ -199,48 +243,64 @@ const wasteAgent = async (req: Request, res: Response) => {
     if (validAgent) {
         try {
             const wasteId = req.body.id;
-            var trackingContract = new (web3.getWeb3()).eth.Contract(TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
+            var trackingContract = new (web3.getWeb3().eth.Contract)(
+                TrackingABI.abi,
+                process.env.TRACKING_ADDRESS,
+                {}
+            );
             let agent_ = req.session.authenticationID;
-            console.log(agent_ + typeof (agent_))
+            console.log(agent_ + typeof agent_);
 
-            await trackingContract.methods.agentOwnWaste(agent_, wasteId).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' }).then(async function (blockchain_result: any) {
-                console.log(blockchain_result)
-                let updatedAgent = await collection.updateOne(
-                    { _id:  new mongoose.Types.ObjectId(wasteId) },
-                    { $set: { wasteAgent: req.session.authenticationID, wasteAgentDate: new Date(Date.now()).toISOString() }}
-                )
-                if(updatedAgent.acknowledged){
+            await trackingContract.methods
+                .agentOwnWaste(agent_, wasteId)
+                .send({
+                    from: process.env.OWNER_ADDRESS,
+                    gas: "1000000",
+                    gasPrice: "3000000",
+                })
+                .then(async function (blockchain_result: any) {
+                    console.log(blockchain_result);
+                    let updatedAgent = await collection.updateOne(
+                        { _id: new mongoose.Types.ObjectId(wasteId) },
+                        {
+                            $set: {
+                                wasteAgent: req.session.authenticationID,
+                                wasteAgentDate: new Date(Date.now()).toISOString(),
+                            },
+                        }
+                    );
+                    if (updatedAgent.acknowledged) {
+                        logs = [
+                            {
+                                field: "Successful Updation",
+                                message: blockchain_result,
+                            },
+                        ];
+
+                        res.status(200).json({ logs });
+                        return { logs };
+                    } else {
+                        logs = [
+                            {
+                                field: "Mongo Error",
+                                message: blockchain_result,
+                            },
+                        ];
+
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                })
+                .catch((err: any) => {
+                    console.log(err);
                     logs = [
                         {
-                            field: "Successful Updation",
-                            message: blockchain_result,
-                        }
-                    ]
-    
-                    res.status(200).json({ logs });
-                    return { logs };
-                } else {
-                    logs = [
-                        {
-                            field: "Mongo Error",
-                            message: blockchain_result,
-                        }
-                    ]
-    
-                    res.status(400).json({ logs });
-                    return { logs };
-                }
-            }).catch( (err: any) => {
-                console.log(err)
-                    logs = [
-                        {
-                            field: "Blockchain Error - Waste Updation"
-                        }
-                    ]
+                            field: "Blockchain Error - Waste Updation",
+                        },
+                    ];
                     res.status(400).json({ logs });
                     return;
-                
-            });
+                });
         } catch (e) {
             res.status(400).json({ e });
             throw e;
@@ -250,45 +310,51 @@ const wasteAgent = async (req: Request, res: Response) => {
             {
                 field: "Invalid Agent",
                 message: "Better check with administrator",
-            }
-        ]
+            },
+        ];
 
         res.status(400).json({ logs });
         return;
     }
-
-}
+};
 
 const wasteCompany = async (req: Request, res: Response) => {
     const db = await connection.getDb();
-    const collection = db.collection('waste');
+    const collection = db.collection("waste");
     let logs;
     if (!req.session.authenticationID) {
         logs = [
             {
                 field: "Not logged in",
                 message: "Please log in",
-            }
-        ]
+            },
+        ];
         res.status(400).json({ logs });
         return null;
     }
 
     let validCompany: boolean = false;
 
-    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
-    await validationContract.methods.validateCompany(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+    var validationContract = new (web3.getWeb3().eth.Contract)(
+        ValidationABI.abi,
+        process.env.VALIDATION_ADDRESS,
+        {}
+    );
+    await validationContract.methods
+        .validateCompany(req.session.authenticationID)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
         .then(function (blockchain_result: any) {
-            console.log(blockchain_result)
+            console.log(blockchain_result);
             validCompany = true;
-        }).catch((err: any) => {
-            console.log(err)
+        })
+        .catch((err: any) => {
+            console.log(err);
             logs = [
                 {
                     field: "Blockchain Error - Validation",
                     message: err,
-                }
-            ]
+                },
+            ];
 
             res.status(400).json({ logs });
             return;
@@ -297,49 +363,64 @@ const wasteCompany = async (req: Request, res: Response) => {
     if (validCompany) {
         try {
             const wasteId = req.body.id;
-            var trackingContract = new (web3.getWeb3()).eth.Contract(TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
+            var trackingContract = new (web3.getWeb3().eth.Contract)(
+                TrackingABI.abi,
+                process.env.TRACKING_ADDRESS,
+                {}
+            );
             let company_ = req.session.authenticationID;
-            console.log(company_ + typeof (company_))
+            console.log(company_ + typeof company_);
 
-            await trackingContract.methods.companyOwnWaste(company_, wasteId).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' }).then(async function (blockchain_result: any) {
-                console.log(blockchain_result)
-                let updatedCompany = await collection.updateOne(
-                    { _id:  new mongoose.Types.ObjectId(wasteId) },
-                    { $set: { wasteCompany: req.session.authenticationID, wasteCompanyDate: new Date(Date.now()).toISOString() }}
-                )
-                if(updatedCompany.acknowledged){
+            await trackingContract.methods
+                .companyOwnWaste(company_, wasteId)
+                .send({
+                    from: process.env.OWNER_ADDRESS,
+                    gas: "1000000",
+                    gasPrice: "3000000",
+                })
+                .then(async function (blockchain_result: any) {
+                    console.log(blockchain_result);
+                    let updatedCompany = await collection.updateOne(
+                        { _id: new mongoose.Types.ObjectId(wasteId) },
+                        {
+                            $set: {
+                                wasteCompany: req.session.authenticationID,
+                                wasteCompanyDate: new Date(Date.now()).toISOString(),
+                            },
+                        }
+                    );
+                    if (updatedCompany.acknowledged) {
+                        logs = [
+                            {
+                                field: "Successful Updation",
+                                message: blockchain_result,
+                            },
+                        ];
+
+                        res.status(200).json({ logs });
+                        return { logs };
+                    } else {
+                        logs = [
+                            {
+                                field: "Mongo Error",
+                                message: blockchain_result,
+                            },
+                        ];
+
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                })
+                .catch((err: any) => {
+                    console.log(err);
                     logs = [
                         {
-                            field: "Successful Updation",
-                            message: blockchain_result,
-                        }
-                    ]
-    
-                    res.status(200).json({ logs });
-                    return { logs };
-                } else {
-                    logs = [
-                        {
-                            field: "Mongo Error",
-                            message: blockchain_result,
-                        }
-                    ]
-    
-                    res.status(400).json({ logs });
-                    return { logs };
-                }
-                
-            }).catch( (err: any) => {
-                console.log(err)
-                    logs = [
-                        {
-                            field: "Blockchain Error - Waste Updation"
-                        }
-                    ]
+                            field: "Blockchain Error - Waste Updation",
+                        },
+                    ];
                     res.status(400).json({ logs });
                     return;
-                
-            });
+                });
         } catch (e) {
             res.status(400).json({ e });
             throw e;
@@ -349,77 +430,191 @@ const wasteCompany = async (req: Request, res: Response) => {
             {
                 field: "Invalid Company",
                 message: "Better check with administrator",
-            }
-        ]
+            },
+        ];
 
         res.status(400).json({ logs });
         return;
     }
-
-}
+};
 
 const wasteBlockchain = async (req: Request, res: Response) => {
     let logs;
     const key = req.body.key;
     console.log(req.body);
-    var trackingContract = new (web3.getWeb3()).eth.Contract(TrackingABI.abi, process.env.TRACKING_ADDRESS, {})
-    await trackingContract.methods.getWaste(key).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+    var trackingContract = new (web3.getWeb3().eth.Contract)(
+        TrackingABI.abi,
+        process.env.TRACKING_ADDRESS,
+        {}
+    );
+    await trackingContract.methods
+        .getWaste(key)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
         .then(async function (blockchain_result: any) {
-            console.log(blockchain_result)
+            console.log(blockchain_result);
             logs = [
                 {
                     field: "Waste Log",
                     message: blockchain_result,
-                }
-            ]
+                },
+            ];
             res.status(200).json({ logs });
             return;
-        }).catch(async (err: any) => {
-            console.log(err)
+        })
+        .catch(async (err: any) => {
+            console.log(err);
 
             logs = [
                 {
                     field: "Blockchain Error",
                     message: err,
-                }
-            ]
+                },
+            ];
             res.status(400).json({ logs });
             return;
-
         });
-}
+};
+
+const getWasteQRDetails = async (req: Request, res: Response) => {
+    let logs;
+    const key = req.params.key;
+    var trackingContract = new (web3.getWeb3().eth.Contract)(
+        TrackingABI.abi,
+        process.env.TRACKING_ADDRESS,
+        {}
+    );
+    await trackingContract.methods
+        .getWaste(key)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
+        .then(async function (blockchain_result: any) {
+            console.log(blockchain_result);
+            logs = {
+                field: "Waste Log",
+                wasteDescription:
+                    blockchain_result.events.WasteData.returnValues.description,
+                wasteWeight: blockchain_result.events.WasteData.returnValues.weight,
+                wasteUser: blockchain_result.events.WasteData.returnValues.user,
+                wasteAgent: blockchain_result.events.WasteData.returnValues.agent,
+                wasteCompany: blockchain_result.events.WasteData.returnValues.company,
+                wasteSubmitted:
+                    blockchain_result.events.WasteData.returnValues.submitDate,
+                wasteExist: blockchain_result.events.WasteData.returnValues.exist,
+            };
+
+            res.status(200).json(logs);
+            return;
+        })
+        .catch(async (err: any) => {
+            console.log(err);
+
+            logs = [
+                {
+                    field: "Blockchain Error",
+                    message: err,
+                },
+            ];
+            res.status(400).json({ logs });
+            return;
+        });
+};
+
+const getWasteQR = async (req: Request, res: Response) => {
+    let logs;
+    const wasteId = req.body.key;
+    let generatedQR;
+    try {
+        await QRCodeGeneratorFunction(wasteId).then(async function (
+            generatedQR: any
+        ) {
+            let imageLink;
+            try {
+                console.log(generatedQR);
+                // console.log(setTimeout(async () => {return await uploadOnImgur((generatedQR.fileName).toString())}, 1000))
+                // imageLink = await uploadOnImgur((generatedQR.fileName).toString())
+                setTimeout(async () => {
+                    imageLink = await uploadOnImgur(generatedQR.fileName.toString());
+                    logs = {
+                        field: "Image Generated",
+                        message: imageLink,
+                    };
+        
+                    res.status(200).json(logs);
+                    return;
+                }, 1000);
+                console.log(imageLink);
+            } catch (err) {
+                logs = {
+                    field: "Imgur Error",
+                    message: err,
+                };
+
+                res.status(400).json(logs);
+                return;
+            }
+
+            logs = {
+                field: "Image Generated",
+                message: imageLink,
+            };
+
+            // res.status(200).json(logs);
+            return;
+        });
+        // console.log(generatedQR.fileName)
+    } catch (err) {
+        console.log(err);
+
+        logs = {
+            field: "QR Generation Error",
+            message: err,
+        };
+
+        res.status(400).json(logs);
+        return;
+    }
+};
 
 const wasteComplete = async (req: Request, res: Response) => {
     let logs;
     const key = req.body.key;
     console.log(req.body);
-    var trackingContract = new (web3.getWeb3()).eth.Contract(TrackingABI.abi, process.env.TRACKING_ADDRESS, {})
-    await trackingContract.methods.concludeWaste(req.session.authenticationID, key).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+    var trackingContract = new (web3.getWeb3().eth.Contract)(
+        TrackingABI.abi,
+        process.env.TRACKING_ADDRESS,
+        {}
+    );
+    await trackingContract.methods
+        .concludeWaste(req.session.authenticationID, key)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
         .then(function (blockchain_result: any) {
-            console.log(blockchain_result)
-            logs = [
-                {
-                    field: "Waste Concluded Log",
-                    message: blockchain_result,
-                }
-            ]
-            res.status(200).json({ logs });
+            console.log(blockchain_result);
+            logs = {
+                field: "Waste Concluded Log",
+                message: blockchain_result,
+            };
+            res.status(200).json(logs);
             return;
-        }).catch( (err: any) => {
-            console.log(err)
+        })
+        .catch((err: any) => {
+            console.log(err);
 
             logs = [
                 {
                     field: "Blockchain Error",
                     message: err,
-                }
-            ]
+                },
+            ];
             res.status(400).json({ logs });
             return;
-
         });
-}
+};
 
 module.exports = {
-    wasteUser, wasteAgent, wasteCompany, wasteBlockchain, wasteComplete
-}
+    wasteUser,
+    wasteAgent,
+    wasteCompany,
+    wasteBlockchain,
+    wasteComplete,
+    getWasteQRDetails,
+    getWasteQR,
+};

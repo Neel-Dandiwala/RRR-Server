@@ -43,6 +43,21 @@ const WasteSchema: Schema = new Schema({
         required: true
     },
 
+    wasteElectronicWeight: {
+        type: Number,
+        required: true
+    },
+
+    wastePaperWeight: {
+        type: Number,
+        required: true
+    },
+
+    wastePlasticWeight: {
+        type: Number,
+        required: true
+    },
+
 }, {timestamps: true})
 
 export default model<WasteInfo>("Waste", WasteSchema);

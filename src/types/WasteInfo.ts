@@ -7,5 +7,8 @@ export class WasteInfo {
     wasteAgentDate: string;
     wasteCompany: string;
     wasteCompanyDate: string;
+    wasteElectronicWeight: number;
+    wastePlasticWeight: number;
+    wastePaperWeight: number;
 }
 
