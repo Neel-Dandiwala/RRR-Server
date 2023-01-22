@@ -258,14 +258,25 @@ const wasteAgent = async (req: Request, res: Response) => {
 
     if (validAgent) {
         try {
-            const wasteId = req.body.id;
+            const wasteId = req.body.key;
+            let _waste = await collection.findOne({ _id: new mongoose.Types.ObjectId(wasteId) })
+            if (_waste.wasteAgent !== req.session.authenticationID) {
+                logs =
+                    {
+                        field: "Invalid Agent",
+                        message: "Better check with administrator",
+                    }
+                ;
+                res.status(400).json({ logs });
+                return;
+            }
             var trackingContract = new (web3.getWeb3().eth.Contract)(
                 TrackingABI.abi,
                 process.env.TRACKING_ADDRESS,
                 {}
             );
             let agent_ = req.session.authenticationID;
-            console.log(agent_ + typeof agent_);
+            // console.log(agent_ + typeof agent_);
 
             await trackingContract.methods
                 .agentOwnWaste(agent_, wasteId)
@@ -280,7 +291,6 @@ const wasteAgent = async (req: Request, res: Response) => {
                         { _id: new mongoose.Types.ObjectId(wasteId) },
                         {
                             $set: {
-                                wasteAgent: req.session.authenticationID,
                                 wasteAgentDate: new Date(Date.now()).toISOString(),
                             },
                         }

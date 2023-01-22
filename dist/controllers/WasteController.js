@@ -223,10 +223,19 @@ const wasteAgent = async (req, res) => {
     });
     if (validAgent) {
         try {
-            const wasteId = req.body.id;
+            const wasteId = req.body.key;
+            let _waste = await collection.findOne({ _id: new mongoose_1.default.Types.ObjectId(wasteId) });
+            if (_waste.wasteAgent !== req.session.authenticationID) {
+                logs =
+                    {
+                        field: "Invalid Agent",
+                        message: "Better check with administrator",
+                    };
+                res.status(400).json({ logs });
+                return;
+            }
             var trackingContract = new (web3_1.web3.getWeb3().eth.Contract)(web3_1.TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
             let agent_ = req.session.authenticationID;
-            console.log(agent_ + typeof agent_);
             await trackingContract.methods
                 .agentOwnWaste(agent_, wasteId)
                 .send({
@@ -238,7 +247,6 @@ const wasteAgent = async (req, res) => {
                 console.log(blockchain_result);
                 let updatedAgent = await collection.updateOne({ _id: new mongoose_1.default.Types.ObjectId(wasteId) }, {
                     $set: {
-                        wasteAgent: req.session.authenticationID,
                         wasteAgentDate: new Date(Date.now()).toISOString(),
                     },
                 });
