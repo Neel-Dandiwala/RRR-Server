@@ -7,7 +7,7 @@ const qrcode_1 = __importDefault(require("qrcode"));
 var base64ToImage = require('base64-to-image');
 require('dotenv').config();
 const generateURL = (wasteId) => {
-    return `http://localhost:4000/waste/${wasteId}`;
+    return `https://rrr-server.onrender.com/waste/${wasteId}`;
 };
 const QRCodeGenerator = async (req, res) => {
     const wasteId = req.body.key;
