@@ -296,15 +296,32 @@ const wasteAgent = async (req: Request, res: Response) => {
                         }
                     );
                     if (updatedAgent.acknowledged) {
-                        logs = [
-                            {
-                                field: "Successful Updation",
-                                message: blockchain_result,
-                            },
-                        ];
-
-                        res.status(200).json({ logs });
-                        return { logs };
+                        let _waste = await collection.findOne(
+                            { _id: new mongoose.Types.ObjectId(wasteId) })
+                        // let userCollection = db.collection("user");
+                        // let agentCollection = db.collection("agent");
+                        // let _user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(_waste.wasteUser) })
+                        // let _agent = await agentCollection.findOne({ _id: new mongoose.Types.ObjectId(_waste.wasteAgent) })
+                        // logs =
+                        //     {
+                        //         field: "Successful Insertion",
+                        //         wasteId: wasteId,
+                        //         wasteWeight: _waste.wasteWeight,
+                        //         wasteUser: _waste.wasteUser,
+                        //         wasteUserName: _user.userName,
+                        //         wasteUserDate: _waste.wasteUserDate,
+                        //         wasteAgent: _waste.wasteAgent,
+                        //         wasteAgentName: _agent.agentName,
+                        //         wasteAgentDate: _waste.wasteAgentDate,
+                        //         wasteCompany: _waste.wasteCompany,
+                        //         wasteCompanyDate: _waste.wasteCompanyDate,
+                        //         wasteElectronicWeight: _waste.wasteElectronicWeight,
+                        //         wastePaperWeight: _waste.wastePaperWeight,
+                        //         wastePlasticWeight: _waste.wastePlasticWeight,
+                        //     }
+                        // ;
+                        res.status(200).json(_waste.wasteAgentDate);
+                        return;
                     } else {
                         logs = [
                             {

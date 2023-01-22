@@ -735,6 +735,126 @@ const agentAcceptBooking = async(req: Request, res:Response) => {
 
 }
 
+// @desc   Get User
+// @route  GET /user/login
+// @access Private
+const setAgentCompanyForm = async (req: Request, res: Response) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    const db = await connection.getDb();
+    const collection = db.collection('user_agent_booking');
+    let validAgent: boolean = false;
+
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validAgent = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
+
+    if (validAgent) {
+        try {
+            const formData = req.body as Pick<UserAgentFormInfo, "bookingDate" | "bookingTimeSlot" | "bookingAddress" | "bookingPincode" | "bookingAgent">
+
+            const _formData: UserAgentFormInfo = new UserAgentForm({
+                bookingUser: req.session.authenticationID,
+
+                bookingAgent: formData.bookingAgent,
+
+                bookingDate: new Date(formData.bookingDate).toISOString(),
+
+                bookingTimeSlot: formData.bookingTimeSlot,
+
+                bookingAddress: formData.bookingAddress,
+
+                bookingPincode: formData.bookingPincode,
+
+                bookingStatus: 'Pending'
+
+            })
+            let result;
+            try {
+                result = await collection.insertOne(_formData);
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }]
+                    res.status(400).json({ logs });
+                    return { logs };
+
+                }
+                else {
+                    res.status(400).json({ err });
+
+                    throw new Error(err)
+                }
+            }
+            console.log(result);
+            if (result.acknowledged) {
+                console.log(result);
+                logs =
+                {
+                    field: "Successful Insertion of Form",
+                    message: "Done",
+                }
+
+
+                res.status(200).json(logs);
+                return { logs };
+            } else {
+                logs = [
+                    {
+                        field: "Unknown Error Occurred",
+                        message: "Better check with administrator",
+                    }
+                ]
+
+                res.status(400).json({ logs });
+                return { logs };
+            }
+
+
+        } catch (e) {
+            res.status(400).json({ e });
+            throw e;
+        }
+    } else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ]
+
+        res.status(400).json({ logs });
+        return;
+    }
+}
+
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private

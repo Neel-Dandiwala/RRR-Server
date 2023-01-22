@@ -251,14 +251,9 @@ const wasteAgent = async (req, res) => {
                     },
                 });
                 if (updatedAgent.acknowledged) {
-                    logs = [
-                        {
-                            field: "Successful Updation",
-                            message: blockchain_result,
-                        },
-                    ];
-                    res.status(200).json({ logs });
-                    return { logs };
+                    let _waste = await collection.findOne({ _id: new mongoose_1.default.Types.ObjectId(wasteId) });
+                    res.status(200).json(_waste.wasteAgentDate);
+                    return;
                 }
                 else {
                     logs = [
