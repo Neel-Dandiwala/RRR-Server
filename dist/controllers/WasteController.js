@@ -425,6 +425,7 @@ const wasteBlockchain = async (req, res) => {
     });
 };
 const getWasteQRDetails = async (req, res) => {
+    const db = await connection_1.connection.getDb();
     let logs;
     const key = req.params.key;
     var trackingContract = new (web3_1.web3.getWeb3().eth.Contract)(web3_1.TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
@@ -433,13 +434,30 @@ const getWasteQRDetails = async (req, res) => {
         .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
         .then(async function (blockchain_result) {
         console.log(blockchain_result);
+        let userCollection = db.collection("user");
+        let _user = await userCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(blockchain_result.events.WasteData.returnValues.user) });
+        let _agentName = "-";
+        let _companyName = "-";
+        if (blockchain_result.events.WasteData.returnValues.agent !== "-") {
+            let agentCollection = db.collection("agent");
+            let _agent = await agentCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(blockchain_result.events.WasteData.returnValues.agent) });
+            _agentName = _agent.agentName;
+        }
+        if (blockchain_result.events.WasteData.returnValues.company !== "-") {
+            let companyCollection = db.collection("company");
+            let _company = await companyCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(blockchain_result.events.WasteData.returnValues.company) });
+            _companyName = _company.companyName;
+        }
         logs = {
             field: "Waste Log",
             wasteDescription: blockchain_result.events.WasteData.returnValues.description,
             wasteWeight: blockchain_result.events.WasteData.returnValues.weight,
             wasteUser: blockchain_result.events.WasteData.returnValues.user,
+            wasteUserName: _user.userName,
             wasteAgent: blockchain_result.events.WasteData.returnValues.agent,
+            wasteAgentName: _agentName,
             wasteCompany: blockchain_result.events.WasteData.returnValues.company,
+            wasteCompanyName: _companyName,
             wasteSubmitted: blockchain_result.events.WasteData.returnValues.submitDate,
             wasteExist: blockchain_result.events.WasteData.returnValues.exist,
         };
