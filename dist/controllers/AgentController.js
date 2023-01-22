@@ -14,6 +14,7 @@ const axios_1 = __importDefault(require("axios"));
 const CompanyInfo_1 = require("../types/CompanyInfo");
 const searchNearby_1 = require("../utils/searchNearby");
 const mongoose_1 = __importDefault(require("mongoose"));
+const AgentCompanyForm_1 = __importDefault(require("../models/AgentCompanyForm"));
 require('dotenv').config();
 class AgentResponse {
 }
@@ -591,7 +592,7 @@ const setAgentCompanyForm = async (req, res) => {
         return null;
     }
     const db = await connection_1.connection.getDb();
-    const collection = db.collection('user_agent_booking');
+    const collection = db.collection('agent_company_booking');
     let validAgent = false;
     var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
     await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
@@ -612,13 +613,15 @@ const setAgentCompanyForm = async (req, res) => {
     if (validAgent) {
         try {
             const formData = req.body;
-            const _formData = new UserAgentForm({
-                bookingUser: req.session.authenticationID,
-                bookingAgent: formData.bookingAgent,
+            const _formData = new AgentCompanyForm_1.default({
+                bookingAgent: req.session.authenticationID,
+                bookingCompany: formData.bookingCompany,
                 bookingDate: new Date(formData.bookingDate).toISOString(),
                 bookingTimeSlot: formData.bookingTimeSlot,
-                bookingAddress: formData.bookingAddress,
-                bookingPincode: formData.bookingPincode,
+                wasteIds: formData.wasteIds,
+                totalPlasticWeight: formData.totalPlasticWeight,
+                totalPaperWeight: formData.totalPaperWeight,
+                totalElectronicWeight: formData.totalElectronicWeight,
                 bookingStatus: 'Pending'
             });
             let result;
@@ -685,6 +688,6 @@ const deleteAgent = async (res) => {
     res.status(200).json({ message: 'agent Delete' });
 };
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm
 };
 //# sourceMappingURL=AgentController.js.map

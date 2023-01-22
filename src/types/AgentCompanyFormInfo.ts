@@ -2,13 +2,17 @@
 
 export class AgentCompanyFormInfo {
 
+    wasteIds: string[];
+
     bookingCompany: string;
     
     bookingDate: string;
 
     bookingTimeSlot: string;
 
-    bookingAddress: string;
+    totalPlasticWeight: number;
 
-    bookingPincode: string;
+    totalPaperWeight: number;
+
+    totalElectronicWeight: number;
 }

@@ -13,6 +13,8 @@ import axios from 'axios';
 import { CompanyInfo } from '../types/CompanyInfo';
 import { calculateDistance } from '../utils/searchNearby';
 import mongoose from 'mongoose';
+import { AgentCompanyFormInfo } from '../types/AgentCompanyFormInfo';
+import AgentCompanyForm from '../models/AgentCompanyForm';
 
 
 require('dotenv').config()
@@ -752,7 +754,7 @@ const setAgentCompanyForm = async (req: Request, res: Response) => {
     }
 
     const db = await connection.getDb();
-    const collection = db.collection('user_agent_booking');
+    const collection = db.collection('agent_company_booking');
     let validAgent: boolean = false;
 
     var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
@@ -775,20 +777,24 @@ const setAgentCompanyForm = async (req: Request, res: Response) => {
 
     if (validAgent) {
         try {
-            const formData = req.body as Pick<UserAgentFormInfo, "bookingDate" | "bookingTimeSlot" | "bookingAddress" | "bookingPincode" | "bookingAgent">
+            const formData = req.body as Pick<AgentCompanyFormInfo, "bookingCompany" | "bookingDate" | "bookingTimeSlot" | "wasteIds" | "totalPlasticWeight" | "totalPaperWeight" | "totalElectronicWeight">
 
-            const _formData: UserAgentFormInfo = new UserAgentForm({
-                bookingUser: req.session.authenticationID,
+            const _formData: AgentCompanyFormInfo = new AgentCompanyForm({
+                bookingAgent: req.session.authenticationID,
 
-                bookingAgent: formData.bookingAgent,
+                bookingCompany: formData.bookingCompany,
 
                 bookingDate: new Date(formData.bookingDate).toISOString(),
 
                 bookingTimeSlot: formData.bookingTimeSlot,
 
-                bookingAddress: formData.bookingAddress,
+                wasteIds: formData.wasteIds,
 
-                bookingPincode: formData.bookingPincode,
+                totalPlasticWeight: formData.totalPlasticWeight,
+
+                totalPaperWeight: formData.totalPaperWeight,
+
+                totalElectronicWeight: formData.totalElectronicWeight,
 
                 bookingStatus: 'Pending'
 
@@ -870,5 +876,5 @@ const deleteAgent = async(res: Response) => {
 }
 
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm
 }

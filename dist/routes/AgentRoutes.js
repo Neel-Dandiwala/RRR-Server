@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const { getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking } = require('../controllers/AgentController');
+const { getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm } = require('../controllers/AgentController');
 const router = express_1.default.Router();
 router.get('/agents', getAgents);
 router.post('/agent/signup', setAgent);
@@ -14,5 +14,6 @@ router.post('/agent/booking/accept', agentAcceptBooking);
 router.get('/agent/nearbycompanies', getNearbyCompanies);
 router.get('/agent/bookings', getAgentBookings);
 router.delete('/agent/login', deleteAgent);
+router.post('/agent/companyForm', setAgentCompanyForm);
 module.exports = router;
 //# sourceMappingURL=AgentRoutes.js.map
