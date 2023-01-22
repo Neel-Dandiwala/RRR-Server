@@ -107,15 +107,30 @@ const wasteUser = async (req, res) => {
                     gas: "1000000",
                     gasPrice: "3000000",
                 })
-                    .then(function (blockchain_result) {
+                    .then(async function (blockchain_result) {
                     console.log(blockchain_result);
-                    logs = [
+                    let userCollection = db.collection("user");
+                    let agentCollection = db.collection("agent");
+                    let _user = await userCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(wasteData.wasteUser) });
+                    let _agent = await agentCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(_waste.wasteAgent) });
+                    logs =
                         {
                             field: "Successful Insertion",
-                            message: blockchain_result,
-                        },
-                    ];
-                    res.status(200).json({ logs });
+                            wasteId: id_,
+                            wasteWeight: _wasteWeight,
+                            wasteUser: wasteData.wasteUser,
+                            wasteUserName: _user.userName,
+                            wasteUserDate: _waste.wasteUserDate,
+                            wasteAgent: _waste.wasteAgent,
+                            wasteAgentName: _agent.agentName,
+                            wasteAgentDate: _waste.wasteAgentDate,
+                            wasteCompany: _waste.wasteCompany,
+                            wasteCompanyDate: _waste.wasteCompanyDate,
+                            wasteElectronicWeight: wasteData.wasteElectronicWeight,
+                            wastePaperWeight: wasteData.wastePaperWeight,
+                            wastePlasticWeight: wasteData.wastePlasticWeight,
+                        };
+                    res.status(200).json(logs);
                     return { logs };
                 })
                     .catch(async (err) => {

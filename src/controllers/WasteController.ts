@@ -133,16 +133,32 @@ const wasteUser = async (req: Request, res: Response) => {
                         gas: "1000000",
                         gasPrice: "3000000",
                     })
-                    .then(function (blockchain_result: any) {
+                    .then(async function (blockchain_result: any) {
                         console.log(blockchain_result);
-                        logs = [
+                        let userCollection = db.collection("user");
+                        let agentCollection = db.collection("agent");
+                        let _user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(wasteData.wasteUser) })
+                        let _agent = await agentCollection.findOne({ _id: new mongoose.Types.ObjectId(_waste.wasteAgent) })
+                        logs =
                             {
                                 field: "Successful Insertion",
-                                message: blockchain_result,
-                            },
-                        ];
+                                wasteId: id_,
+                                wasteWeight: _wasteWeight,
+                                wasteUser: wasteData.wasteUser,
+                                wasteUserName: _user.userName,
+                                wasteUserDate: _waste.wasteUserDate,
+                                wasteAgent: _waste.wasteAgent,
+                                wasteAgentName: _agent.agentName,
+                                wasteAgentDate: _waste.wasteAgentDate,
+                                wasteCompany: _waste.wasteCompany,
+                                wasteCompanyDate: _waste.wasteCompanyDate,
+                                wasteElectronicWeight: wasteData.wasteElectronicWeight,
+                                wastePaperWeight: wasteData.wastePaperWeight,
+                                wastePlasticWeight: wasteData.wastePlasticWeight,
+                            }
+                        ;
 
-                        res.status(200).json({ logs });
+                        res.status(200).json(logs);
                         return { logs };
                     })
                     .catch(async (err: any) => {
