@@ -69,6 +69,7 @@ const wasteUser = async (req, res) => {
                 wasteElectronicWeight: wasteData.wasteElectronicWeight,
                 wastePaperWeight: wasteData.wastePaperWeight,
                 wastePlasticWeight: wasteData.wastePlasticWeight,
+                bookingId: wasteData.bookingId
             });
             let result;
             try {

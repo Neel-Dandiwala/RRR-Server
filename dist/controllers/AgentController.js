@@ -12,7 +12,6 @@ const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
 const axios_1 = __importDefault(require("axios"));
 const CompanyInfo_1 = require("../types/CompanyInfo");
-const searchNearby_1 = require("../utils/searchNearby");
 const mongoose_1 = __importDefault(require("mongoose"));
 const AgentCompanyForm_1 = __importDefault(require("../models/AgentCompanyForm"));
 require('dotenv').config();
@@ -261,7 +260,7 @@ const getNearbyCompanies = async (req, res) => {
             result = await collection.find({}).toArray();
             result.forEach(function (company) {
                 console.log(company);
-                let _distance = (0, searchNearby_1.calculateDistance)(lat, lon, company.companyLatitude, company.companyLongitude);
+                let _distance = calculateDistance(lat, lon, company.companyLatitude, company.companyLongitude);
                 console.log(_distance);
                 if (_distance <= 5.0) {
                     console.log("Distance is good");
@@ -668,6 +667,100 @@ const setAgentCompanyForm = async (req, res) => {
         catch (e) {
             res.status(400).json({ e });
             throw e;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
+const wasteByBooking = async (req, res) => {
+    const bookingId = req.body.key;
+    let logs;
+    if (!req.session.authenticationID) {
+        logs =
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            };
+        res.status(400).json({ logs });
+        return null;
+    }
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('user_agent_booking');
+    let validAgent = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validAgent = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validAgent) {
+        try {
+            const bookingData = await collection.findOne({ _id: new mongoose_1.default.Types.ObjectId(bookingId) });
+            let wasteData;
+            try {
+                const wasteCollection = db.collection('waste');
+                wasteData = await wasteCollection.findOne(_formData);
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            const _formData = new AgentCompanyForm_1.default({
+                bookingAgent: req.session.authenticationID,
+                bookingCompany: formData.bookingCompany,
+                bookingDate: new Date(formData.bookingDate).toISOString(),
+                bookingTimeSlot: formData.bookingTimeSlot,
+                wasteIds: formData.wasteIds,
+                totalPlasticWeight: formData.totalPlasticWeight,
+                totalPaperWeight: formData.totalPaperWeight,
+                totalElectronicWeight: formData.totalElectronicWeight,
+                bookingStatus: 'Pending'
+            });
+            let result;
+        }
+        catch (err) {
+            if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err);
+                logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }];
+                res.status(400).json({ logs });
+                return { logs };
+            }
+            else {
+                res.status(400).json({ err });
+                throw new Error(err);
+            }
         }
     }
     else {

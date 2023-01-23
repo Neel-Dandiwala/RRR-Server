@@ -33,6 +33,7 @@ const wasteUser = async (req: Request, res: Response) => {
         | "wasteElectronicWeight"
         | "wastePaperWeight"
         | "wastePlasticWeight"
+        | "bookingId"
     >;
     console.log(wasteData);
 
@@ -89,6 +90,7 @@ const wasteUser = async (req: Request, res: Response) => {
                 wasteElectronicWeight: wasteData.wasteElectronicWeight,
                 wastePaperWeight: wasteData.wastePaperWeight,
                 wastePlasticWeight: wasteData.wastePlasticWeight,
+                bookingId: wasteData.bookingId
             });
 
             let result: any;
@@ -673,6 +675,8 @@ const wasteComplete = async (req: Request, res: Response) => {
             return;
         });
 };
+
+
 
 module.exports = {
     wasteUser,

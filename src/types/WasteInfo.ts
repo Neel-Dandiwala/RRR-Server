@@ -10,5 +10,6 @@ export class WasteInfo {
     wasteElectronicWeight: number;
     wastePlasticWeight: number;
     wastePaperWeight: number;
+    bookingId: string;
 }
 

@@ -43,6 +43,11 @@ const WasteSchema: Schema = new Schema({
         required: true
     },
 
+    bookingId: {
+        type: String,
+        required: true
+    },
+
     wasteElectronicWeight: {
         type: Number,
         required: true

@@ -11,7 +11,6 @@ import { web3, ValidationABI } from "../web3"
 import { getCoordinates } from '../utils/GeoLocation';
 import axios from 'axios';
 import { CompanyInfo } from '../types/CompanyInfo';
-import { calculateDistance } from '../utils/searchNearby';
 import mongoose from 'mongoose';
 import { AgentCompanyFormInfo } from '../types/AgentCompanyFormInfo';
 import AgentCompanyForm from '../models/AgentCompanyForm';
@@ -847,6 +846,120 @@ const setAgentCompanyForm = async (req: Request, res: Response) => {
         } catch (e) {
             res.status(400).json({ e });
             throw e;
+        }
+    } else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ]
+
+        res.status(400).json({ logs });
+        return;
+    }
+}
+
+const wasteByBooking = async (req: Request, res: Response) => {
+    const bookingId = req.body.key
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = 
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    const db = await connection.getDb();
+    const collection = db.collection('user_agent_booking');
+    let validAgent: boolean = false;
+
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validAgent = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
+
+    if (validAgent) {
+        try {
+            const bookingData = await collection.findOne({ _id: new mongoose.Types.ObjectId(bookingId)  })
+            let wasteData;
+            try {
+                const wasteCollection = db.collection('waste');
+
+                wasteData = await wasteCollection.findOne(_formData);
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }]
+                    res.status(400).json({ logs });
+                    return { logs };
+
+                }
+                else {
+                    res.status(400).json({ err });
+
+                    throw new Error(err)
+                }
+            }
+            const _formData: AgentCompanyFormInfo = new AgentCompanyForm({
+                bookingAgent: req.session.authenticationID,
+
+                bookingCompany: formData.bookingCompany,
+
+                bookingDate: new Date(formData.bookingDate).toISOString(),
+
+                bookingTimeSlot: formData.bookingTimeSlot,
+
+                wasteIds: formData.wasteIds,
+
+                totalPlasticWeight: formData.totalPlasticWeight,
+
+                totalPaperWeight: formData.totalPaperWeight,
+
+                totalElectronicWeight: formData.totalElectronicWeight,
+
+                bookingStatus: 'Pending'
+
+            })
+            let result;
+
+
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return { logs };
+
+            }
+            else {
+                res.status(400).json({ err });
+
+                throw new Error(err)
+            }
         }
     } else {
         logs = [

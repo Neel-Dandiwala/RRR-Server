@@ -34,6 +34,10 @@ const WasteSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    bookingId: {
+        type: String,
+        required: true
+    },
     wasteElectronicWeight: {
         type: Number,
         required: true
