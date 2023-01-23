@@ -695,5 +695,5 @@ const updateUser = async (res: Response) => {
 
 
 module.exports = {
-    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings, getUserBookings2
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings,
 }

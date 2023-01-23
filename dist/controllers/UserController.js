@@ -553,6 +553,6 @@ const updateUser = async (res) => {
     res.status(200).json({ message: 'User Update' });
 };
 module.exports = {
-    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings, getUserBookings2
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings,
 };
 //# sourceMappingURL=UserController.js.map
