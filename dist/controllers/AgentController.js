@@ -339,12 +339,12 @@ const getAgentBookings = async (req, res) => {
         res.status(400).json({ logs });
         return null;
     }
-    let validUser = false;
+    let validAgent = false;
     var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
     await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
         .then(function (blockchain_result) {
         console.log(blockchain_result);
-        validUser = true;
+        validAgent = true;
     }).catch((err) => {
         console.log(err);
         logs = [
@@ -356,7 +356,7 @@ const getAgentBookings = async (req, res) => {
         res.status(400).json({ logs });
         return;
     });
-    if (validUser) {
+    if (validAgent) {
         try {
             let result;
             let _bookings = [];
@@ -776,6 +776,132 @@ const wasteByBooking = async (req, res) => {
         return;
     }
 };
+const getAgentCompanyBookings = async (req, res) => {
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('agent_company_booking');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let validAgent = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validAgent = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validAgent) {
+        try {
+            let result;
+            let _bookings = [];
+            try {
+                result = await collection.find({ bookingAgent: req.session.authenticationID }).toArray();
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            const agentCollection = db.collection('agent');
+            let _agent;
+            _agent = await agentCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(req.session.authenticationID) });
+            for (const booking of result) {
+                const companyCollection = db.collection('company');
+                let _company;
+                try {
+                    _company = await companyCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(booking.bookingCompany) });
+                }
+                catch (err) {
+                    if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err);
+                        logs = [{
+                                field: "Unexpected Mongo Error",
+                                message: "Default Message"
+                            }];
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                    else {
+                        res.status(400).json({ err });
+                        throw new Error(err);
+                    }
+                }
+                if (_company !== null) {
+                    let _booking = {
+                        bookingId: booking._id,
+                        bookingAgent: booking.bookingAgent,
+                        bookingAgentName: _agent.agentName,
+                        bookingCompany: booking.bookingCompany,
+                        bookingCompanyName: _company.companyName,
+                        bookingDate: booking.bookingDate,
+                        bookingTimeSlot: booking.bookingTimeSlot,
+                        wasteIds: booking.wasteIds,
+                        totalPlasticWeight: booking.totalPlasticWeight,
+                        totalPaperWeight: booking.totalPaperWeight,
+                        totalElectronicWeight: booking.totalElectronicWeight,
+                        bookingStatus: booking.bookingStatus,
+                    };
+                    console.log(_booking);
+                    _bookings.push(_booking);
+                }
+                else {
+                    continue;
+                }
+            }
+            ;
+            console.log(_bookings);
+            res.status(200).json(_bookings);
+            return _bookings;
+        }
+        catch (e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }
+            ];
+            res.status(400).json({ logs });
+            return null;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid Agent",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
 const updateAgent = async (res) => {
     res.status(200).json({ message: 'agent Update' });
 };
@@ -783,6 +909,6 @@ const deleteAgent = async (res) => {
     res.status(200).json({ message: 'agent Delete' });
 };
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm, wasteByBooking
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm, wasteByBooking, getAgentCompanyBookings
 };
 //# sourceMappingURL=AgentController.js.map

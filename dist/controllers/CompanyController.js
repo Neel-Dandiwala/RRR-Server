@@ -11,6 +11,7 @@ const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
 const axios_1 = __importDefault(require("axios"));
+const mongoose_1 = __importDefault(require("mongoose"));
 require('dotenv').config();
 class CompanyResponse {
 }
@@ -211,6 +212,132 @@ const validationCompany = async (req, res) => {
         return { logs };
     });
 };
+const getCompanyAgentBookings = async (req, res) => {
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('agent_company_booking');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let validCompany = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateCompany(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validCompany = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validCompany) {
+        try {
+            let result;
+            let _bookings = [];
+            try {
+                result = await collection.find({ $and: [{ bookingCompany: req.session.authenticationID }, { $or: [{ bookingStatus: "Pending" }, { bookingStatus: "Accepted" }] }] }).toArray();
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            const companyCollection = db.collection('company');
+            let _company;
+            _company = await companyCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(req.session.authenticationID) });
+            for (const booking of result) {
+                const agentCollection = db.collection('agent');
+                let _agent;
+                try {
+                    _agent = await agentCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(booking.bookingAgent) });
+                }
+                catch (err) {
+                    if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err);
+                        logs = [{
+                                field: "Unexpected Mongo Error",
+                                message: "Default Message"
+                            }];
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                    else {
+                        res.status(400).json({ err });
+                        throw new Error(err);
+                    }
+                }
+                if (_agent !== null) {
+                    let _booking = {
+                        bookingId: booking._id,
+                        bookingAgent: booking.bookingAgent,
+                        bookingAgentName: _agent.agentName,
+                        bookingCompany: booking.bookingCompany,
+                        bookingCompanyName: _company.companyName,
+                        bookingDate: booking.bookingDate,
+                        bookingTimeSlot: booking.bookingTimeSlot,
+                        wasteIds: booking.wasteIds,
+                        totalPlasticWeight: booking.totalPlasticWeight,
+                        totalPaperWeight: booking.totalPaperWeight,
+                        totalElectronicWeight: booking.totalElectronicWeight,
+                        bookingStatus: booking.bookingStatus,
+                    };
+                    console.log(_booking);
+                    _bookings.push(_booking);
+                }
+                else {
+                    continue;
+                }
+            }
+            ;
+            console.log(_bookings);
+            res.status(200).json(_bookings);
+            return _bookings;
+        }
+        catch (e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }
+            ];
+            res.status(400).json({ logs });
+            return null;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid Company",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
 const updateCompany = async (res) => {
     res.status(200).json({ message: 'company Update' });
 };
@@ -218,6 +345,6 @@ const deleteCompany = async (res) => {
     res.status(200).json({ message: 'company Delete' });
 };
 module.exports = {
-    getCompanies, setCompany, updateCompany, deleteCompany, validationCompany
+    getCompanies, setCompany, updateCompany, deleteCompany, validationCompany, getCompanyAgentBookings
 };
 //# sourceMappingURL=CompanyController.js.map

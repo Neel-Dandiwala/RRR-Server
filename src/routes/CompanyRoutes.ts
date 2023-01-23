@@ -1,9 +1,11 @@
 import express from 'express';
-const { getCompanies, setCompany, updateCompany, deleteCompany, validationCompany} = require('../controllers/CompanyController')
+const { getCompanies, setCompany, updateCompany, deleteCompany, validationCompany, getCompanyAgentBookings } = require('../controllers/CompanyController')
 
 const router = express.Router();
 
 router.get('/companies', getCompanies)
+
+router.get('/company/agent/bookings', getCompanyAgentBookings)
 
 router.post('/company/signup', setCompany)
 
