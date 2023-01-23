@@ -358,6 +358,7 @@ const getUserBookings = async (req, res) => {
         try {
             let result;
             let _bookings = [];
+            const agentCollection = db.collection('agent');
             try {
                 result = await collection.find({ bookingUser: req.session.authenticationID }).toArray();
             }
@@ -377,7 +378,6 @@ const getUserBookings = async (req, res) => {
                 }
             }
             for (const booking of result) {
-                const agentCollection = db.collection('agent');
                 let _agent;
                 try {
                     _agent = await agentCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(booking.bookingAgent) });
@@ -385,10 +385,10 @@ const getUserBookings = async (req, res) => {
                 catch (err) {
                     if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
                         console.error("# Duplicate Data Found:\n", err);
-                        logs = [{
-                                field: "Unexpected Mongo Error",
-                                message: "Default Message"
-                            }];
+                        logs = {
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        };
                         res.status(400).json({ logs });
                         return { logs };
                     }
@@ -407,9 +407,131 @@ const getUserBookings = async (req, res) => {
                     bookingPincode: booking.bookingPincode,
                     bookingStatus: booking.bookingStatus,
                 };
+                console.log(_booking);
                 _bookings.push(_booking);
             }
             ;
+            console.log(_bookings);
+            res.status(200).json(_bookings);
+            return;
+        }
+        catch (e) {
+            logs = [
+                {
+                    field: "Some Error",
+                    message: e,
+                }
+            ];
+            res.status(400).json({ logs });
+            return null;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
+const getUserBookings2 = async (req, res) => {
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('user_agent_booking');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    let validUser = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validUser = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validUser) {
+        try {
+            let result;
+            let _bookings = [];
+            try {
+                result = await collection.find({ bookingUser: req.session.authenticationID }).toArray();
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            for (const booking of result) {
+                const AgentCollection = db.collection('agent');
+                let _agent;
+                try {
+                    _agent = await AgentCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(booking.bookingAgent) });
+                }
+                catch (err) {
+                    if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err);
+                        logs = [{
+                                field: "Unexpected Mongo Error",
+                                message: "Default Message"
+                            }];
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                    else {
+                        res.status(400).json({ err });
+                        throw new Error(err);
+                    }
+                }
+                if (_agent !== null) {
+                    let _booking = {
+                        bookingId: booking._id,
+                        bookingAgent: booking.bookingAgent,
+                        bookingUser: booking.bookingUser,
+                        bookingAgentName: _agent.agentName,
+                        bookingDate: booking.bookingDate,
+                        bookingTimeSlot: booking.bookingTimeSlot,
+                        bookingAddress: booking.bookingAddress,
+                        bookingPincode: booking.bookingPincode,
+                        bookingStatus: booking.bookingStatus,
+                    };
+                    console.log(_booking);
+                    _bookings.push(_booking);
+                }
+                else {
+                    continue;
+                }
+            }
+            ;
+            console.log(_bookings);
             res.status(200).json(_bookings);
             return _bookings;
         }
@@ -539,6 +661,6 @@ const updateUser = async (res) => {
     res.status(200).json({ message: 'User Update' });
 };
 module.exports = {
-    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings, getUserBookings2
 };
 //# sourceMappingURL=UserController.js.map
