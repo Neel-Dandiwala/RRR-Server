@@ -15,4 +15,6 @@ export class AgentCompanyFormInfo {
     totalPaperWeight: number;
 
     totalElectronicWeight: number;
+
+    bookingStatus?: string;
 }

@@ -7,7 +7,7 @@ router.get('/users', getUsers)
 
 router.get('/user/balance', getUserBalance)
 
-router.get('/user/bookings', getUserBookings2)
+router.get('/user/bookings', getUserBookings)
 
 router.post('/validation/user', validationUser);
 

@@ -485,7 +485,7 @@ const getAgentBookings = async (req: Request, res: Response) => {
 
 
             try {
-                result = await collection.find({ bookingAgent: req.session.authenticationID }).toArray();
+                result = await collection.find({$and: [{ bookingAgent: req.session.authenticationID}, {$or: [ { bookingStatus: "Pending"  }, { bookingStatus: "Accepted" } ]} ]}).toArray();
             } catch (err) {
                 if (err instanceof MongoServerError && err.code === 11000) {
                     console.error("# Duplicate Data Found:\n", err)
@@ -824,7 +824,15 @@ const setAgentCompanyForm = async (req: Request, res: Response) => {
                 logs =
                 {
                     field: "Successful Insertion of Form",
-                    message: "Done",
+                    bookingAgent: req.session.authenticationID,
+                    bookingCompany: formData.bookingCompany,
+                    bookingDate: _formData.bookingDate,
+                    bookingTimeSlot: formData.bookingTimeSlot,
+                    wasteIds: formData.wasteIds,
+                    totalPlasticWeight: formData.totalPlasticWeight,
+                    totalPaperWeight: formData.totalPaperWeight,
+                    totalElectronicWeight: formData.totalElectronicWeight,
+                    bookingStatus: _formData.bookingStatus
                 }
 
 
@@ -903,7 +911,8 @@ const wasteByBooking = async (req: Request, res: Response) => {
             try {
                 const wasteCollection = db.collection('waste');
 
-                wasteData = await wasteCollection.findOne(_formData);
+                wasteData = await wasteCollection.findOne({ wasteBookingId: (bookingData._id).toString() });
+                console.log(wasteData);
             } catch (err) {
                 if (err instanceof MongoServerError && err.code === 11000) {
                     console.error("# Duplicate Data Found:\n", err)
@@ -921,28 +930,13 @@ const wasteByBooking = async (req: Request, res: Response) => {
                     throw new Error(err)
                 }
             }
-            const _formData: AgentCompanyFormInfo = new AgentCompanyForm({
-                bookingAgent: req.session.authenticationID,
-
-                bookingCompany: formData.bookingCompany,
-
-                bookingDate: new Date(formData.bookingDate).toISOString(),
-
-                bookingTimeSlot: formData.bookingTimeSlot,
-
-                wasteIds: formData.wasteIds,
-
-                totalPlasticWeight: formData.totalPlasticWeight,
-
-                totalPaperWeight: formData.totalPaperWeight,
-
-                totalElectronicWeight: formData.totalElectronicWeight,
-
-                bookingStatus: 'Pending'
-
-            })
-            let result;
-
+            
+            logs = {
+                field: "Waste Details By Booking",
+                message: "Default Message"
+            }
+            res.status(200).json(wasteData);
+            return;
 
         } catch (err) {
             if (err instanceof MongoServerError && err.code === 11000) {
@@ -962,12 +956,12 @@ const wasteByBooking = async (req: Request, res: Response) => {
             }
         }
     } else {
-        logs = [
+        logs = 
             {
-                field: "Invalid User",
+                field: "Invalid Agent",
                 message: "Better check with administrator",
             }
-        ]
+        
 
         res.status(400).json({ logs });
         return;
@@ -989,5 +983,5 @@ const deleteAgent = async(res: Response) => {
 }
 
 module.exports = {
-    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm
+    getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm, wasteByBooking
 }

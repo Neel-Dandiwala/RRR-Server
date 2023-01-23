@@ -11,4 +11,6 @@ export class UserAgentFormInfo {
     bookingAddress: string;
 
     bookingPincode: string;
+
+    bookingStatus?: string;
 }

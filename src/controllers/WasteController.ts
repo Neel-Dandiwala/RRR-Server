@@ -33,7 +33,7 @@ const wasteUser = async (req: Request, res: Response) => {
         | "wasteElectronicWeight"
         | "wastePaperWeight"
         | "wastePlasticWeight"
-        | "bookingId"
+        | "wasteBookingId"
     >;
     console.log(wasteData);
 
@@ -90,7 +90,7 @@ const wasteUser = async (req: Request, res: Response) => {
                 wasteElectronicWeight: wasteData.wasteElectronicWeight,
                 wastePaperWeight: wasteData.wastePaperWeight,
                 wastePlasticWeight: wasteData.wastePlasticWeight,
-                bookingId: wasteData.bookingId
+                wasteBookingId: wasteData.wasteBookingId
             });
 
             let result: any;
@@ -157,6 +157,7 @@ const wasteUser = async (req: Request, res: Response) => {
                                 wasteElectronicWeight: wasteData.wasteElectronicWeight,
                                 wastePaperWeight: wasteData.wastePaperWeight,
                                 wastePlasticWeight: wasteData.wastePlasticWeight,
+                                wasteBookingId: wasteData.wasteBookingId
                             }
                         ;
 
@@ -585,6 +586,81 @@ const getWasteQRDetails = async (req: Request, res: Response) => {
         });
 };
 
+const getWasteDetails = async (req: Request, res: Response) => {
+    const db = await connection.getDb();
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+    const key = req.body.key;
+    var trackingContract = new (web3.getWeb3().eth.Contract)(
+        TrackingABI.abi,
+        process.env.TRACKING_ADDRESS,
+        {}
+    );
+    await trackingContract.methods
+        .getWaste(key)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
+        .then(async function (blockchain_result: any) {
+            console.log(blockchain_result);
+            let userCollection = db.collection("user");
+            let _user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(blockchain_result.events.WasteData.returnValues.user) })
+
+            let _agentName = "-";
+            let _companyName = "-";
+
+            if (blockchain_result.events.WasteData.returnValues.agent !== "-") {
+                let agentCollection = db.collection("agent");
+                let _agent = await agentCollection.findOne({ _id: new mongoose.Types.ObjectId(blockchain_result.events.WasteData.returnValues.agent) })
+                _agentName = _agent.agentName
+            }
+
+            if (blockchain_result.events.WasteData.returnValues.company !== "-") {
+                let companyCollection = db.collection("company");
+                let _company = await companyCollection.findOne({ _id: new mongoose.Types.ObjectId(blockchain_result.events.WasteData.returnValues.company) })
+                _companyName = _company.companyName
+            }
+            
+            logs = {
+                field: "Waste Log",
+                wasteDescription:
+                    blockchain_result.events.WasteData.returnValues.description,
+                wasteWeight: blockchain_result.events.WasteData.returnValues.weight,
+                wasteUser: blockchain_result.events.WasteData.returnValues.user,
+                wasteUserName: _user.userName,
+                wasteAgent: blockchain_result.events.WasteData.returnValues.agent,
+                wasteAgentName: _agentName,
+                wasteCompany: blockchain_result.events.WasteData.returnValues.company,
+                wasteCompanyName: _companyName,
+                wasteSubmitted:
+                    blockchain_result.events.WasteData.returnValues.submitDate,
+                wasteExist: blockchain_result.events.WasteData.returnValues.exist,
+            };
+
+            res.status(200).json(logs);
+            return;
+        })
+        .catch(async (err: any) => {
+            console.log(err);
+
+            logs = [
+                {
+                    field: "Blockchain Error",
+                    message: err,
+                },
+            ];
+            res.status(400).json({ logs });
+            return;
+        });
+};
+
 const getWasteQR = async (req: Request, res: Response) => {
     let logs;
     const wasteId = req.body.key;
@@ -686,4 +762,5 @@ module.exports = {
     wasteComplete,
     getWasteQRDetails,
     getWasteQR,
+    getWasteDetails
 };

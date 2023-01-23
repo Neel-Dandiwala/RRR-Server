@@ -34,7 +34,7 @@ const WasteSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    bookingId: {
+    wasteBookingId: {
         type: String,
         required: true
     },

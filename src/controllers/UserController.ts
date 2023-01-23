@@ -398,158 +398,11 @@ const getNearbyAgents = async (req: Request, res: Response) => {
     }
 }
 
+
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
 const getUserBookings = async (req: Request, res: Response) => {
-    const db = await connection.getDb();
-    const collection = db.collection('user_agent_booking');
-    let logs;
-    if (!req.session.authenticationID) {
-        logs = [
-            {
-                field: "Not logged in",
-                message: "Please log in",
-            }
-        ]
-        res.status(400).json({ logs });
-        return null;
-    }
-
-    let validUser: boolean = false;
-
-    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
-    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
-        .then(function (blockchain_result: any) {
-            console.log(blockchain_result)
-            validUser = true;
-        }).catch((err: any) => {
-            console.log(err)
-            logs = [
-                {
-                    field: "Blockchain Error - Validation",
-                    message: err,
-                }
-            ]
-
-            res.status(400).json({ logs });
-            return;
-        });
-
-    if (validUser) {
-        try {
-            type bookingData = {
-                bookingUser: string,
-                bookingAgent: string,
-                bookingAgentName?: string,
-                bookingDate: string,
-                bookingTimeSlot: string,
-                bookingAddress: string,
-                bookingPincode: string,
-                bookingStatus: string,
-            };
-            let result;
-            let _bookings: bookingData[] = [];
-            
-            const agentCollection = db.collection('agent');
-
-            try {
-                result = await collection.find({ bookingUser: req.session.authenticationID }).toArray();
-            } catch (err) {
-                if (err instanceof MongoServerError && err.code === 11000) {
-                    console.error("# Duplicate Data Found:\n", err)
-                    logs = [{
-                        field: "Unexpected Mongo Error",
-                        message: "Default Message"
-                    }]
-                    res.status(400).json({ logs });
-                    return { logs };
-
-                }
-                else {
-                    res.status(400).json({ err });
-
-                    throw new Error(err)
-                }
-            }
-            for(const booking of result) {
-                // console.log('here')
-
-                let _agent;
-                try {
-                    _agent= await agentCollection.findOne({ _id:  new mongoose.Types.ObjectId(booking.bookingAgent) })
-                    
-                } catch (err) {
-                    if (err instanceof MongoServerError && err.code === 11000) {
-                        console.error("# Duplicate Data Found:\n", err)
-                        logs = {
-                            field: "Unexpected Mongo Error",
-                            message: "Default Message"
-                        }
-                        res.status(400).json({ logs });
-                        return { logs };
-    
-                    }
-                    else {
-                        res.status(400).json({ err });
-    
-                        throw new Error(err)
-                    }
-                }
-
-                let _booking: bookingData = {
-                    bookingUser: booking.bookingUser,
-
-                    bookingAgent: booking.bookingAgent,
-
-                    bookingAgentName: _agent.agentName,
-
-                    bookingDate: booking.bookingDate,
-
-                    bookingTimeSlot: booking.bookingTimeSlot,
-
-                    bookingAddress: booking.bookingAddress,
-
-                    bookingPincode: booking.bookingPincode,
-
-                    bookingStatus: booking.bookingStatus,
-
-                }
-                console.log(_booking)
-                _bookings.push(_booking);
-
-            };
-
-            console.log(_bookings)
-            res.status(200).json(_bookings);
-            return ;
-        }
-        catch (e) {
-            logs = [
-                {
-                    field: "Some Error",
-                    message: e,
-                }
-            ]
-            res.status(400).json({ logs });
-            return null;
-        }
-    } else {
-        logs = [
-            {
-                field: "Invalid User",
-                message: "Better check with administrator",
-            }
-        ]
-        res.status(400).json({ logs });
-        return;
-    }
-}
-
-// @desc   Get User
-// @route  GET /user/login
-// @access Private
-const getUserBookings2 = async (req: Request, res: Response) => {
     const db = await connection.getDb();
     const collection = db.collection('user_agent_booking');
     let logs;
@@ -790,7 +643,13 @@ const setUserAgentForm = async (req: Request, res: Response) => {
                 logs =
                 {
                     field: "Successful Insertion of Form",
-                    message: "Done",
+                    bookingUser: req.session.authenticationID,
+                    bookingAgent: formData.bookingAgent,
+                    bookingDate: _formData.bookingDate,
+                    bookingTimeSlot: formData.bookingTimeSlot,
+                    bookingAddress: formData.bookingAddress,
+                    bookingPincode: formData.bookingPincode,
+                    bookingStatus: _formData.bookingStatus,
                 }
 
 

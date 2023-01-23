@@ -8,7 +8,7 @@ const { getUsers, setUser, updateUser, deleteUser, validationUser, getNearbyAgen
 const router = express_1.default.Router();
 router.get('/users', getUsers);
 router.get('/user/balance', getUserBalance);
-router.get('/user/bookings', getUserBookings2);
+router.get('/user/bookings', getUserBookings);
 router.post('/validation/user', validationUser);
 router.post('/user/signup', setUser);
 router.post('/user/nearbyagents', getNearbyAgents);

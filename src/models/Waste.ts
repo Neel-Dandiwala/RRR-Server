@@ -43,7 +43,7 @@ const WasteSchema: Schema = new Schema({
         required: true
     },
 
-    bookingId: {
+    wasteBookingId: {
         type: String,
         required: true
     },

@@ -1,5 +1,5 @@
 import express from 'express';
-const { getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm } = require('../controllers/AgentController')
+const { getAgents, setAgent, updateAgent, deleteAgent, validationAgent, getNearbyCompanies, getAgentBookings, agentRejectBooking, agentAcceptBooking, setAgentCompanyForm, wasteByBooking } = require('../controllers/AgentController')
 
 const router = express.Router();
 
@@ -12,6 +12,8 @@ router.post('/validation/agent', validationAgent);
 router.post('/agent/booking/reject', agentRejectBooking);
 
 router.post('/agent/booking/accept', agentAcceptBooking);
+
+router.post('/agent/booking/waste', wasteByBooking);
 
 router.get('/agent/nearbycompanies', getNearbyCompanies);
 
