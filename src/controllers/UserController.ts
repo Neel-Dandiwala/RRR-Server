@@ -8,7 +8,7 @@ import { connection } from "../connection";
 import { CredentialsInput } from "../utils/CredentialsInput";
 import { MongoServerError } from 'mongodb'
 import { web3, ValidationABI, RewardABI } from "../web3"
-import { calculateDistance, isNearby } from '../utils/searchNearby';
+import { calculateDistance, isNearby } from '../utils/SearchNearby';
 import { AgentDetails } from '../types/AgentDetails';
 import { AgentInfo } from '../types/AgentInfo';
 import { UserAgentFormInfo } from '../types/UserAgentFormInfo';

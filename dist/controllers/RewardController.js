@@ -10,7 +10,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const Token_1 = __importDefault(require("../models/Token"));
 require('dotenv').config();
 const rewardTransferFrom = async (req, res) => {
-    const key = req.body.key;
+    const bookingId = req.body.key;
     const db = await connection_1.connection.getDb();
     const collection = db.collection('waste');
     let logs;

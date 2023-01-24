@@ -10,7 +10,7 @@ const connection_1 = require("../connection");
 const CredentialsInput_1 = require("../utils/CredentialsInput");
 const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
-const searchNearby_1 = require("../utils/searchNearby");
+const SearchNearby_1 = require("../utils/SearchNearby");
 const AgentDetails_1 = require("../types/AgentDetails");
 const UserAgentForm_1 = __importDefault(require("../models/UserAgentForm"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -260,7 +260,7 @@ const getNearbyAgents = async (req, res) => {
             result = await collection.find({}).toArray();
             result.forEach(function (agent) {
                 console.log(agent);
-                let _distance = (0, searchNearby_1.calculateDistance)(lat, lon, agent.agentLatitude, agent.agentLongitude);
+                let _distance = (0, SearchNearby_1.calculateDistance)(lat, lon, agent.agentLatitude, agent.agentLongitude);
                 console.log(_distance);
                 if (_distance <= 5.0) {
                     console.log("Distance is good");

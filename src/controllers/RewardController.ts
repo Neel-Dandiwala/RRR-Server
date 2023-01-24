@@ -12,7 +12,7 @@ import { TokenInfo } from '../types/TokenInfo';
 require('dotenv').config()
 
 const rewardTransferFrom = async (req: Request, res: Response) => {
-    const key = req.body.key;
+    const bookingId = req.body.key;
     const db = await connection.getDb();
     const collection = db.collection('waste');
     let logs;
