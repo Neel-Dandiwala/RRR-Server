@@ -356,7 +356,7 @@ const rewardMint = async (req: Request, res: Response) => {
             logs = [
                 {
                     field: "Successful Mint",
-                    message: "All rewards imbursed",
+                    message: "All rewards imbursed now",
                 }
             ]
 
