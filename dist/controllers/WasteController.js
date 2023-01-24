@@ -329,58 +329,90 @@ const wasteCompany = async (req, res) => {
         res.status(400).json({ logs });
         return;
     });
+    const bookingId = req.body.key;
     if (validCompany) {
         try {
-            const wasteId = req.body.id;
-            var trackingContract = new (web3_1.web3.getWeb3().eth.Contract)(web3_1.TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
-            let company_ = req.session.authenticationID;
-            console.log(company_ + typeof company_);
-            await trackingContract.methods
-                .companyOwnWaste(company_, wasteId)
-                .send({
-                from: process.env.OWNER_ADDRESS,
-                gas: "1000000",
-                gasPrice: "3000000",
-            })
-                .then(async function (blockchain_result) {
-                console.log(blockchain_result);
-                let updatedCompany = await collection.updateOne({ _id: new mongoose_1.default.Types.ObjectId(wasteId) }, {
-                    $set: {
-                        wasteCompany: req.session.authenticationID,
-                        wasteCompanyDate: new Date(Date.now()).toISOString(),
-                    },
-                });
-                if (updatedCompany.acknowledged) {
-                    logs = [
-                        {
-                            field: "Successful Updation",
-                            message: blockchain_result,
-                        },
-                    ];
-                    res.status(200).json({ logs });
-                    return { logs };
-                }
-                else {
-                    logs = [
-                        {
-                            field: "Mongo Error",
-                            message: blockchain_result,
-                        },
-                    ];
+            let bookingData;
+            const bookingCollection = db.collection("agent_company_booking");
+            try {
+                bookingData = await bookingCollection.findOne({ _id: new mongoose_1.default.Types.ObjectId(bookingId) });
+                console.log(bookingData);
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
                     res.status(400).json({ logs });
                     return { logs };
                 }
-            })
-                .catch((err) => {
-                console.log(err);
-                logs = [
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            if (bookingData === null) {
+                logs =
                     {
-                        field: "Blockchain Error - Waste Updation",
-                    },
-                ];
+                        field: "Invalid Booking Id",
+                        message: "Better check with administrator",
+                    };
                 res.status(400).json({ logs });
                 return;
-            });
+            }
+            for (const wasteId of bookingData.wasteIds) {
+                var trackingContract = new (web3_1.web3.getWeb3().eth.Contract)(web3_1.TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
+                let company_ = req.session.authenticationID;
+                console.log(company_ + typeof company_);
+                await trackingContract.methods
+                    .companyOwnWaste(company_, wasteId)
+                    .send({
+                    from: process.env.OWNER_ADDRESS,
+                    gas: "1000000",
+                    gasPrice: "3000000",
+                })
+                    .then(async function (blockchain_result) {
+                    console.log(blockchain_result);
+                    let updatedCompany = await collection.updateOne({ _id: new mongoose_1.default.Types.ObjectId(wasteId) }, {
+                        $set: {
+                            wasteCompany: req.session.authenticationID,
+                            wasteCompanyDate: new Date(Date.now()).toISOString(),
+                        },
+                    });
+                    if (updatedCompany.acknowledged) {
+                        logs = [
+                            {
+                                field: "Successful Updation",
+                                message: blockchain_result,
+                            },
+                        ];
+                        res.status(200).json({ logs });
+                        return { logs };
+                    }
+                    else {
+                        logs = [
+                            {
+                                field: "Mongo Error",
+                                message: blockchain_result,
+                            },
+                        ];
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                })
+                    .catch((err) => {
+                    console.log(err);
+                    logs = [
+                        {
+                            field: "Blockchain Error - Waste Updation",
+                        },
+                    ];
+                    res.status(400).json({ logs });
+                    return;
+                });
+            }
         }
         catch (e) {
             res.status(400).json({ e });

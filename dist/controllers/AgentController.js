@@ -14,6 +14,7 @@ const axios_1 = __importDefault(require("axios"));
 const CompanyInfo_1 = require("../types/CompanyInfo");
 const mongoose_1 = __importDefault(require("mongoose"));
 const AgentCompanyForm_1 = __importDefault(require("../models/AgentCompanyForm"));
+const SearchNearby_1 = require("../utils/SearchNearby");
 require('dotenv').config();
 class AgentResponse {
 }
@@ -260,7 +261,7 @@ const getNearbyCompanies = async (req, res) => {
             result = await collection.find({}).toArray();
             result.forEach(function (company) {
                 console.log(company);
-                let _distance = calculateDistance(lat, lon, company.companyLatitude, company.companyLongitude);
+                let _distance = (0, SearchNearby_1.calculateDistance)(lat, lon, company.companyLatitude, company.companyLongitude);
                 console.log(_distance);
                 if (_distance <= 5.0) {
                     console.log("Distance is good");

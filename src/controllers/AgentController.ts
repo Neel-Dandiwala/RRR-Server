@@ -14,6 +14,7 @@ import { CompanyInfo } from '../types/CompanyInfo';
 import mongoose from 'mongoose';
 import { AgentCompanyFormInfo } from '../types/AgentCompanyFormInfo';
 import AgentCompanyForm from '../models/AgentCompanyForm';
+import { calculateDistance } from '../utils/SearchNearby';
 
 
 require('dotenv').config()

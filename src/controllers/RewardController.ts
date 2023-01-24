@@ -31,36 +31,36 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
 
     var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
     await validationContract.methods.validateAgent(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
-    .then(function (blockchain_result: any) {
-        console.log(blockchain_result)
-        validAgent = true;
-    }).catch((err: any) => {
-        console.log(err)
-        logs = [
-            {
-                field: "Blockchain Error - Agent Validation",
-                message: err,
-            }
-        ]
-    
-        res.status(400).json({ logs });
-        return;
-    });
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validAgent = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Agent Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
 
     if (validAgent) {
         try {
 
             let wasteData: any;
             try {
-                wasteData = await collection.findOne({ _id:  new mongoose.Types.ObjectId(key) });
-                if(wasteData.wasteAgent !== req.session.authenticationID){
+                wasteData = await collection.findOne({ _id: new mongoose.Types.ObjectId(key) });
+                if (wasteData.wasteAgent !== req.session.authenticationID) {
                     logs = [
                         {
                             field: "Invalid Agent",
                             message: "Better check with log in",
                         }
                     ]
-            
+
                     res.status(400).json({ logs });
                     return;
                 }
@@ -85,21 +85,21 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
             try {
                 var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
                 await validationContract.methods.validateUser(wasteData.wasteUser).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
-                .then(function (blockchain_result: any) {
-                    console.log(blockchain_result)
-                    
-                }).catch((err: any) => {
-                    console.log(err)
-                    logs = [
-                        {
-                            field: "Blockchain Error - User Validation",
-                            message: err,
-                        }
-                    ]
-                    res.status(400).json({ logs });
-                    return;
-                });
-            } catch(err) {
+                    .then(function (blockchain_result: any) {
+                        console.log(blockchain_result)
+
+                    }).catch((err: any) => {
+                        console.log(err)
+                        logs = [
+                            {
+                                field: "Blockchain Error - User Validation",
+                                message: err,
+                            }
+                        ]
+                        res.status(400).json({ logs });
+                        return;
+                    });
+            } catch (err) {
                 logs = [
                     {
                         field: "Blockchain Error",
@@ -112,29 +112,29 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
             let amount = parseInt(wasteData.wasteWeight);
             var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
             await rewardContract.methods.transferFrom(wasteData.wasteAgent, wasteData.wasteUser, amount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
-            .then(function (blockchain_result: any) {
-                console.log(blockchain_result)
-                logs = [
-                    {
-                        field: "Successful TransferFrom",
-                        message: blockchain_result,
-                    }
-                ]
+                .then(function (blockchain_result: any) {
+                    console.log(blockchain_result)
+                    logs = [
+                        {
+                            field: "Successful TransferFrom",
+                            message: blockchain_result,
+                        }
+                    ]
 
-                res.status(200).json({ logs });
-                return;
-            }).catch((err: any) => {
-                console.log(err)
-                logs = [
-                    {
-                        field: "Blockchain Error - TransferFrom",
-                        message: err,
-                    }
-                ]
+                    res.status(200).json({ logs });
+                    return;
+                }).catch((err: any) => {
+                    console.log(err)
+                    logs = [
+                        {
+                            field: "Blockchain Error - TransferFrom",
+                            message: err,
+                        }
+                    ]
 
-                res.status(400).json({ logs });
-                return;
-            });
+                    res.status(400).json({ logs });
+                    return;
+                });
 
         } catch (e) {
             res.status(400).json({ e });
@@ -154,7 +154,7 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
 }
 
 const rewardMint = async (req: Request, res: Response) => {
-    const key = req.body.key;
+    const bookingId = req.body.key;
     const db = await connection.getDb();
     const collection = db.collection('waste');
     let logs;
@@ -173,39 +173,28 @@ const rewardMint = async (req: Request, res: Response) => {
 
     var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
     await validationContract.methods.validateCompany(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
-    .then(function (blockchain_result: any) {
-        console.log(blockchain_result)
-        validCompany = true;
-    }).catch((err: any) => {
-        console.log(err)
-        logs = [
-            {
-                field: "Blockchain Error - Company Validation",
-                message: err,
-            }
-        ]
-    
-        res.status(400).json({ logs });
-        return;
-    });
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validCompany = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Company Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
 
     if (validCompany) {
         try {
-
-            let wasteData: any;
+            const bookingCollection = db.collection('agent_company_booking');
+            let bookingData;
             try {
-                wasteData = await collection.findOne({ _id:  new mongoose.Types.ObjectId(key) });
-                if(wasteData.wasteCompany !== req.session.authenticationID){
-                    logs = [
-                        {
-                            field: "Invalid Company",
-                            message: "Better check with log in",
-                        }
-                    ]
-            
-                    res.status(400).json({ logs });
-                    return;
-                }
+                bookingData = await bookingCollection.findOne({ _id: new mongoose.Types.ObjectId(bookingId) });
             } catch (err) {
                 if (err instanceof MongoServerError && err.code === 11000) {
                     console.error("# Duplicate Data Found:\n", err)
@@ -223,65 +212,109 @@ const rewardMint = async (req: Request, res: Response) => {
                     throw new Error(err)
                 }
             }
-            console.log(wasteData);
-            try {
-                var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
-                await validationContract.methods.validateAgent(wasteData.wasteAgent).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
-                .then(function (blockchain_result: any) {
-                    console.log(blockchain_result)
-                }).catch((err: any) => {
-                    console.log(err)
-                    logs = [
-                        {
-                            field: "Blockchain Error - Agent Validation",
-                            message: err,
-                        }
-                    ]
-                
-                    res.status(400).json({ logs });
-                    return;
-                });
-            } catch(err) {
-                logs = [
-                    {
-                        field: "Blockchain Error",
-                        message: err,
-                    }
-                ]
+
+            if (bookingData === null) {
+                logs =
+                {
+                    field: "Invalid Booking Id",
+                    message: "Better check with administrator",
+                }
                 res.status(400).json({ logs });
                 return;
             }
-            let amount = parseInt(wasteData.wasteWeight);
-            var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
-            await rewardContract.methods._mint(wasteData.wasteAgent, amount).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
-            .then(function (blockchain_result: any) {
-                console.log(blockchain_result)
-                logs = [
-                    {
-                        field: "Successful _Mint",
-                        message: blockchain_result,
-                    }
-                ]
+            for (const wasteId of bookingData.wasteIds) {
+                let wasteData: any;
+                try {
+                    wasteData = await collection.findOne({ _id: new mongoose.Types.ObjectId(wasteId) });
+                    if (wasteData.wasteCompany !== req.session.authenticationID) {
+                        logs = [
+                            {
+                                field: "Invalid Company",
+                                message: "Better check with log in",
+                            }
+                        ]
 
-                res.status(200).json({ logs });
-                return;
-            }).catch((err: any) => {
-                console.log(err)
-                logs = [
-                    {
-                        field: "Blockchain Error - _Mint",
-                        message: err,
+                        res.status(400).json({ logs });
+                        return;
                     }
-                ]
+                } catch (err) {
+                    if (err instanceof MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err)
+                        logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }]
+                        res.status(400).json({ logs });
+                        return { logs };
 
-                res.status(400).json({ logs });
-                return;
-            });
+                    }
+                    else {
+                        res.status(400).json({ err });
+
+                        throw new Error(err)
+                    }
+                }
+                console.log(wasteData);
+                try {
+                    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+                    await validationContract.methods.validateAgent(wasteData.wasteAgent).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+                        .then(function (blockchain_result: any) {
+                            console.log(blockchain_result)
+                        }).catch((err: any) => {
+                            console.log(err)
+                            logs = [
+                                {
+                                    field: "Blockchain Error - Agent Validation",
+                                    message: err,
+                                }
+                            ]
+
+                            res.status(400).json({ logs });
+                            return;
+                        });
+                } catch (err) {
+                    logs = [
+                        {
+                            field: "Blockchain Error",
+                            message: err,
+                        }
+                    ]
+                    res.status(400).json({ logs });
+                    return;
+                }
+                let amount = parseInt(wasteData.wasteWeight);
+                var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
+                await rewardContract.methods._mint(wasteData.wasteAgent, amount).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+                    .then(function (blockchain_result: any) {
+                        console.log(blockchain_result)
+                        logs = [
+                            {
+                                field: "Successful _Mint",
+                                message: blockchain_result,
+                            }
+                        ]
+
+                        res.status(200).json({ logs });
+                        return;
+                    }).catch((err: any) => {
+                        console.log(err)
+                        logs = [
+                            {
+                                field: "Blockchain Error - _Mint",
+                                message: err,
+                            }
+                        ]
+
+                        res.status(400).json({ logs });
+                        return;
+                    });
+            }
 
         } catch (e) {
             res.status(400).json({ e });
             throw e;
         }
+
     } else {
         logs = [
             {
@@ -373,63 +406,63 @@ const rewardMintToken = async (req: Request, res: Response) => {
                 console.log(result);
                 var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
                 await rewardContract.methods.mintToken(req.session.authenticationID, tokenData.tokenName, tokenData.tokenSymbol, tokenData.tokenAmount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
-                .then(async function (blockchain_result: any) {
-                    console.log(blockchain_result)
-                    // blockchain_result.events.Transfer.returnValues.
-                    let _tokenExpires = (blockchain_result.events.TokenEvent.returnValues.expires).toString();
-                    let _tokenId = (blockchain_result.events.TokenEvent.returnValues.id).toString();
+                    .then(async function (blockchain_result: any) {
+                        console.log(blockchain_result)
+                        // blockchain_result.events.Transfer.returnValues.
+                        let _tokenExpires = (blockchain_result.events.TokenEvent.returnValues.expires).toString();
+                        let _tokenId = (blockchain_result.events.TokenEvent.returnValues.id).toString();
 
-                    let updatedToken = await collection.updateOne(
-                        { _id:  result.insertedId },
-                        { $set: { tokenId: _tokenId, tokenExpires: _tokenExpires }}
-                    )
-                    if(updatedToken.acknowledged){
-                        logs = [
-                            {
-                                field: "Successful Updation",
-                                message: blockchain_result,
-                            }
-                        ]
-        
+                        let updatedToken = await collection.updateOne(
+                            { _id: result.insertedId },
+                            { $set: { tokenId: _tokenId, tokenExpires: _tokenExpires } }
+                        )
+                        if (updatedToken.acknowledged) {
+                            logs = [
+                                {
+                                    field: "Successful Updation",
+                                    message: blockchain_result,
+                                }
+                            ]
+
+                            res.status(200).json({ logs });
+                            return { logs };
+                        } else {
+                            logs = [
+                                {
+                                    field: "Mongo Error",
+                                    message: blockchain_result,
+                                }
+                            ]
+
+                            res.status(400).json({ logs });
+                            return { logs };
+                        }
+
                         res.status(200).json({ logs });
                         return { logs };
-                    } else {
-                        logs = [
-                            {
-                                field: "Mongo Error",
-                                message: blockchain_result,
-                            }
-                        ]
-        
-                        res.status(400).json({ logs });
-                        return { logs };
-                    }
-
-                    res.status(200).json({ logs });
-                    return { logs };
-                }).catch(async (err: any) => {
-                    console.log(err)
-                    let deleted = await collection.deleteOne({ _id: result.insertedId });
-                    if (deleted.acknowledged) {
-                        logs = [
-                            {
-                                field: "Blockchain Error - Token Insertion",
-                                message: err,
-                            }
-                        ]
-                        res.status(400).json({ logs });
-                        return;
-                    } else {
-                        logs = [
-                            {
-                                field: "Blockchain Error and MongoDB Error",
-                                message: err,
-                            }
-                        ]
-                        res.status(400).json({ logs });
-                        return;
-                    }
-                });
+                    }).catch(async (err: any) => {
+                        console.log(err)
+                        let deleted = await collection.deleteOne({ _id: result.insertedId });
+                        if (deleted.acknowledged) {
+                            logs = [
+                                {
+                                    field: "Blockchain Error - Token Insertion",
+                                    message: err,
+                                }
+                            ]
+                            res.status(400).json({ logs });
+                            return;
+                        } else {
+                            logs = [
+                                {
+                                    field: "Blockchain Error and MongoDB Error",
+                                    message: err,
+                                }
+                            ]
+                            res.status(400).json({ logs });
+                            return;
+                        }
+                    });
             } else {
                 logs = [
                     {
@@ -496,7 +529,7 @@ const rewardBurnToken = async (req: Request, res: Response) => {
         try {
             let tokenData;
             try {
-                tokenData = await collection.findOne({ _id:  new mongoose.Types.ObjectId(key) });
+                tokenData = await collection.findOne({ _id: new mongoose.Types.ObjectId(key) });
             } catch (err) {
                 if (err instanceof MongoServerError && err.code === 11000) {
                     console.error("# Duplicate Data Found:\n", err)
@@ -518,48 +551,48 @@ const rewardBurnToken = async (req: Request, res: Response) => {
             let tokenId = parseInt(tokenData.tokenId);
             var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
             await rewardContract.methods.burnToken(req.session.authenticationID, tokenId).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
-            .then(async function (blockchain_result: any) {
-                console.log(blockchain_result)
-                let updatedToken = await collection.updateOne(
-                    { _id: new mongoose.Types.ObjectId(key)  },
-                    { $set: { tokenUsed: true }}
-                )
-                if(updatedToken.acknowledged){
-                    logs = [
-                        {
-                            field: "Successful Updation",
-                            message: blockchain_result,
-                        }
-                    ]
-    
+                .then(async function (blockchain_result: any) {
+                    console.log(blockchain_result)
+                    let updatedToken = await collection.updateOne(
+                        { _id: new mongoose.Types.ObjectId(key) },
+                        { $set: { tokenUsed: true } }
+                    )
+                    if (updatedToken.acknowledged) {
+                        logs = [
+                            {
+                                field: "Successful Updation",
+                                message: blockchain_result,
+                            }
+                        ]
+
+                        res.status(200).json({ logs });
+                        return { logs };
+                    } else {
+                        logs = [
+                            {
+                                field: "Mongo Error",
+                                message: blockchain_result,
+                            }
+                        ]
+
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
                     res.status(200).json({ logs });
                     return { logs };
-                } else {
+                }).catch((err: any) => {
+                    console.log(err)
                     logs = [
                         {
-                            field: "Mongo Error",
-                            message: blockchain_result,
+                            field: "Blockchain Error",
+                            message: err,
                         }
                     ]
-    
+
                     res.status(400).json({ logs });
                     return { logs };
-                }
-                res.status(200).json({ logs });
-                return { logs };
-            }).catch((err: any) => {
-                console.log(err)
-                logs = [
-                    {
-                        field: "Blockchain Error",
-                        message: err,
-                    }
-                ]
+                });
 
-                res.status(400).json({ logs });
-                return { logs };
-            });
-            
         } catch (e) {
             res.status(400).json({ e });
             throw e;
