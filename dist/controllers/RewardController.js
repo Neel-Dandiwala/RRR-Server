@@ -22,7 +22,7 @@ const rewardTransferFrom = async (req, res) => {
             }
         ];
         res.status(400).json({ logs });
-        return null;
+        return;
     }
     let validAgent = false;
     var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
@@ -41,6 +41,7 @@ const rewardTransferFrom = async (req, res) => {
         res.status(400).json({ logs });
         return;
     });
+    console.log(validAgent);
     if (validAgent) {
         try {
             const bookingCollection = db.collection('agent_company_booking');
@@ -80,7 +81,7 @@ const rewardTransferFrom = async (req, res) => {
                         logs = [
                             {
                                 field: "Invalid Agent",
-                                message: "Better check with log in",
+                                message: "Waste specifies another Agent",
                             }
                         ];
                         res.status(400).json({ logs });
@@ -135,14 +136,6 @@ const rewardTransferFrom = async (req, res) => {
                 await rewardContract.methods.transferFrom(wasteData.wasteAgent, wasteData.wasteUser, amount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
                     .then(function (blockchain_result) {
                     console.log(blockchain_result);
-                    logs = [
-                        {
-                            field: "Successful TransferFrom",
-                            message: blockchain_result,
-                        }
-                    ];
-                    res.status(200).json({ logs });
-                    return;
                 }).catch((err) => {
                     console.log(err);
                     logs = [
@@ -155,6 +148,14 @@ const rewardTransferFrom = async (req, res) => {
                     return;
                 });
             }
+            logs = [
+                {
+                    field: "Successful TransferFrom",
+                    message: "All rewards imbursed",
+                }
+            ];
+            res.status(200).json({ logs });
+            return;
         }
         catch (e) {
             res.status(400).json({ e });
@@ -298,14 +299,6 @@ const rewardMint = async (req, res) => {
                 await rewardContract.methods._mint(wasteData.wasteAgent, amount).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
                     .then(function (blockchain_result) {
                     console.log(blockchain_result);
-                    logs = [
-                        {
-                            field: "Successful _Mint",
-                            message: blockchain_result,
-                        }
-                    ];
-                    res.status(200).json({ logs });
-                    return;
                 }).catch((err) => {
                     console.log(err);
                     logs = [
@@ -318,6 +311,14 @@ const rewardMint = async (req, res) => {
                     return;
                 });
             }
+            logs = [
+                {
+                    field: "Successful Mint",
+                    message: "All rewards imbursed",
+                }
+            ];
+            res.status(200).json({ logs });
+            return;
         }
         catch (e) {
             res.status(400).json({ e });

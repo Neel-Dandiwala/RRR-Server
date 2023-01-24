@@ -1143,6 +1143,7 @@ const getAgentCompanyBookings = async (req: Request, res: Response) => {
 }
 
 
+
 // @desc   Get agent
 // @route  GET /agent/login
 // @access Private

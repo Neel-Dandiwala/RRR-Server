@@ -24,7 +24,7 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
             }
         ]
         res.status(400).json({ logs });
-        return null;
+        return;
     }
 
     let validAgent: boolean = false;
@@ -34,6 +34,7 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
         .then(function (blockchain_result: any) {
             console.log(blockchain_result)
             validAgent = true;
+
         }).catch((err: any) => {
             console.log(err)
             logs = [
@@ -47,7 +48,9 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
             return;
         });
 
+    console.log(validAgent)
     if (validAgent) {
+        // console.log("HERERERERE")
         try {
             const bookingCollection = db.collection('agent_company_booking');
             let bookingData;
@@ -82,92 +85,101 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
             }
 
             for (const wasteId of bookingData.wasteIds) {
-            let wasteData: any;
-            try {
-                wasteData = await collection.findOne({ _id: new mongoose.Types.ObjectId(wasteId) });
-                if (wasteData.wasteAgent !== req.session.authenticationID) {
+                let wasteData: any;
+                try {
+                    wasteData = await collection.findOne({ _id: new mongoose.Types.ObjectId(wasteId) });
+                    if (wasteData.wasteAgent !== req.session.authenticationID) {
+                        logs = [
+                            {
+                                field: "Invalid Agent",
+                                message: "Waste specifies another Agent",
+                            }
+                        ]
+
+                        res.status(400).json({ logs });
+                        return;
+                    }
+                } catch (err) {
+                    if (err instanceof MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err)
+                        logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }]
+                        res.status(400).json({ logs });
+                        return { logs };
+
+                    }
+                    else {
+                        res.status(400).json({ err });
+
+                        throw new Error(err)
+                    }
+                }
+                console.log(wasteData);
+                try {
+                    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+                    await validationContract.methods.validateUser(wasteData.wasteUser).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+                        .then(function (blockchain_result: any) {
+                            console.log(blockchain_result)
+
+                        }).catch((err: any) => {
+                            console.log(err)
+                            logs = [
+                                {
+                                    field: "Blockchain Error - User Validation",
+                                    message: err,
+                                }
+                            ]
+                            res.status(400).json({ logs });
+                            return;
+                        });
+                } catch (err) {
                     logs = [
                         {
-                            field: "Invalid Agent",
-                            message: "Better check with log in",
+                            field: "Blockchain Error",
+                            message: err,
                         }
                     ]
-
                     res.status(400).json({ logs });
                     return;
                 }
-            } catch (err) {
-                if (err instanceof MongoServerError && err.code === 11000) {
-                    console.error("# Duplicate Data Found:\n", err)
-                    logs = [{
-                        field: "Unexpected Mongo Error",
-                        message: "Default Message"
-                    }]
-                    res.status(400).json({ logs });
-                    return { logs };
-
-                }
-                else {
-                    res.status(400).json({ err });
-
-                    throw new Error(err)
-                }
-            }
-            console.log(wasteData);
-            try {
-                var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
-                await validationContract.methods.validateUser(wasteData.wasteUser).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+                let amount = parseInt(wasteData.wasteWeight);
+                var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
+                await rewardContract.methods.transferFrom(wasteData.wasteAgent, wasteData.wasteUser, amount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
                     .then(function (blockchain_result: any) {
                         console.log(blockchain_result)
+                        // logs = [
+                        //     {
+                        //         field: "Successful TransferFrom",
+                        //         message: blockchain_result,
+                        //     }
+                        // ]
 
+                        // res.status(200).json({ logs });
+                        // return;
                     }).catch((err: any) => {
                         console.log(err)
                         logs = [
                             {
-                                field: "Blockchain Error - User Validation",
+                                field: "Blockchain Error - TransferFrom",
                                 message: err,
                             }
                         ]
+
                         res.status(400).json({ logs });
                         return;
                     });
-            } catch (err) {
-                logs = [
-                    {
-                        field: "Blockchain Error",
-                        message: err,
-                    }
-                ]
-                res.status(400).json({ logs });
-                return;
             }
-            let amount = parseInt(wasteData.wasteWeight);
-            var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
-            await rewardContract.methods.transferFrom(wasteData.wasteAgent, wasteData.wasteUser, amount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
-                .then(function (blockchain_result: any) {
-                    console.log(blockchain_result)
-                    logs = [
-                        {
-                            field: "Successful TransferFrom",
-                            message: blockchain_result,
-                        }
-                    ]
+            logs = [
+                {
+                    field: "Successful TransferFrom",
+                    message: "All rewards imbursed",
+                }
+            ]
 
-                    res.status(200).json({ logs });
-                    return;
-                }).catch((err: any) => {
-                    console.log(err)
-                    logs = [
-                        {
-                            field: "Blockchain Error - TransferFrom",
-                            message: err,
-                        }
-                    ]
-
-                    res.status(400).json({ logs });
-                    return;
-                });
-            }
+            res.status(200).json({ logs });
+            return;
         } catch (e) {
             res.status(400).json({ e });
             throw e;
@@ -319,15 +331,15 @@ const rewardMint = async (req: Request, res: Response) => {
                 await rewardContract.methods._mint(wasteData.wasteAgent, amount).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
                     .then(function (blockchain_result: any) {
                         console.log(blockchain_result)
-                        logs = [
-                            {
-                                field: "Successful _Mint",
-                                message: blockchain_result,
-                            }
-                        ]
+                        // logs = [
+                        //     {
+                        //         field: "Successful _Mint",
+                        //         message: blockchain_result,
+                        //     }
+                        // ]
 
-                        res.status(200).json({ logs });
-                        return;
+                        // res.status(200).json({ logs });
+                        // return;
                     }).catch((err: any) => {
                         console.log(err)
                         logs = [
@@ -341,6 +353,15 @@ const rewardMint = async (req: Request, res: Response) => {
                         return;
                     });
             }
+            logs = [
+                {
+                    field: "Successful Mint",
+                    message: "All rewards imbursed",
+                }
+            ]
+
+            res.status(200).json({ logs });
+            return;
 
         } catch (e) {
             res.status(400).json({ e });
