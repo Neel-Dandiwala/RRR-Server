@@ -505,6 +505,7 @@ const companyAcceptBooking = async(req: Request, res:Response) => {
     const bookingId = req.body.key
     const db = await connection.getDb();
     const collection = db.collection('agent_company_booking');
+    const wasteCollection = db.collection('waste');
     let logs;
     if (!req.session.authenticationID) {
         logs = [
@@ -537,27 +538,68 @@ const companyAcceptBooking = async(req: Request, res:Response) => {
         }
     }
     if(result.bookingCompany !== req.session.authenticationID) {
-        logs = [
+        logs = 
             {
                 field: "Invalid Company",
                 message: "Better check with administrator",
             }
-        ]
+        
 
         res.status(400).json({ logs });
         return;
+    }
+    for (const wasteId of result.wasteIds) {
+        let wasteData: any;
+        let updatedCompany;
+        try {
+            updatedCompany = await wasteCollection.updateOne(
+                { _id: new mongoose.Types.ObjectId(wasteId) },
+                {
+                    $set: {
+                        wasteCompany: req.session.authenticationID,
+                        wasteCompanyDate: new Date(Date.now()).toISOString(),
+                    },
+                }
+            );
+            if (!updatedCompany.acknowledged) {
+                logs =
+                    {
+                        field: "Failed Updation",
+                        message: "Error in modifying each waste",
+                    }
+
+                res.status(400).json({ logs });
+                return { logs };
+            }
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return { logs };
+
+            }
+            else {
+                res.status(400).json({ err });
+
+                throw new Error(err)
+            }
+        }
     }
 
     try {
         await collection.updateOne(
             { _id:  new mongoose.Types.ObjectId(bookingId) },
             { $set: { bookingStatus: 'Accepted' }})
-            logs = {
-                field: "Succesful Updation",
-                message: "Booking Accepted by Company"
-            }
-            res.status(200).json( logs );
-            return { logs };
+        logs = {
+            field: "Succesful Updation",
+            message: "Booking Accepted by Company"
+        }
+        // res.status(200).json( logs );
+        // return { logs };
     } catch (err) {
         if (err instanceof MongoServerError && err.code === 11000) {
             console.error("# Duplicate Data Found:\n", err)
@@ -566,7 +608,35 @@ const companyAcceptBooking = async(req: Request, res:Response) => {
                 message: "Default Message"
             }]
             res.status(400).json({ logs });
-            return { logs };
+            return;
+
+        }
+        else {
+            res.status(400).json({ err });
+
+            throw new Error(err)
+        }
+    }
+
+    try {
+        await collection.updateOne(
+            { _id:  new mongoose.Types.ObjectId(bookingId) },
+            { $set: { bookingStatus: 'Accepted' }})
+        logs = {
+            field: "Succesful Updation",
+            message: "Booking Accepted by Company"
+        }
+        res.status(200).json( logs );
+        return { logs };
+    } catch (err) {
+        if (err instanceof MongoServerError && err.code === 11000) {
+            console.error("# Duplicate Data Found:\n", err)
+            logs = [{
+                field: "Unexpected Mongo Error",
+                message: "Default Message"
+            }]
+            res.status(400).json({ logs });
+            return;
 
         }
         else {

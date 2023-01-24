@@ -50,6 +50,18 @@ const WasteSchema = new mongoose_1.Schema({
         type: Number,
         required: true
     },
+    wasteProcessed: {
+        type: String,
+        required: true
+    },
+    wasteOneWay: {
+        type: String,
+        required: true
+    },
+    wasteTwoWay: {
+        type: String,
+        required: true
+    },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("Waste", WasteSchema);
 //# sourceMappingURL=Waste.js.map

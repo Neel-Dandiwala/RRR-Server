@@ -63,6 +63,21 @@ const WasteSchema: Schema = new Schema({
         required: true
     },
 
+    wasteProcessed: {
+        type: String,
+        required: true
+    },
+
+    wasteOneWay: {
+        type: String,
+        required: true
+    },
+
+    wasteTwoWay: {
+        type: String,
+        required: true
+    },
+
 }, {timestamps: true})
 
 export default model<WasteInfo>("Waste", WasteSchema);

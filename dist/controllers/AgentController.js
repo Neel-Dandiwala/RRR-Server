@@ -532,10 +532,10 @@ const agentAcceptBooking = async (req, res) => {
     catch (err) {
         if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
             console.error("# Duplicate Data Found:\n", err);
-            logs = [{
-                    field: "Unexpected Mongo Error",
-                    message: "Default Message"
-                }];
+            logs = {
+                field: "Unexpected Mongo Error",
+                message: "Default Message"
+            };
             res.status(400).json({ logs });
             return { logs };
         }

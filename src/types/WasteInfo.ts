@@ -11,5 +11,8 @@ export class WasteInfo {
     wastePlasticWeight: number;
     wastePaperWeight: number;
     wasteBookingId: string;
+    wasteProcessed: string;
+    wasteOneWay: string;
+    wasteTwoWay: string;
 }
 

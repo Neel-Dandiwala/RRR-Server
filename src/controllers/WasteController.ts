@@ -90,7 +90,10 @@ const wasteUser = async (req: Request, res: Response) => {
                 wasteElectronicWeight: wasteData.wasteElectronicWeight,
                 wastePaperWeight: wasteData.wastePaperWeight,
                 wastePlasticWeight: wasteData.wastePlasticWeight,
-                wasteBookingId: wasteData.wasteBookingId
+                wasteBookingId: wasteData.wasteBookingId,
+                wasteProcessed: "",
+                wasteOneWay: "",
+                wasteTwoWay: ""
             });
 
             let result: any;
@@ -157,7 +160,10 @@ const wasteUser = async (req: Request, res: Response) => {
                             wasteElectronicWeight: wasteData.wasteElectronicWeight,
                             wastePaperWeight: wasteData.wastePaperWeight,
                             wastePlasticWeight: wasteData.wastePlasticWeight,
-                            wasteBookingId: wasteData.wasteBookingId
+                            wasteBookingId: wasteData.wasteBookingId,
+                            wasteProcessed: _waste.wasteProcessed,
+                            wasteOneWay: _waste.wasteOneWay,
+                            wasteTwoWay: _waste.wasteTwoWay
                         }
                             ;
 
@@ -467,28 +473,27 @@ const wasteCompany = async (req: Request, res: Response) => {
                             { _id: new mongoose.Types.ObjectId(wasteId) },
                             {
                                 $set: {
-                                    wasteCompany: req.session.authenticationID,
-                                    wasteCompanyDate: new Date(Date.now()).toISOString(),
+                                    // wasteCompany: req.session.authenticationID,
+                                    wasteProcessed: new Date(Date.now()).toISOString(),
                                 },
                             }
                         );
                         if (updatedCompany.acknowledged) {
-                            logs = [
+                            logs =
                                 {
                                     field: "Successful Updation",
                                     message: blockchain_result,
-                                },
-                            ];
+                                }
 
                             res.status(200).json({ logs });
                             return { logs };
                         } else {
-                            logs = [
+                            logs = 
                                 {
                                     field: "Mongo Error",
                                     message: blockchain_result,
                                 },
-                            ];
+                            
 
                             res.status(400).json({ logs });
                             return { logs };
@@ -496,11 +501,11 @@ const wasteCompany = async (req: Request, res: Response) => {
                     })
                     .catch((err: any) => {
                         console.log(err);
-                        logs = [
+                        logs =
                             {
                                 field: "Blockchain Error - Waste Updation",
-                            },
-                        ];
+                            }
+                        
                         res.status(400).json({ logs });
                         return;
                     });
@@ -701,6 +706,67 @@ const getWasteDetails = async (req: Request, res: Response) => {
         });
 };
 
+const getWasteTimestamps = async (req: Request, res: Response) => {
+    const db = await connection.getDb();
+    const collection = db.collection("waste");
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+    const wasteId = req.body.key;
+    let wasteData;
+    try {
+        wasteData = await collection.findOne({ _id: new mongoose.Types.ObjectId(wasteId) });
+    } catch (err) {
+        if (err instanceof MongoServerError && err.code === 11000) {
+            console.error("# Duplicate Data Found:\n", err)
+            logs = [{
+                field: "Unexpected Mongo Error",
+                message: "Default Message"
+            }]
+            res.status(400).json({ logs });
+            return { logs };
+
+        }
+        else {
+            res.status(400).json({ err });
+
+            throw new Error(err)
+        }
+    }
+
+    if(wasteData === null) {
+        logs =
+                {
+                    field: "Invalid Waste Id",
+                    message: "Better check with administrator",
+                }
+                res.status(400).json({ logs });
+                return;
+    }
+
+    logs = {
+        field: "Waste Timestamp Log",
+        wasteAgentAccept: wasteData.wasteUserDate,
+        wasteAgentCollect: wasteData.wasteAgentDate,
+        wasteCompanyAccept: wasteData.wasteCompanyDate,
+        wasteCompanyCollect: wasteData.wasteProcessed,
+        wasteOneWay: wasteData.wasteOneWay,
+        wasteTwoWay: wasteData.wasteTwoWay
+    };
+
+    res.status(200).json(logs);
+    return;
+    
+};
+
 const getWasteQR = async (req: Request, res: Response) => {
     let logs;
     const wasteId = req.body.key;
@@ -802,5 +868,6 @@ module.exports = {
     wasteComplete,
     getWasteQRDetails,
     getWasteQR,
-    getWasteDetails
+    getWasteDetails,
+    getWasteTimestamps
 };

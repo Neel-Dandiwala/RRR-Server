@@ -145,9 +145,10 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
                     return;
                 }
                 let amount = parseInt(wasteData.wasteWeight);
+                let updatedWaste;
                 var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
                 await rewardContract.methods.transferFrom(wasteData.wasteAgent, wasteData.wasteUser, amount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
-                    .then(function (blockchain_result: any) {
+                    .then(async function (blockchain_result: any) {
                         console.log(blockchain_result)
                         // logs = [
                         //     {
@@ -158,6 +159,26 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
 
                         // res.status(200).json({ logs });
                         // return;
+
+                        updatedWaste = await collection.updateOne(
+                            { _id: new mongoose.Types.ObjectId(wasteId) },
+                            {
+                                $set: {
+                                    wasteTwoWay: new Date(Date.now()).toISOString(),
+                                },
+                            }
+                        );
+                        if (!updatedWaste.acknowledged) {
+                            logs =
+                                {
+                                    field: "Failed Updation",
+                                    message: "Error in modifying each waste",
+                                }
+            
+                            res.status(400).json({ logs });
+                            return { logs };
+                        }
+
                     }).catch((err: any) => {
                         console.log(err)
                         logs = [
@@ -298,6 +319,46 @@ const rewardMint = async (req: Request, res: Response) => {
                         throw new Error(err)
                     }
                 }
+                try{
+                    var trackingContract = new (web3.getWeb3().eth.Contract)(
+                        TrackingABI.abi,
+                        process.env.TRACKING_ADDRESS,
+                        {}
+                    );
+                    await trackingContract.methods
+                        .concludeWaste(req.session.authenticationID, wasteId)
+                        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
+                        .then(function (blockchain_result: any) {
+                            console.log(blockchain_result);
+                            // logs = {
+                            //     field: "Waste Concluded Log",
+                            //     message: blockchain_result,
+                            // };
+                            // res.status(200).json(logs);
+                            // return;
+                        })
+                        .catch((err: any) => {
+                            console.log(err);
+                
+                            logs = [
+                                {
+                                    field: "Blockchain Error - Conclude waste",
+                                    message: err,
+                                },
+                            ];
+                            res.status(400).json({ logs });
+                            return;
+                        });
+                } catch (err) {
+                    logs = [
+                        {
+                            field: "Blockchain Error",
+                            message: err,
+                        }
+                    ]
+                    res.status(400).json({ logs });
+                    return;
+                }
                 console.log(wasteData);
                 try {
                     var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
@@ -327,9 +388,10 @@ const rewardMint = async (req: Request, res: Response) => {
                     return;
                 }
                 let amount = parseInt(wasteData.wasteWeight);
+                let updatedWaste;
                 var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
                 await rewardContract.methods._mint(wasteData.wasteAgent, amount).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
-                    .then(function (blockchain_result: any) {
+                    .then(async function (blockchain_result: any) {
                         console.log(blockchain_result)
                         // logs = [
                         //     {
@@ -340,6 +402,24 @@ const rewardMint = async (req: Request, res: Response) => {
 
                         // res.status(200).json({ logs });
                         // return;
+                        updatedWaste = await collection.updateOne(
+                            { _id: new mongoose.Types.ObjectId(wasteId) },
+                            {
+                                $set: {
+                                    wasteOneWay: new Date(Date.now()).toISOString(),
+                                },
+                            }
+                        );
+                        if (!updatedWaste.acknowledged) {
+                            logs =
+                                {
+                                    field: "Failed Updation",
+                                    message: "Error in modifying each waste",
+                                }
+            
+                            res.status(400).json({ logs });
+                            return { logs };
+                        }
                     }).catch((err: any) => {
                         console.log(err)
                         logs = [
