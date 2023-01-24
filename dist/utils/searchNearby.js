@@ -26,4 +26,4 @@ const isNearby = (lat1, lon1, lat2, lon2, threshold) => {
     }
 };
 exports.isNearby = isNearby;
-//# sourceMappingURL=searchNearby.js.map
+//# sourceMappingURL=SearchNearby.js.map

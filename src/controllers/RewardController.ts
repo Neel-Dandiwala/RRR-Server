@@ -49,10 +49,42 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
 
     if (validAgent) {
         try {
+            const bookingCollection = db.collection('agent_company_booking');
+            let bookingData;
+            try {
+                bookingData = await bookingCollection.findOne({ _id: new mongoose.Types.ObjectId(bookingId) });
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }]
+                    res.status(400).json({ logs });
+                    return { logs };
 
+                }
+                else {
+                    res.status(400).json({ err });
+
+                    throw new Error(err)
+                }
+            }
+
+            if (bookingData === null) {
+                logs =
+                {
+                    field: "Invalid Booking Id",
+                    message: "Better check with administrator",
+                }
+                res.status(400).json({ logs });
+                return;
+            }
+
+            for (const wasteId of bookingData.wasteIds) {
             let wasteData: any;
             try {
-                wasteData = await collection.findOne({ _id: new mongoose.Types.ObjectId(key) });
+                wasteData = await collection.findOne({ _id: new mongoose.Types.ObjectId(wasteId) });
                 if (wasteData.wasteAgent !== req.session.authenticationID) {
                     logs = [
                         {
@@ -135,7 +167,7 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
                     res.status(400).json({ logs });
                     return;
                 });
-
+            }
         } catch (e) {
             res.status(400).json({ e });
             throw e;
