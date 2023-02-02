@@ -18,7 +18,7 @@ exports.web3 = {
         return _web3.web3_link;
     },
     getWeb3: function () {
-        return new web3_1.default(new web3_1.default.providers.HttpProvider("http://localhost:9545"));
+        return new web3_1.default(new web3_1.default.providers.HttpProvider(_web3.web3_link));
     }
 };
 exports.RewardABI = JSON.parse(fs_1.default.readFileSync('blockchain/build/contracts/Reward.json', 'utf-8'));

@@ -17,8 +17,8 @@ export const web3 = {
 
     getWeb3: function() {
         return new Web3(
-                new Web3.providers.HttpProvider("http://localhost:9545")
-                // new Web3.providers.HttpProvider(_web3.web3_link)
+                // new Web3.providers.HttpProvider("http://localhost:9545")
+                new Web3.providers.HttpProvider(_web3.web3_link)
             );
     } 
 };
