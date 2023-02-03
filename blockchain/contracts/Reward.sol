@@ -82,7 +82,8 @@ library SafeMath {
 
 contract Reward {
 
-    address private constant VALIDATION_CONTRACT = 0x5df848c79F19e9a8Ff59F83eD1A862da26aEbA3E;
+    // address private constant VALIDATION_CONTRACT = 0x5df848c79F19e9a8Ff59F83eD1A862da26aEbA3E;
+    address private constant VALIDATION_CONTRACT = 0x4959daeA53bEd12F1859da37AE00935F173D598b;
     ValidationInterface private Validation = ValidationInterface(VALIDATION_CONTRACT);
 
 
