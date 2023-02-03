@@ -210,7 +210,7 @@ const getUserBalance = async (req, res) => {
         console.log(err);
         logs = [
             {
-                field: "Blockchain Error - TransferFrom",
+                field: "Blockchain Error - Balance",
                 message: err,
             }
         ];
