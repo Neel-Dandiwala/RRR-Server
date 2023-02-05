@@ -655,6 +655,7 @@ const setUserAgentForm = async (req: Request, res: Response) => {
                     bookingAddress: formData.bookingAddress,
                     bookingPincode: formData.bookingPincode,
                     bookingStatus: _formData.bookingStatus,
+                    bookingWasteId: _formData.bookingWasteId
                 }
 
 
