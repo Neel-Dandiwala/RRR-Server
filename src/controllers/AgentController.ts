@@ -480,6 +480,7 @@ const getAgentBookings = async (req: Request, res: Response) => {
                 bookingAddress: string,
                 bookingPincode: string,
                 bookingStatus: string,
+                bookingWasteId: string,
             };
             let result;
             let _bookings: bookingData[] = [];
@@ -548,6 +549,8 @@ const getAgentBookings = async (req: Request, res: Response) => {
                     bookingPincode: booking.bookingPincode,
 
                     bookingStatus: booking.bookingStatus,
+
+                    bookingWasteId: booking.bookingWasteId,
 
                 }
                 console.log(_booking)
@@ -1101,6 +1104,8 @@ const getAgentCompanyBookings = async (req: Request, res: Response) => {
                         totalElectronicWeight: booking.totalElectronicWeight,
     
                         bookingStatus: booking.bookingStatus,
+
+                        
     
                     }
                     console.log(_booking)

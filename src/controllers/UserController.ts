@@ -449,6 +449,7 @@ const getUserBookings = async (req: Request, res: Response) => {
                 bookingAddress: string,
                 bookingPincode: string,
                 bookingStatus: string,
+                bookingWasteId: string
             };
             let result;
             let _bookings: bookingData[] = [];
@@ -518,6 +519,8 @@ const getUserBookings = async (req: Request, res: Response) => {
                         bookingPincode: booking.bookingPincode,
     
                         bookingStatus: booking.bookingStatus,
+
+                        bookingWasteId: booking.bookingWasteId,
     
                     }
                     console.log(_booking)
@@ -614,7 +617,9 @@ const setUserAgentForm = async (req: Request, res: Response) => {
 
                 bookingPincode: formData.bookingPincode,
 
-                bookingStatus: 'Pending'
+                bookingStatus: 'Pending',
+
+                bookingWasteId: 'Pending'
 
             })
             let result;

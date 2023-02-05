@@ -13,4 +13,6 @@ export class UserAgentFormInfo {
     bookingPincode: string;
 
     bookingStatus?: string;
+
+    bookingWasteId? : string;
 }

@@ -35,7 +35,12 @@ const UserAgentFormSchema: Schema = new Schema({
     bookingStatus:  {
         type: String,
         required: true
-    }
+    },
+
+    bookingWasteId:  {
+        type: String,
+        required: true
+    },
 
 }, {timestamps: true})
 
