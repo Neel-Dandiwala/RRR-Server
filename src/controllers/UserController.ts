@@ -619,7 +619,7 @@ const setUserAgentForm = async (req: Request, res: Response) => {
 
                 bookingStatus: 'Pending',
 
-                bookingWasteId: 'Pending'
+                bookingWasteId: 'Pending',
 
             })
             let result;
