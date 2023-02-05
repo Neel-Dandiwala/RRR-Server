@@ -100,6 +100,31 @@ const wasteUser = async (req, res) => {
                 console.log(result);
                 var trackingContract = new (web3_1.web3.getWeb3().eth.Contract)(web3_1.TrackingABI.abi, process.env.TRACKING_ADDRESS, {});
                 let id_ = result.insertedId.toString();
+                try {
+                    let bookingCollection = db.collection('user_agent_booking');
+                    await bookingCollection.updateOne({ _id: new mongoose_1.default.Types.ObjectId(wasteData.wasteBookingId) }, {
+                        $set: {
+                            bookingWasteId: id_,
+                        },
+                    });
+                }
+                catch (err) {
+                    if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                        console.error("# Duplicate Data Found:\n", err);
+                        logs = [
+                            {
+                                field: "Unexpected Mongo Error - Booking Waste Id",
+                                message: "Default Message",
+                            },
+                        ];
+                        res.status(400).json({ logs });
+                        return { logs };
+                    }
+                    else {
+                        res.status(400).json({ err });
+                        throw new Error(err);
+                    }
+                }
                 let description_ = _waste.wasteDescription;
                 console.log(description_);
                 let weight_ = _wasteWeight.toString();

@@ -410,6 +410,7 @@ const getAgentBookings = async (req, res) => {
                     bookingAddress: booking.bookingAddress,
                     bookingPincode: booking.bookingPincode,
                     bookingStatus: booking.bookingStatus,
+                    bookingWasteId: booking.bookingWasteId,
                 };
                 console.log(_booking);
                 _bookings.push(_booking);

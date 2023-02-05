@@ -408,6 +408,7 @@ const getUserBookings = async (req, res) => {
                         bookingAddress: booking.bookingAddress,
                         bookingPincode: booking.bookingPincode,
                         bookingStatus: booking.bookingStatus,
+                        bookingWasteId: booking.bookingWasteId,
                     };
                     console.log(_booking);
                     _bookings.push(_booking);
@@ -484,7 +485,8 @@ const setUserAgentForm = async (req, res) => {
                 bookingTimeSlot: formData.bookingTimeSlot,
                 bookingAddress: formData.bookingAddress,
                 bookingPincode: formData.bookingPincode,
-                bookingStatus: 'Pending'
+                bookingStatus: 'Pending',
+                bookingWasteId: 'Pending',
             });
             let result;
             try {
@@ -518,6 +520,7 @@ const setUserAgentForm = async (req, res) => {
                         bookingAddress: formData.bookingAddress,
                         bookingPincode: formData.bookingPincode,
                         bookingStatus: _formData.bookingStatus,
+                        bookingWasteId: _formData.bookingWasteId
                     };
                 res.status(200).json(logs);
                 return { logs };

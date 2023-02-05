@@ -29,7 +29,11 @@ const UserAgentFormSchema = new mongoose_1.Schema({
     bookingStatus: {
         type: String,
         required: true
-    }
+    },
+    bookingWasteId: {
+        type: String,
+        required: true
+    },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("UserAgentForm", UserAgentFormSchema);
 //# sourceMappingURL=UserAgentForm.js.map
