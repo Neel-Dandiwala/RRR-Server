@@ -8,6 +8,7 @@ import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
 import { AdminInfo } from '../types/AdminInfo';
 import { QueryInfo } from '../types/QueryInfo';
+import { TokenAdminInfo } from '../types/TokenAdminInfo';
 import mongoose from 'mongoose';
 // import { serverContext } from '../context';
 
@@ -22,18 +23,18 @@ class AdminResponse {
 // @route  GET /agent/login
 // @access Private
 const getAdminQueries = async(req:Request, res: Response) => {
-    try {
-        if (!req.session ) {
-            const logs =  {
-                field: "Session ID Missing",
-                message: "Please login first"
-            }
-            res.status(400).json({ logs });
-        }
-    } catch (e) {
-        res.status(400).json({ e });
-        throw e;
-    } 
+    // try {
+    //     if (!req.session ) {
+    //         const logs =  {
+    //             field: "Session ID Missing",
+    //             message: "Please login first"
+    //         }
+    //         res.status(400).json({ logs });
+    //     }
+    // } catch (e) {
+    //     res.status(400).json({ e });
+    //     throw e;
+    // } 
 
     const db = await connection.getDb();
 
@@ -68,7 +69,78 @@ const getAdminQueries = async(req:Request, res: Response) => {
             logs = [
                 {
                     field: "Successful Retrieval",
-                    message: req.sessionID,
+                    message: "Queries",
+                }
+            ]
+            
+
+            res.status(200).json({ result  });
+            return {logs};
+        } else {
+            logs = [
+                {
+                    field: "Unknown Error Occurred",
+                    message: "Better check with administrator",
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return {logs};
+        }
+    } catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+}
+
+const getAdminTokens = async(req:Request, res: Response) => {
+    // try {
+    //     if (!req.session ) {
+    //         const logs =  {
+    //             field: "Session ID Missing",
+    //             message: "Please login first"
+    //         }
+    //         res.status(400).json({ logs });
+    //     }
+    // } catch (e) {
+    //     res.status(400).json({ e });
+    //     throw e;
+    // } 
+
+    const db = await connection.getDb();
+
+    const collection = db.collection( 'tokens' );
+
+    try {
+        let result;
+        let logs;
+        try {
+            result = await collection.find({ }).toArray()
+            
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{ 
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return {logs};
+                
+            }
+            else {
+                res.status(400).json({ err });
+                
+                throw new Error(err)
+            }
+        }
+        // result = JSON.stringify(result, null, 2);
+        if(result){
+            // console.log(result);
+            logs = [
+                {
+                    field: "Successful Retrieval",
+                    message: "Tokens",
                 }
             ]
             
@@ -189,7 +261,7 @@ const loginAdmin = async(req: Request, res: Response) => {
         const valid = await argon2.verify(result.adminPassword, admin.adminPassword);
         if(valid){
             console.log(result);
-            req.session.authenticationID = admin._id;
+            // req.session.authenticationID = admin._id;
             logs = [
                 {
                     field: "Successful Log In",
@@ -293,18 +365,18 @@ const setQuery = async(req:Request, res: Response) => {
 // @route  GET /agent/login
 // @access Private
 const replyQuery = async(req:Request, res: Response) => {
-    try {
-        if (!req.session) {
-            const logs =  {
-                field: "Session ID Missing",
-                message: "Please login first"
-            }
-            res.status(400).json({ logs });
-        }
-    } catch (e) {
-        res.status(400).json({ e });
-        throw e;
-    } 
+    // try {
+    //     if (!req.session) {
+    //         const logs =  {
+    //             field: "Session ID Missing",
+    //             message: "Please login first"
+    //         }
+    //         res.status(400).json({ logs });
+    //     }
+    // } catch (e) {
+    //     res.status(400).json({ e });
+    //     throw e;
+    // } 
     const db = await connection.getDb();
 
     const collection = db.collection( 'queries' );
@@ -349,6 +421,147 @@ const replyQuery = async(req:Request, res: Response) => {
                 {
                     field: "Successful Finding",
                     message: "Done",
+                }
+            ]
+
+            res.status(200).json({ logs });
+            return {logs};
+        } else {
+            logs = [
+                {
+                    field: "Unknown Error Occurred",
+                    message: "Better check with administrator",
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return {logs};
+        }
+        
+
+    } catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+}
+
+const setToken = async(req:Request, res: Response) => {
+    const db = await connection.getDb();
+
+    const collection = db.collection( 'tokens' );
+    // console.log(req.body)
+    try {
+        const tokenName = req.body.tokenName;
+        const tokenSymbol = req.body.tokenSymbol;
+        const tokenDescription = req.body.tokenDescription;
+
+        const _token: TokenAdminInfo = {
+            tokenName: tokenName,
+            tokenSymbol: tokenSymbol,
+            tokenDescription: tokenDescription,
+            
+        }
+
+        let result;
+        let logs;
+        try {
+            result = await collection.insertOne(_token);
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{ 
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return {logs};
+                
+            }
+            else {
+                res.status(400).json({ err });
+                
+                throw new Error(err)
+            }
+        }
+        console.log(result);
+        if(result.acknowledged){
+            console.log(result);
+            logs = [
+                {
+                    field: "Successful Insertion",
+                    message: "Admin Token",
+                }
+            ]
+
+            res.status(200).json({ logs });
+            return {logs};
+        } else {
+            logs = [
+                {
+                    field: "Unknown Error Occurred",
+                    message: "Better check with administrator",
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return {logs};
+        }
+        
+
+    } catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+}
+
+
+const deleteToken = async(req:Request, res: Response) => {
+    // try {
+    //     if (!req.session) {
+    //         const logs =  {
+    //             field: "Session ID Missing",
+    //             message: "Please login first"
+    //         }
+    //         res.status(400).json({ logs });
+    //     }
+    // } catch (e) {
+    //     res.status(400).json({ e });
+    //     throw e;
+    // } 
+    const db = await connection.getDb();
+
+    const collection = db.collection( 'tokens' );
+    console.log(req.body)
+    try {
+        const tokenId = (req.body.tokenId).toString()
+        let result;
+        let logs;
+        try {
+            result = await collection.deleteOne({ _id: new mongoose.Types.ObjectId(tokenId) });
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{ 
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return {logs};
+                
+            }
+            else {
+                res.status(400).json({ err });
+                
+                throw new Error(err)
+            }
+        }
+        console.log(result);
+        if(result.acknowledged){
+            console.log(result);
+            logs = [
+                {
+                    field: "Successful Deletion",
+                    message: "Token",
                 }
             ]
 
@@ -443,5 +656,5 @@ const getQuery = async(req:Request, res: Response) => {
 }
 
 module.exports = {
-    getAdminQueries, loginAdmin, setQuery, replyQuery, getQuery, getAdminSession, logoutAdmin
+    getAdminQueries, loginAdmin, setQuery, replyQuery, getQuery, getAdminSession, logoutAdmin, getAdminTokens, deleteToken, setToken
 }
