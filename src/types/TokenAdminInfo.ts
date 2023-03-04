@@ -8,4 +8,8 @@ export class TokenAdminInfo {
     tokenSymbol?: string;
 
     tokenDescription?: string;
+
+    tokenValidity?: number;
+
+    tokenPrice?: number;
 }

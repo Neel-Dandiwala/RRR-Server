@@ -8,6 +8,12 @@ const mongodb_1 = require("mongodb");
 const web3_1 = require("../web3");
 const mongoose_1 = __importDefault(require("mongoose"));
 const Token_1 = __importDefault(require("../models/Token"));
+const addDays = (days) => {
+    var datetemp = new Date(Date.now());
+    var date = new Date(datetemp.valueOf());
+    date.setDate(date.getDate() + days);
+    return date.toISOString();
+};
 require('dotenv').config();
 const rewardTransferFrom = async (req, res) => {
     const bookingId = req.body.key;
@@ -163,13 +169,12 @@ const rewardTransferFrom = async (req, res) => {
                     return;
                 });
             }
-            logs = [
+            logs =
                 {
                     field: "Successful TransferFrom",
-                    message: "All rewards imbursed",
-                }
-            ];
-            res.status(200).json({ logs });
+                    message: "Transaction Received",
+                };
+            res.status(200).json(logs);
             return;
         }
         catch (e) {
@@ -371,13 +376,12 @@ const rewardMint = async (req, res) => {
                     return;
                 });
             }
-            logs = [
+            logs =
                 {
                     field: "Successful Mint",
-                    message: "All rewards imbursed now",
-                }
-            ];
-            res.status(200).json({ logs });
+                    message: "Transaction Done",
+                };
+            res.status(200).json(logs);
             return;
         }
         catch (e) {
@@ -438,7 +442,8 @@ const rewardMintToken = async (req, res) => {
                 tokenUserId: req.session.authenticationID,
                 tokenName: tokenData.tokenName,
                 tokenSymbol: tokenData.tokenSymbol,
-                tokenExpires: '',
+                tokenExpires: 0,
+                tokenExpiresDate: addDays(tokenData.tokenExpires / 86400),
                 tokenUsed: false,
                 tokenAmount: tokenData.tokenAmount
             });
@@ -465,20 +470,24 @@ const rewardMintToken = async (req, res) => {
             if (result.acknowledged) {
                 console.log(result);
                 var rewardContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.RewardABI.abi, process.env.REWARD_ADDRESS, {});
-                await rewardContract.methods.mintToken(req.session.authenticationID, tokenData.tokenName, tokenData.tokenSymbol, tokenData.tokenAmount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
+                await rewardContract.methods.mintToken(req.session.authenticationID, tokenData.tokenName, tokenData.tokenSymbol, tokenData.tokenAmount, result.insertedId, tokenData.tokenExpires).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
                     .then(async function (blockchain_result) {
                     console.log(blockchain_result);
-                    let _tokenExpires = (blockchain_result.events.TokenEvent.returnValues.expires).toString();
+                    let _tokenExpires = parseInt((blockchain_result.events.TokenEvent.returnValues.expires).toString());
                     let _tokenId = (blockchain_result.events.TokenEvent.returnValues.id).toString();
                     let updatedToken = await collection.updateOne({ _id: result.insertedId }, { $set: { tokenId: _tokenId, tokenExpires: _tokenExpires } });
                     if (updatedToken.acknowledged) {
-                        logs = [
-                            {
-                                field: "Successful Updation",
-                                message: blockchain_result,
-                            }
-                        ];
-                        res.status(200).json({ logs });
+                        logs = {
+                            tokenId: _tokenId,
+                            tokenUserId: req.session.authenticationID,
+                            tokenName: tokenData.tokenName,
+                            tokenSymbol: tokenData.tokenSymbol,
+                            tokenExpires: _tokenExpires,
+                            tokenExpiresDate: _token.tokenExpiresDate,
+                            tokenUsed: false,
+                            tokenAmount: tokenData.tokenAmount
+                        };
+                        res.status(200).json(logs);
                         return { logs };
                     }
                     else {

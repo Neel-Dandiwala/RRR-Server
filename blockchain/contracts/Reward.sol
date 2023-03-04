@@ -112,6 +112,8 @@ contract Reward {
     );
     event TokenEvent( 
         uint256 id,
+        string tokenMongoId,
+        string user,
         uint256 userTokenId,
         string name,
         string symbol,
@@ -119,6 +121,8 @@ contract Reward {
         bool consumed,
         string eventMessage
     );
+
+    event BlockTimestamp(uint256 timestamp, string eventMessage);
 
     address private owner;
     using SafeMath for uint256;
@@ -132,6 +136,8 @@ contract Reward {
 
     struct Token {
         uint256 id;
+        string tokenMongoId;
+        string user;
         uint256 userTokenId;
         string name;
         string symbol;
@@ -229,6 +235,17 @@ contract Reward {
     {
         emit Balance(_balances[account], "balanceOf");
         return _balances[account];
+    }
+
+    /**
+     * Get block.timestamp
+     */
+    function blockTimestamp()
+        public
+        returns (uint256)
+    {
+        emit BlockTimestamp(block.timestamp, "blockTimestamp");
+        return block.timestamp;
     }
 
     /**
@@ -348,7 +365,7 @@ contract Reward {
         onlyOwner
     {
         require(_tokens[tokenId].expires != 0);
-        emit TokenEvent(_tokens[tokenId].id, _tokens[tokenId].userTokenId, _tokens[tokenId].name, _tokens[tokenId].symbol, _tokens[tokenId].expires, _tokens[tokenId].consumed, "getToken");
+        emit TokenEvent(_tokens[tokenId].id,  _tokens[tokenId].tokenMongoId,  _tokens[tokenId].user, _tokens[tokenId].userTokenId, _tokens[tokenId].name, _tokens[tokenId].symbol, _tokens[tokenId].expires, _tokens[tokenId].consumed, "getToken");
     }
 
     /**
@@ -528,15 +545,17 @@ contract Reward {
      *
      * - `account` cannot be the self address.
      */
-    function mintToken(string memory account, string memory _name, string memory _symbol, uint256 amount) public onlyOwner {
+    function mintToken(string memory account, string memory _name, string memory _symbol, uint256 amount, string memory _mongoId, uint256 _seconds) public onlyOwner {
         _burn(account, amount);
         _tokenCount = _tokenCount.add(1);
         _tokens[_tokenCount] = Token({
             id: _tokenCount,
+            tokenMongoId: _mongoId,
+            user: account,
             userTokenId: _userTokensCount[account],
             name: _name,
             symbol: _symbol,
-            expires: (block.timestamp).add(7890000),
+            expires: (block.timestamp).add(_seconds),
             consumed: false
         });
         _tokenTotalSupply = _tokenTotalSupply.add(1);

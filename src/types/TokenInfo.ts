@@ -3,7 +3,8 @@ export class TokenInfo {
     tokenUserId: string;
     tokenName: string;
     tokenSymbol: string;
-    tokenExpires: string;
+    tokenExpires: number;
+    tokenExpiresDate: string;
     tokenUsed: boolean;
     tokenAmount: number;
 }

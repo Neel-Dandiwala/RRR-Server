@@ -349,10 +349,14 @@ const setToken = async (req, res) => {
         const tokenName = req.body.tokenName;
         const tokenSymbol = req.body.tokenSymbol;
         const tokenDescription = req.body.tokenDescription;
+        const tokenValidity = req.body.tokenValidity;
+        const tokenPrice = req.body.tokenPrice;
         const _token = {
             tokenName: tokenName,
             tokenSymbol: tokenSymbol,
             tokenDescription: tokenDescription,
+            tokenValidity: tokenValidity * 86400,
+            tokenPrice: tokenPrice
         };
         let result;
         let logs;

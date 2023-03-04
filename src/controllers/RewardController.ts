@@ -8,6 +8,12 @@ import mongoose from 'mongoose';
 import Token from '../models/Token';
 import { TokenInfo } from '../types/TokenInfo';
 
+const addDays = (days: number) => {
+    var datetemp = new Date(Date.now());
+    var date = new Date(datetemp.valueOf());
+    date.setDate(date.getDate() + days);
+    return date.toISOString();
+}
 
 require('dotenv').config()
 
@@ -192,14 +198,14 @@ const rewardTransferFrom = async (req: Request, res: Response) => {
                         return;
                     });
             }
-            logs = [
+            logs = 
                 {
                     field: "Successful TransferFrom",
-                    message: "All rewards imbursed",
+                    message: "Transaction Received",
                 }
-            ]
+            
 
-            res.status(200).json({ logs });
+            res.status(200).json(logs);
             return;
         } catch (e) {
             res.status(400).json({ e });
@@ -433,14 +439,14 @@ const rewardMint = async (req: Request, res: Response) => {
                         return;
                     });
             }
-            logs = [
+            logs = 
                 {
                     field: "Successful Mint",
-                    message: "All rewards imbursed now",
+                    message: "Transaction Done",
                 }
-            ]
+            
 
-            res.status(200).json({ logs });
+            res.status(200).json(logs);
             return;
 
         } catch (e) {
@@ -502,14 +508,15 @@ const rewardMintToken = async (req: Request, res: Response) => {
 
     if (validUser) {
         try {
-            const tokenData = req.body as Pick<TokenInfo, "tokenName" | "tokenSymbol" | "tokenAmount">
+            const tokenData = req.body as Pick<TokenInfo, "tokenName" | "tokenSymbol" | "tokenAmount" | "tokenExpires">
             console.log(tokenData);
             const _token: TokenInfo = new Token({
                 tokenId: '',
                 tokenUserId: req.session.authenticationID,
                 tokenName: tokenData.tokenName,
                 tokenSymbol: tokenData.tokenSymbol,
-                tokenExpires: '',
+                tokenExpires: 0,
+                tokenExpiresDate: addDays(tokenData.tokenExpires / 86400),
                 tokenUsed: false,
                 tokenAmount: tokenData.tokenAmount
             })
@@ -538,11 +545,11 @@ const rewardMintToken = async (req: Request, res: Response) => {
             if (result.acknowledged) {
                 console.log(result);
                 var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
-                await rewardContract.methods.mintToken(req.session.authenticationID, tokenData.tokenName, tokenData.tokenSymbol, tokenData.tokenAmount).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
+                await rewardContract.methods.mintToken(req.session.authenticationID, tokenData.tokenName, tokenData.tokenSymbol, tokenData.tokenAmount, result.insertedId, tokenData.tokenExpires).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
                     .then(async function (blockchain_result: any) {
                         console.log(blockchain_result)
                         // blockchain_result.events.Transfer.returnValues.
-                        let _tokenExpires = (blockchain_result.events.TokenEvent.returnValues.expires).toString();
+                        let _tokenExpires = parseInt((blockchain_result.events.TokenEvent.returnValues.expires).toString());
                         let _tokenId = (blockchain_result.events.TokenEvent.returnValues.id).toString();
 
                         let updatedToken = await collection.updateOne(
@@ -550,14 +557,18 @@ const rewardMintToken = async (req: Request, res: Response) => {
                             { $set: { tokenId: _tokenId, tokenExpires: _tokenExpires } }
                         )
                         if (updatedToken.acknowledged) {
-                            logs = [
-                                {
-                                    field: "Successful Updation",
-                                    message: blockchain_result,
-                                }
-                            ]
+                            logs = {
+                                tokenId: _tokenId,
+                                tokenUserId: req.session.authenticationID,
+                                tokenName: tokenData.tokenName,
+                                tokenSymbol: tokenData.tokenSymbol,
+                                tokenExpires: _tokenExpires,
+                                tokenExpiresDate: _token.tokenExpiresDate,
+                                tokenUsed: false,
+                                tokenAmount: tokenData.tokenAmount
+                            }
 
-                            res.status(200).json({ logs });
+                            res.status(200).json( logs );
                             return { logs };
                         } else {
                             logs = [

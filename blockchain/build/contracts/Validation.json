@@ -167,9 +167,9 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.18+commit.87f61d96\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"method\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"value\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"eventMessage\",\"type\":\"string\"}],\"name\":\"ValidationEvent\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"agent\",\"type\":\"string\"}],\"name\":\"addAgent\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"company\",\"type\":\"string\"}],\"name\":\"addCompany\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"user\",\"type\":\"string\"}],\"name\":\"addUser\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"agent\",\"type\":\"string\"}],\"name\":\"removeAgent\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"company\",\"type\":\"string\"}],\"name\":\"removeCompany\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"user\",\"type\":\"string\"}],\"name\":\"removeUser\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"agent\",\"type\":\"string\"}],\"name\":\"validateAgent\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"company\",\"type\":\"string\"}],\"name\":\"validateCompany\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"user\",\"type\":\"string\"}],\"name\":\"validateUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Contract with abstraction for validation of entities\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Validation\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Validation.sol\":\"Validation\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Validation.sol\":{\"keccak256\":\"0x8e56ed62a2ed3e586410b295fe07f2636da63252b51050c4bd7efb2b1b9ce0cd\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a673cead93c5eaa93cbbc1d3357f5e048cb9f244ed9253df3b14f9d6d0b3b978\",\"dweb:/ipfs/Qma5xn8Lfgb25w5NeREKyCffeTFDFN77NxYpUF2vEeRfsb\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b5061077c806100206000396000f3fe608060405234801561001057600080fd5b50600436106100935760003560e01c8063ca87e7b511610066578063ca87e7b5146100fa578063d6483d171461010d578063dea02fe314610120578063fb24ab0f14610133578063ffcee0a11461014657600080fd5b806318b8275a14610098578063600cee78146100ad578063a21dabb7146100c0578063b08eff93146100e7575b600080fd5b6100ab6100a63660046103aa565b610159565b005b6100ab6100bb3660046103aa565b6101b2565b6100d36100ce3660046103aa565b6101ff565b604051901515815260200160405180910390f35b6100d36100f53660046103aa565b61023a565b6100ab6101083660046103aa565b61024b565b6100ab61011b3660046103aa565b610298565b6100ab61012e3660046103aa565b6102e6565b6100d36101413660046103aa565b610334565b6100ab6101543660046103aa565b610346565b600160008260405161016b919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906104c7565b60405180910390a150565b600080826040516101c3919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610529565b6000600282604051610211919061047f565b9081526040519081900360200190205460ff16151560011461023257600080fd5b506001919050565b60008082604051610211919061047f565b6001808260405161025c919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a790839061058c565b60016002826040516102aa919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906105f0565b60006001826040516102f8919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610658565b6000600182604051610211919061047f565b6000600282604051610358919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906106bd565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156103bc57600080fd5b813567ffffffffffffffff808211156103d457600080fd5b818401915084601f8301126103e857600080fd5b8135818111156103fa576103fa610394565b604051601f8201601f19908116603f0116810190838211818310171561042257610422610394565b8160405282815287602084870101111561043b57600080fd5b826020860160208301376000928101602001929092525095945050505050565b60005b8381101561047657818101518382015260200161045e565b50506000910152565b6000825161049181846020870161045b565b9190910192915050565b600081518084526104b381602086016020860161045b565b601f01601f19169290920160200192915050565b60608152600760608201526630b2322ab9b2b960c91b608082015260a0602082015260006104f860a083018461049b565b828103604093840152601181527024b739b2b93a34b7b71037b3102ab9b2b960791b60208201529190910192915050565b60608152600a6060820152693932b6b7bb32aab9b2b960b11b608082015260a06020820152600061055d60a083018461049b565b828103604093840152600f81526e2932b6b7bb30b61037b3102ab9b2b960891b60208201529190910192915050565b6060815260086060820152671859191059d95b9d60c21b608082015260a0602082015260006105be60a083018461049b565b8281036040938401526012815271125b9cd95c9d1a5bdb881bd9881059d95b9d60721b60208201529190910192915050565b60608152600a606082015269616464436f6d70616e7960b01b608082015260a06020820152600061062460a083018461049b565b8281036040938401526014815273496e73657274696f6e206f6620436f6d70616e7960601b60208201529190910192915050565b60608152600b60608201526a1c995b5bdd995059d95b9d60aa1b608082015260a06020820152600061068d60a083018461049b565b828103604093840152601081526f14995b5bdd985b081bd9881059d95b9d60821b60208201529190910192915050565b60608152600d60608201526c72656d6f7665436f6d70616e7960981b608082015260a0602082015260006106f460a083018461049b565b828103604093840152601281527152656d6f76616c206f6620436f6d70616e7960701b6020820152919091019291505056fe977ad43df54956a5e7e9c2f3dbb198524df140c1ea3686b92c328e20c39eb134a2646970667358221220b80a47521dbf2b31fd00e52d7d585c66bc4a83297a4483d0bb52f72a7e295fb864736f6c63430008120033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100935760003560e01c8063ca87e7b511610066578063ca87e7b5146100fa578063d6483d171461010d578063dea02fe314610120578063fb24ab0f14610133578063ffcee0a11461014657600080fd5b806318b8275a14610098578063600cee78146100ad578063a21dabb7146100c0578063b08eff93146100e7575b600080fd5b6100ab6100a63660046103aa565b610159565b005b6100ab6100bb3660046103aa565b6101b2565b6100d36100ce3660046103aa565b6101ff565b604051901515815260200160405180910390f35b6100d36100f53660046103aa565b61023a565b6100ab6101083660046103aa565b61024b565b6100ab61011b3660046103aa565b610298565b6100ab61012e3660046103aa565b6102e6565b6100d36101413660046103aa565b610334565b6100ab6101543660046103aa565b610346565b600160008260405161016b919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906104c7565b60405180910390a150565b600080826040516101c3919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610529565b6000600282604051610211919061047f565b9081526040519081900360200190205460ff16151560011461023257600080fd5b506001919050565b60008082604051610211919061047f565b6001808260405161025c919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a790839061058c565b60016002826040516102aa919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906105f0565b60006001826040516102f8919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610658565b6000600182604051610211919061047f565b6000600282604051610358919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906106bd565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156103bc57600080fd5b813567ffffffffffffffff808211156103d457600080fd5b818401915084601f8301126103e857600080fd5b8135818111156103fa576103fa610394565b604051601f8201601f19908116603f0116810190838211818310171561042257610422610394565b8160405282815287602084870101111561043b57600080fd5b826020860160208301376000928101602001929092525095945050505050565b60005b8381101561047657818101518382015260200161045e565b50506000910152565b6000825161049181846020870161045b565b9190910192915050565b600081518084526104b381602086016020860161045b565b601f01601f19169290920160200192915050565b60608152600760608201526630b2322ab9b2b960c91b608082015260a0602082015260006104f860a083018461049b565b828103604093840152601181527024b739b2b93a34b7b71037b3102ab9b2b960791b60208201529190910192915050565b60608152600a6060820152693932b6b7bb32aab9b2b960b11b608082015260a06020820152600061055d60a083018461049b565b828103604093840152600f81526e2932b6b7bb30b61037b3102ab9b2b960891b60208201529190910192915050565b6060815260086060820152671859191059d95b9d60c21b608082015260a0602082015260006105be60a083018461049b565b8281036040938401526012815271125b9cd95c9d1a5bdb881bd9881059d95b9d60721b60208201529190910192915050565b60608152600a606082015269616464436f6d70616e7960b01b608082015260a06020820152600061062460a083018461049b565b8281036040938401526014815273496e73657274696f6e206f6620436f6d70616e7960601b60208201529190910192915050565b60608152600b60608201526a1c995b5bdd995059d95b9d60aa1b608082015260a06020820152600061068d60a083018461049b565b828103604093840152601081526f14995b5bdd985b081bd9881059d95b9d60821b60208201529190910192915050565b60608152600d60608201526c72656d6f7665436f6d70616e7960981b608082015260a0602082015260006106f460a083018461049b565b828103604093840152601281527152656d6f76616c206f6620436f6d70616e7960701b6020820152919091019291505056fe977ad43df54956a5e7e9c2f3dbb198524df140c1ea3686b92c328e20c39eb134a2646970667358221220b80a47521dbf2b31fd00e52d7d585c66bc4a83297a4483d0bb52f72a7e295fb864736f6c63430008120033",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"method\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"value\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"eventMessage\",\"type\":\"string\"}],\"name\":\"ValidationEvent\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"agent\",\"type\":\"string\"}],\"name\":\"addAgent\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"company\",\"type\":\"string\"}],\"name\":\"addCompany\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"user\",\"type\":\"string\"}],\"name\":\"addUser\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"agent\",\"type\":\"string\"}],\"name\":\"removeAgent\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"company\",\"type\":\"string\"}],\"name\":\"removeCompany\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"user\",\"type\":\"string\"}],\"name\":\"removeUser\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"agent\",\"type\":\"string\"}],\"name\":\"validateAgent\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"company\",\"type\":\"string\"}],\"name\":\"validateCompany\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"user\",\"type\":\"string\"}],\"name\":\"validateUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Contract with abstraction for validation of entities\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Validation\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Validation.sol\":\"Validation\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Validation.sol\":{\"keccak256\":\"0x8e56ed62a2ed3e586410b295fe07f2636da63252b51050c4bd7efb2b1b9ce0cd\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a673cead93c5eaa93cbbc1d3357f5e048cb9f244ed9253df3b14f9d6d0b3b978\",\"dweb:/ipfs/Qma5xn8Lfgb25w5NeREKyCffeTFDFN77NxYpUF2vEeRfsb\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061077c806100206000396000f3fe608060405234801561001057600080fd5b50600436106100935760003560e01c8063ca87e7b511610066578063ca87e7b5146100fa578063d6483d171461010d578063dea02fe314610120578063fb24ab0f14610133578063ffcee0a11461014657600080fd5b806318b8275a14610098578063600cee78146100ad578063a21dabb7146100c0578063b08eff93146100e7575b600080fd5b6100ab6100a63660046103aa565b610159565b005b6100ab6100bb3660046103aa565b6101b2565b6100d36100ce3660046103aa565b6101ff565b604051901515815260200160405180910390f35b6100d36100f53660046103aa565b61023a565b6100ab6101083660046103aa565b61024b565b6100ab61011b3660046103aa565b610298565b6100ab61012e3660046103aa565b6102e6565b6100d36101413660046103aa565b610334565b6100ab6101543660046103aa565b610346565b600160008260405161016b919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906104c7565b60405180910390a150565b600080826040516101c3919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610529565b6000600282604051610211919061047f565b9081526040519081900360200190205460ff16151560011461023257600080fd5b506001919050565b60008082604051610211919061047f565b6001808260405161025c919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a790839061058c565b60016002826040516102aa919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906105f0565b60006001826040516102f8919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610658565b6000600182604051610211919061047f565b6000600282604051610358919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906106bd565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156103bc57600080fd5b813567ffffffffffffffff808211156103d457600080fd5b818401915084601f8301126103e857600080fd5b8135818111156103fa576103fa610394565b604051601f8201601f19908116603f0116810190838211818310171561042257610422610394565b8160405282815287602084870101111561043b57600080fd5b826020860160208301376000928101602001929092525095945050505050565b60005b8381101561047657818101518382015260200161045e565b50506000910152565b6000825161049181846020870161045b565b9190910192915050565b600081518084526104b381602086016020860161045b565b601f01601f19169290920160200192915050565b60608152600760608201526630b2322ab9b2b960c91b608082015260a0602082015260006104f860a083018461049b565b828103604093840152601181527024b739b2b93a34b7b71037b3102ab9b2b960791b60208201529190910192915050565b60608152600a6060820152693932b6b7bb32aab9b2b960b11b608082015260a06020820152600061055d60a083018461049b565b828103604093840152600f81526e2932b6b7bb30b61037b3102ab9b2b960891b60208201529190910192915050565b6060815260086060820152671859191059d95b9d60c21b608082015260a0602082015260006105be60a083018461049b565b8281036040938401526012815271125b9cd95c9d1a5bdb881bd9881059d95b9d60721b60208201529190910192915050565b60608152600a606082015269616464436f6d70616e7960b01b608082015260a06020820152600061062460a083018461049b565b8281036040938401526014815273496e73657274696f6e206f6620436f6d70616e7960601b60208201529190910192915050565b60608152600b60608201526a1c995b5bdd995059d95b9d60aa1b608082015260a06020820152600061068d60a083018461049b565b828103604093840152601081526f14995b5bdd985b081bd9881059d95b9d60821b60208201529190910192915050565b60608152600d60608201526c72656d6f7665436f6d70616e7960981b608082015260a0602082015260006106f460a083018461049b565b828103604093840152601281527152656d6f76616c206f6620436f6d70616e7960701b6020820152919091019291505056fe977ad43df54956a5e7e9c2f3dbb198524df140c1ea3686b92c328e20c39eb134a264697066735822122094ff598e2554aff43646272739731eb9a0c8bffece9bd0370d2c2761aa7da5fc64736f6c63430008130033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100935760003560e01c8063ca87e7b511610066578063ca87e7b5146100fa578063d6483d171461010d578063dea02fe314610120578063fb24ab0f14610133578063ffcee0a11461014657600080fd5b806318b8275a14610098578063600cee78146100ad578063a21dabb7146100c0578063b08eff93146100e7575b600080fd5b6100ab6100a63660046103aa565b610159565b005b6100ab6100bb3660046103aa565b6101b2565b6100d36100ce3660046103aa565b6101ff565b604051901515815260200160405180910390f35b6100d36100f53660046103aa565b61023a565b6100ab6101083660046103aa565b61024b565b6100ab61011b3660046103aa565b610298565b6100ab61012e3660046103aa565b6102e6565b6100d36101413660046103aa565b610334565b6100ab6101543660046103aa565b610346565b600160008260405161016b919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906104c7565b60405180910390a150565b600080826040516101c3919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610529565b6000600282604051610211919061047f565b9081526040519081900360200190205460ff16151560011461023257600080fd5b506001919050565b60008082604051610211919061047f565b6001808260405161025c919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a790839061058c565b60016002826040516102aa919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906105f0565b60006001826040516102f8919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a7908390610658565b6000600182604051610211919061047f565b6000600282604051610358919061047f565b908152604051908190036020018120805492151560ff1990931692909217909155600080516020610727833981519152906101a79083906106bd565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156103bc57600080fd5b813567ffffffffffffffff808211156103d457600080fd5b818401915084601f8301126103e857600080fd5b8135818111156103fa576103fa610394565b604051601f8201601f19908116603f0116810190838211818310171561042257610422610394565b8160405282815287602084870101111561043b57600080fd5b826020860160208301376000928101602001929092525095945050505050565b60005b8381101561047657818101518382015260200161045e565b50506000910152565b6000825161049181846020870161045b565b9190910192915050565b600081518084526104b381602086016020860161045b565b601f01601f19169290920160200192915050565b60608152600760608201526630b2322ab9b2b960c91b608082015260a0602082015260006104f860a083018461049b565b828103604093840152601181527024b739b2b93a34b7b71037b3102ab9b2b960791b60208201529190910192915050565b60608152600a6060820152693932b6b7bb32aab9b2b960b11b608082015260a06020820152600061055d60a083018461049b565b828103604093840152600f81526e2932b6b7bb30b61037b3102ab9b2b960891b60208201529190910192915050565b6060815260086060820152671859191059d95b9d60c21b608082015260a0602082015260006105be60a083018461049b565b8281036040938401526012815271125b9cd95c9d1a5bdb881bd9881059d95b9d60721b60208201529190910192915050565b60608152600a606082015269616464436f6d70616e7960b01b608082015260a06020820152600061062460a083018461049b565b8281036040938401526014815273496e73657274696f6e206f6620436f6d70616e7960601b60208201529190910192915050565b60608152600b60608201526a1c995b5bdd995059d95b9d60aa1b608082015260a06020820152600061068d60a083018461049b565b828103604093840152601081526f14995b5bdd985b081bd9881059d95b9d60821b60208201529190910192915050565b60608152600d60608201526c72656d6f7665436f6d70616e7960981b608082015260a0602082015260006106f460a083018461049b565b828103604093840152601281527152656d6f76616c206f6620436f6d70616e7960701b6020820152919091019291505056fe977ad43df54956a5e7e9c2f3dbb198524df140c1ea3686b92c328e20c39eb134a264697066735822122094ff598e2554aff43646272739731eb9a0c8bffece9bd0370d2c2761aa7da5fc64736f6c63430008130033",
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [
@@ -4474,15 +4474,15 @@
     "absolutePath": "project:/contracts/Validation.sol",
     "exportedSymbols": {
       "Validation": [
-        2025
+        2069
       ]
     },
-    "id": 2026,
+    "id": 2070,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1837,
+        "id": 1881,
         "literals": [
           "solidity",
           "^",
@@ -4499,15 +4499,15 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 1838,
+          "id": 1882,
           "nodeType": "StructuredDocumentation",
           "src": "61:92:2",
           "text": " @title Validation\n @dev Contract with abstraction for validation of entities"
         },
         "fullyImplemented": true,
-        "id": 2025,
+        "id": 2069,
         "linearizedBaseContracts": [
-          2025
+          2069
         ],
         "name": "Validation",
         "nameLocation": "166:10:2",
@@ -4516,23 +4516,23 @@
           {
             "anonymous": false,
             "eventSelector": "977ad43df54956a5e7e9c2f3dbb198524df140c1ea3686b92c328e20c39eb134",
-            "id": 1846,
+            "id": 1890,
             "name": "ValidationEvent",
             "nameLocation": "192:15:2",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1845,
+              "id": 1889,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1840,
+                  "id": 1884,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "method",
                   "nameLocation": "215:6:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1846,
+                  "scope": 1890,
                   "src": "208:13:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -4541,7 +4541,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1839,
+                    "id": 1883,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "208:6:2",
@@ -4554,13 +4554,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1842,
+                  "id": 1886,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "value",
                   "nameLocation": "230:5:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1846,
+                  "scope": 1890,
                   "src": "223:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -4569,7 +4569,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1841,
+                    "id": 1885,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "223:6:2",
@@ -4582,13 +4582,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1844,
+                  "id": 1888,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "eventMessage",
                   "nameLocation": "244:12:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1846,
+                  "scope": 1890,
                   "src": "237:19:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -4597,7 +4597,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1843,
+                    "id": 1887,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "237:6:2",
@@ -4615,12 +4615,12 @@
           },
           {
             "constant": false,
-            "id": 1850,
+            "id": 1894,
             "mutability": "mutable",
             "name": "userValidation",
             "nameLocation": "298:14:2",
             "nodeType": "VariableDeclaration",
-            "scope": 2025,
+            "scope": 2069,
             "src": "266:46:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -4629,11 +4629,11 @@
               "typeString": "mapping(string => bool)"
             },
             "typeName": {
-              "id": 1849,
+              "id": 1893,
               "keyName": "",
               "keyNameLocation": "-1:-1:-1",
               "keyType": {
-                "id": 1847,
+                "id": 1891,
                 "name": "string",
                 "nodeType": "ElementaryTypeName",
                 "src": "274:6:2",
@@ -4651,7 +4651,7 @@
               "valueName": "",
               "valueNameLocation": "-1:-1:-1",
               "valueType": {
-                "id": 1848,
+                "id": 1892,
                 "name": "bool",
                 "nodeType": "ElementaryTypeName",
                 "src": "284:4:2",
@@ -4665,12 +4665,12 @@
           },
           {
             "constant": false,
-            "id": 1854,
+            "id": 1898,
             "mutability": "mutable",
             "name": "agentValidation",
             "nameLocation": "351:15:2",
             "nodeType": "VariableDeclaration",
-            "scope": 2025,
+            "scope": 2069,
             "src": "319:47:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -4679,11 +4679,11 @@
               "typeString": "mapping(string => bool)"
             },
             "typeName": {
-              "id": 1853,
+              "id": 1897,
               "keyName": "",
               "keyNameLocation": "-1:-1:-1",
               "keyType": {
-                "id": 1851,
+                "id": 1895,
                 "name": "string",
                 "nodeType": "ElementaryTypeName",
                 "src": "327:6:2",
@@ -4701,7 +4701,7 @@
               "valueName": "",
               "valueNameLocation": "-1:-1:-1",
               "valueType": {
-                "id": 1852,
+                "id": 1896,
                 "name": "bool",
                 "nodeType": "ElementaryTypeName",
                 "src": "337:4:2",
@@ -4715,12 +4715,12 @@
           },
           {
             "constant": false,
-            "id": 1858,
+            "id": 1902,
             "mutability": "mutable",
             "name": "companyValidation",
             "nameLocation": "405:17:2",
             "nodeType": "VariableDeclaration",
-            "scope": 2025,
+            "scope": 2069,
             "src": "373:49:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -4729,11 +4729,11 @@
               "typeString": "mapping(string => bool)"
             },
             "typeName": {
-              "id": 1857,
+              "id": 1901,
               "keyName": "",
               "keyNameLocation": "-1:-1:-1",
               "keyType": {
-                "id": 1855,
+                "id": 1899,
                 "name": "string",
                 "nodeType": "ElementaryTypeName",
                 "src": "381:6:2",
@@ -4751,7 +4751,7 @@
               "valueName": "",
               "valueNameLocation": "-1:-1:-1",
               "valueType": {
-                "id": 1856,
+                "id": 1900,
                 "name": "bool",
                 "nodeType": "ElementaryTypeName",
                 "src": "391:4:2",
@@ -4765,12 +4765,12 @@
           },
           {
             "body": {
-              "id": 1861,
+              "id": 1905,
               "nodeType": "Block",
               "src": "445:2:2",
               "statements": []
             },
-            "id": 1862,
+            "id": 1906,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
@@ -4778,18 +4778,18 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1859,
+              "id": 1903,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "442:2:2"
             },
             "returnParameters": {
-              "id": 1860,
+              "id": 1904,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "445:0:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "431:16:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -4797,7 +4797,7 @@
           },
           {
             "body": {
-              "id": 1879,
+              "id": 1923,
               "nodeType": "Block",
               "src": "524:79:2",
               "statements": [
@@ -4809,31 +4809,31 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 1874,
+                        "id": 1918,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "baseExpression": {
-                            "id": 1870,
+                            "id": 1914,
                             "name": "userValidation",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1850,
+                            "referencedDeclaration": 1894,
                             "src": "544:14:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                               "typeString": "mapping(string memory => bool)"
                             }
                           },
-                          "id": 1872,
+                          "id": 1916,
                           "indexExpression": {
-                            "id": 1871,
+                            "id": 1915,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1864,
+                            "referencedDeclaration": 1908,
                             "src": "559:4:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
@@ -4855,7 +4855,7 @@
                         "operator": "==",
                         "rightExpression": {
                           "hexValue": "74727565",
-                          "id": 1873,
+                          "id": 1917,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -4883,7 +4883,7 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 1869,
+                      "id": 1913,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -4897,7 +4897,7 @@
                         "typeString": "function (bool) pure"
                       }
                     },
-                    "id": 1875,
+                    "id": 1919,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4913,14 +4913,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1876,
+                  "id": 1920,
                   "nodeType": "ExpressionStatement",
                   "src": "536:37:2"
                 },
                 {
                   "expression": {
                     "hexValue": "74727565",
-                    "id": 1877,
+                    "id": 1921,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
@@ -4934,15 +4934,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 1868,
-                  "id": 1878,
+                  "functionReturnParameters": 1912,
+                  "id": 1922,
                   "nodeType": "Return",
                   "src": "584:11:2"
                 }
               ]
             },
             "functionSelector": "b08eff93",
-            "id": 1880,
+            "id": 1924,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -4950,17 +4950,17 @@
             "nameLocation": "464:12:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1865,
+              "id": 1909,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1864,
+                  "id": 1908,
                   "mutability": "mutable",
                   "name": "user",
                   "nameLocation": "491:4:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1880,
+                  "scope": 1924,
                   "src": "477:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -4969,7 +4969,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1863,
+                    "id": 1907,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "477:6:2",
@@ -4984,17 +4984,17 @@
               "src": "476:20:2"
             },
             "returnParameters": {
-              "id": 1868,
+              "id": 1912,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1867,
+                  "id": 1911,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1880,
+                  "scope": 1924,
                   "src": "518:4:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -5003,7 +5003,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 1866,
+                    "id": 1910,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "518:4:2",
@@ -5017,7 +5017,7 @@
               ],
               "src": "517:6:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "455:148:2",
             "stateMutability": "view",
             "virtual": false,
@@ -5025,7 +5025,7 @@
           },
           {
             "body": {
-              "id": 1897,
+              "id": 1941,
               "nodeType": "Block",
               "src": "682:81:2",
               "statements": [
@@ -5037,31 +5037,31 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 1892,
+                        "id": 1936,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "baseExpression": {
-                            "id": 1888,
+                            "id": 1932,
                             "name": "agentValidation",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1854,
+                            "referencedDeclaration": 1898,
                             "src": "702:15:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                               "typeString": "mapping(string memory => bool)"
                             }
                           },
-                          "id": 1890,
+                          "id": 1934,
                           "indexExpression": {
-                            "id": 1889,
+                            "id": 1933,
                             "name": "agent",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1882,
+                            "referencedDeclaration": 1926,
                             "src": "718:5:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
@@ -5083,7 +5083,7 @@
                         "operator": "==",
                         "rightExpression": {
                           "hexValue": "74727565",
-                          "id": 1891,
+                          "id": 1935,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -5111,7 +5111,7 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 1887,
+                      "id": 1931,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -5125,7 +5125,7 @@
                         "typeString": "function (bool) pure"
                       }
                     },
-                    "id": 1893,
+                    "id": 1937,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5141,14 +5141,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1894,
+                  "id": 1938,
                   "nodeType": "ExpressionStatement",
                   "src": "694:39:2"
                 },
                 {
                   "expression": {
                     "hexValue": "74727565",
-                    "id": 1895,
+                    "id": 1939,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
@@ -5162,15 +5162,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 1886,
-                  "id": 1896,
+                  "functionReturnParameters": 1930,
+                  "id": 1940,
                   "nodeType": "Return",
                   "src": "744:11:2"
                 }
               ]
             },
             "functionSelector": "fb24ab0f",
-            "id": 1898,
+            "id": 1942,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -5178,17 +5178,17 @@
             "nameLocation": "620:13:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1883,
+              "id": 1927,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1882,
+                  "id": 1926,
                   "mutability": "mutable",
                   "name": "agent",
                   "nameLocation": "648:5:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1898,
+                  "scope": 1942,
                   "src": "634:19:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5197,7 +5197,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1881,
+                    "id": 1925,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "634:6:2",
@@ -5212,17 +5212,17 @@
               "src": "633:21:2"
             },
             "returnParameters": {
-              "id": 1886,
+              "id": 1930,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1885,
+                  "id": 1929,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1898,
+                  "scope": 1942,
                   "src": "676:4:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -5231,7 +5231,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 1884,
+                    "id": 1928,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "676:4:2",
@@ -5245,7 +5245,7 @@
               ],
               "src": "675:6:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "611:152:2",
             "stateMutability": "view",
             "virtual": false,
@@ -5253,7 +5253,7 @@
           },
           {
             "body": {
-              "id": 1915,
+              "id": 1959,
               "nodeType": "Block",
               "src": "846:85:2",
               "statements": [
@@ -5265,31 +5265,31 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 1910,
+                        "id": 1954,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "baseExpression": {
-                            "id": 1906,
+                            "id": 1950,
                             "name": "companyValidation",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1858,
+                            "referencedDeclaration": 1902,
                             "src": "866:17:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                               "typeString": "mapping(string memory => bool)"
                             }
                           },
-                          "id": 1908,
+                          "id": 1952,
                           "indexExpression": {
-                            "id": 1907,
+                            "id": 1951,
                             "name": "company",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1900,
+                            "referencedDeclaration": 1944,
                             "src": "884:7:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
@@ -5311,7 +5311,7 @@
                         "operator": "==",
                         "rightExpression": {
                           "hexValue": "74727565",
-                          "id": 1909,
+                          "id": 1953,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -5339,7 +5339,7 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 1905,
+                      "id": 1949,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -5353,7 +5353,7 @@
                         "typeString": "function (bool) pure"
                       }
                     },
-                    "id": 1911,
+                    "id": 1955,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5369,14 +5369,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1912,
+                  "id": 1956,
                   "nodeType": "ExpressionStatement",
                   "src": "858:43:2"
                 },
                 {
                   "expression": {
                     "hexValue": "74727565",
-                    "id": 1913,
+                    "id": 1957,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
@@ -5390,15 +5390,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 1904,
-                  "id": 1914,
+                  "functionReturnParameters": 1948,
+                  "id": 1958,
                   "nodeType": "Return",
                   "src": "912:11:2"
                 }
               ]
             },
             "functionSelector": "a21dabb7",
-            "id": 1916,
+            "id": 1960,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -5406,17 +5406,17 @@
             "nameLocation": "780:15:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1901,
+              "id": 1945,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1900,
+                  "id": 1944,
                   "mutability": "mutable",
                   "name": "company",
                   "nameLocation": "810:7:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1916,
+                  "scope": 1960,
                   "src": "796:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5425,7 +5425,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1899,
+                    "id": 1943,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "796:6:2",
@@ -5440,17 +5440,17 @@
               "src": "795:23:2"
             },
             "returnParameters": {
-              "id": 1904,
+              "id": 1948,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1903,
+                  "id": 1947,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1916,
+                  "scope": 1960,
                   "src": "840:4:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -5459,7 +5459,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 1902,
+                    "id": 1946,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "840:4:2",
@@ -5473,7 +5473,7 @@
               ],
               "src": "839:6:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "771:160:2",
             "stateMutability": "view",
             "virtual": false,
@@ -5481,37 +5481,37 @@
           },
           {
             "body": {
-              "id": 1933,
+              "id": 1977,
               "nodeType": "Block",
               "src": "983:115:2",
               "statements": [
                 {
                   "expression": {
-                    "id": 1925,
+                    "id": 1969,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 1921,
+                        "id": 1965,
                         "name": "userValidation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1850,
+                        "referencedDeclaration": 1894,
                         "src": "994:14:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                           "typeString": "mapping(string memory => bool)"
                         }
                       },
-                      "id": 1923,
+                      "id": 1967,
                       "indexExpression": {
-                        "id": 1922,
+                        "id": 1966,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1918,
+                        "referencedDeclaration": 1962,
                         "src": "1009:4:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -5533,7 +5533,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "74727565",
-                      "id": 1924,
+                      "id": 1968,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -5553,7 +5553,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 1926,
+                  "id": 1970,
                   "nodeType": "ExpressionStatement",
                   "src": "994:27:2"
                 },
@@ -5562,7 +5562,7 @@
                     "arguments": [
                       {
                         "hexValue": "61646455736572",
-                        "id": 1928,
+                        "id": 1972,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -5577,11 +5577,11 @@
                         "value": "addUser"
                       },
                       {
-                        "id": 1929,
+                        "id": 1973,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1918,
+                        "referencedDeclaration": 1962,
                         "src": "1064:4:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -5590,7 +5590,7 @@
                       },
                       {
                         "hexValue": "496e73657274696f6e206f662055736572",
-                        "id": 1930,
+                        "id": 1974,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -5620,18 +5620,18 @@
                           "typeString": "literal_string \"Insertion of User\""
                         }
                       ],
-                      "id": 1927,
+                      "id": 1971,
                       "name": "ValidationEvent",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1846,
+                      "referencedDeclaration": 1890,
                       "src": "1037:15:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory,string memory,string memory)"
                       }
                     },
-                    "id": 1931,
+                    "id": 1975,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5647,14 +5647,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1932,
+                  "id": 1976,
                   "nodeType": "EmitStatement",
                   "src": "1032:58:2"
                 }
               ]
             },
             "functionSelector": "18b8275a",
-            "id": 1934,
+            "id": 1978,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -5662,17 +5662,17 @@
             "nameLocation": "948:7:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1919,
+              "id": 1963,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1918,
+                  "id": 1962,
                   "mutability": "mutable",
                   "name": "user",
                   "nameLocation": "970:4:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1934,
+                  "scope": 1978,
                   "src": "956:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5681,7 +5681,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1917,
+                    "id": 1961,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "956:6:2",
@@ -5696,12 +5696,12 @@
               "src": "955:20:2"
             },
             "returnParameters": {
-              "id": 1920,
+              "id": 1964,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "983:0:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "939:159:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -5709,37 +5709,37 @@
           },
           {
             "body": {
-              "id": 1951,
+              "id": 1995,
               "nodeType": "Block",
               "src": "1152:120:2",
               "statements": [
                 {
                   "expression": {
-                    "id": 1943,
+                    "id": 1987,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 1939,
+                        "id": 1983,
                         "name": "agentValidation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1854,
+                        "referencedDeclaration": 1898,
                         "src": "1163:15:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                           "typeString": "mapping(string memory => bool)"
                         }
                       },
-                      "id": 1941,
+                      "id": 1985,
                       "indexExpression": {
-                        "id": 1940,
+                        "id": 1984,
                         "name": "agent",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1936,
+                        "referencedDeclaration": 1980,
                         "src": "1179:5:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -5761,7 +5761,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "74727565",
-                      "id": 1942,
+                      "id": 1986,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -5781,7 +5781,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 1944,
+                  "id": 1988,
                   "nodeType": "ExpressionStatement",
                   "src": "1163:29:2"
                 },
@@ -5790,7 +5790,7 @@
                     "arguments": [
                       {
                         "hexValue": "6164644167656e74",
-                        "id": 1946,
+                        "id": 1990,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -5805,11 +5805,11 @@
                         "value": "addAgent"
                       },
                       {
-                        "id": 1947,
+                        "id": 1991,
                         "name": "agent",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1936,
+                        "referencedDeclaration": 1980,
                         "src": "1236:5:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -5818,7 +5818,7 @@
                       },
                       {
                         "hexValue": "496e73657274696f6e206f66204167656e74",
-                        "id": 1948,
+                        "id": 1992,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -5848,18 +5848,18 @@
                           "typeString": "literal_string \"Insertion of Agent\""
                         }
                       ],
-                      "id": 1945,
+                      "id": 1989,
                       "name": "ValidationEvent",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1846,
+                      "referencedDeclaration": 1890,
                       "src": "1208:15:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory,string memory,string memory)"
                       }
                     },
-                    "id": 1949,
+                    "id": 1993,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5875,14 +5875,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1950,
+                  "id": 1994,
                   "nodeType": "EmitStatement",
                   "src": "1203:61:2"
                 }
               ]
             },
             "functionSelector": "ca87e7b5",
-            "id": 1952,
+            "id": 1996,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -5890,17 +5890,17 @@
             "nameLocation": "1115:8:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1937,
+              "id": 1981,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1936,
+                  "id": 1980,
                   "mutability": "mutable",
                   "name": "agent",
                   "nameLocation": "1138:5:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1952,
+                  "scope": 1996,
                   "src": "1124:19:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5909,7 +5909,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1935,
+                    "id": 1979,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1124:6:2",
@@ -5924,12 +5924,12 @@
               "src": "1123:21:2"
             },
             "returnParameters": {
-              "id": 1938,
+              "id": 1982,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1152:0:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "1106:166:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -5937,37 +5937,37 @@
           },
           {
             "body": {
-              "id": 1969,
+              "id": 2013,
               "nodeType": "Block",
               "src": "1330:130:2",
               "statements": [
                 {
                   "expression": {
-                    "id": 1961,
+                    "id": 2005,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 1957,
+                        "id": 2001,
                         "name": "companyValidation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1858,
+                        "referencedDeclaration": 1902,
                         "src": "1341:17:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                           "typeString": "mapping(string memory => bool)"
                         }
                       },
-                      "id": 1959,
+                      "id": 2003,
                       "indexExpression": {
-                        "id": 1958,
+                        "id": 2002,
                         "name": "company",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1954,
+                        "referencedDeclaration": 1998,
                         "src": "1359:7:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -5989,7 +5989,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "74727565",
-                      "id": 1960,
+                      "id": 2004,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -6009,7 +6009,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 1962,
+                  "id": 2006,
                   "nodeType": "ExpressionStatement",
                   "src": "1341:33:2"
                 },
@@ -6018,7 +6018,7 @@
                     "arguments": [
                       {
                         "hexValue": "616464436f6d70616e79",
-                        "id": 1964,
+                        "id": 2008,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6033,11 +6033,11 @@
                         "value": "addCompany"
                       },
                       {
-                        "id": 1965,
+                        "id": 2009,
                         "name": "company",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1954,
+                        "referencedDeclaration": 1998,
                         "src": "1420:7:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -6046,7 +6046,7 @@
                       },
                       {
                         "hexValue": "496e73657274696f6e206f6620436f6d70616e79",
-                        "id": 1966,
+                        "id": 2010,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6076,18 +6076,18 @@
                           "typeString": "literal_string \"Insertion of Company\""
                         }
                       ],
-                      "id": 1963,
+                      "id": 2007,
                       "name": "ValidationEvent",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1846,
+                      "referencedDeclaration": 1890,
                       "src": "1390:15:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory,string memory,string memory)"
                       }
                     },
-                    "id": 1967,
+                    "id": 2011,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -6103,14 +6103,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1968,
+                  "id": 2012,
                   "nodeType": "EmitStatement",
                   "src": "1385:67:2"
                 }
               ]
             },
             "functionSelector": "d6483d17",
-            "id": 1970,
+            "id": 2014,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -6118,17 +6118,17 @@
             "nameLocation": "1289:10:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1955,
+              "id": 1999,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1954,
+                  "id": 1998,
                   "mutability": "mutable",
                   "name": "company",
                   "nameLocation": "1314:7:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1970,
+                  "scope": 2014,
                   "src": "1300:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -6137,7 +6137,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1953,
+                    "id": 1997,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1300:6:2",
@@ -6152,12 +6152,12 @@
               "src": "1299:23:2"
             },
             "returnParameters": {
-              "id": 1956,
+              "id": 2000,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1330:0:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "1280:180:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -6165,37 +6165,37 @@
           },
           {
             "body": {
-              "id": 1987,
+              "id": 2031,
               "nodeType": "Block",
               "src": "1515:117:2",
               "statements": [
                 {
                   "expression": {
-                    "id": 1979,
+                    "id": 2023,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 1975,
+                        "id": 2019,
                         "name": "userValidation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1850,
+                        "referencedDeclaration": 1894,
                         "src": "1526:14:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                           "typeString": "mapping(string memory => bool)"
                         }
                       },
-                      "id": 1977,
+                      "id": 2021,
                       "indexExpression": {
-                        "id": 1976,
+                        "id": 2020,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1972,
+                        "referencedDeclaration": 2016,
                         "src": "1541:4:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -6217,7 +6217,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "66616c7365",
-                      "id": 1978,
+                      "id": 2022,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -6237,7 +6237,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 1980,
+                  "id": 2024,
                   "nodeType": "ExpressionStatement",
                   "src": "1526:28:2"
                 },
@@ -6246,7 +6246,7 @@
                     "arguments": [
                       {
                         "hexValue": "72656d6f766555736572",
-                        "id": 1982,
+                        "id": 2026,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6261,11 +6261,11 @@
                         "value": "removeUser"
                       },
                       {
-                        "id": 1983,
+                        "id": 2027,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1972,
+                        "referencedDeclaration": 2016,
                         "src": "1600:4:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -6274,7 +6274,7 @@
                       },
                       {
                         "hexValue": "52656d6f76616c206f662055736572",
-                        "id": 1984,
+                        "id": 2028,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6304,18 +6304,18 @@
                           "typeString": "literal_string \"Removal of User\""
                         }
                       ],
-                      "id": 1981,
+                      "id": 2025,
                       "name": "ValidationEvent",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1846,
+                      "referencedDeclaration": 1890,
                       "src": "1570:15:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory,string memory,string memory)"
                       }
                     },
-                    "id": 1985,
+                    "id": 2029,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -6331,14 +6331,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1986,
+                  "id": 2030,
                   "nodeType": "EmitStatement",
                   "src": "1565:59:2"
                 }
               ]
             },
             "functionSelector": "600cee78",
-            "id": 1988,
+            "id": 2032,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -6346,17 +6346,17 @@
             "nameLocation": "1477:10:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1973,
+              "id": 2017,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1972,
+                  "id": 2016,
                   "mutability": "mutable",
                   "name": "user",
                   "nameLocation": "1502:4:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1988,
+                  "scope": 2032,
                   "src": "1488:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -6365,7 +6365,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1971,
+                    "id": 2015,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1488:6:2",
@@ -6380,12 +6380,12 @@
               "src": "1487:20:2"
             },
             "returnParameters": {
-              "id": 1974,
+              "id": 2018,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1515:0:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "1468:164:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -6393,37 +6393,37 @@
           },
           {
             "body": {
-              "id": 2005,
+              "id": 2049,
               "nodeType": "Block",
               "src": "1689:122:2",
               "statements": [
                 {
                   "expression": {
-                    "id": 1997,
+                    "id": 2041,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 1993,
+                        "id": 2037,
                         "name": "agentValidation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1854,
+                        "referencedDeclaration": 1898,
                         "src": "1700:15:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                           "typeString": "mapping(string memory => bool)"
                         }
                       },
-                      "id": 1995,
+                      "id": 2039,
                       "indexExpression": {
-                        "id": 1994,
+                        "id": 2038,
                         "name": "agent",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1990,
+                        "referencedDeclaration": 2034,
                         "src": "1716:5:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -6445,7 +6445,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "66616c7365",
-                      "id": 1996,
+                      "id": 2040,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -6465,7 +6465,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 1998,
+                  "id": 2042,
                   "nodeType": "ExpressionStatement",
                   "src": "1700:30:2"
                 },
@@ -6474,7 +6474,7 @@
                     "arguments": [
                       {
                         "hexValue": "72656d6f76654167656e74",
-                        "id": 2000,
+                        "id": 2044,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6489,11 +6489,11 @@
                         "value": "removeAgent"
                       },
                       {
-                        "id": 2001,
+                        "id": 2045,
                         "name": "agent",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1990,
+                        "referencedDeclaration": 2034,
                         "src": "1777:5:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -6502,7 +6502,7 @@
                       },
                       {
                         "hexValue": "52656d6f76616c206f66204167656e74",
-                        "id": 2002,
+                        "id": 2046,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6532,18 +6532,18 @@
                           "typeString": "literal_string \"Removal of Agent\""
                         }
                       ],
-                      "id": 1999,
+                      "id": 2043,
                       "name": "ValidationEvent",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1846,
+                      "referencedDeclaration": 1890,
                       "src": "1746:15:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory,string memory,string memory)"
                       }
                     },
-                    "id": 2003,
+                    "id": 2047,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -6559,14 +6559,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2004,
+                  "id": 2048,
                   "nodeType": "EmitStatement",
                   "src": "1741:62:2"
                 }
               ]
             },
             "functionSelector": "dea02fe3",
-            "id": 2006,
+            "id": 2050,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -6574,17 +6574,17 @@
             "nameLocation": "1649:11:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1991,
+              "id": 2035,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1990,
+                  "id": 2034,
                   "mutability": "mutable",
                   "name": "agent",
                   "nameLocation": "1675:5:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2006,
+                  "scope": 2050,
                   "src": "1661:19:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -6593,7 +6593,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1989,
+                    "id": 2033,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1661:6:2",
@@ -6608,12 +6608,12 @@
               "src": "1660:21:2"
             },
             "returnParameters": {
-              "id": 1992,
+              "id": 2036,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1689:0:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "1640:171:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -6621,37 +6621,37 @@
           },
           {
             "body": {
-              "id": 2023,
+              "id": 2067,
               "nodeType": "Block",
               "src": "1872:134:2",
               "statements": [
                 {
                   "expression": {
-                    "id": 2015,
+                    "id": 2059,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 2011,
+                        "id": 2055,
                         "name": "companyValidation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1858,
+                        "referencedDeclaration": 1902,
                         "src": "1883:17:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_bool_$",
                           "typeString": "mapping(string memory => bool)"
                         }
                       },
-                      "id": 2013,
+                      "id": 2057,
                       "indexExpression": {
-                        "id": 2012,
+                        "id": 2056,
                         "name": "company",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2008,
+                        "referencedDeclaration": 2052,
                         "src": "1901:7:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -6673,7 +6673,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "66616c7365",
-                      "id": 2014,
+                      "id": 2058,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -6693,7 +6693,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 2016,
+                  "id": 2060,
                   "nodeType": "ExpressionStatement",
                   "src": "1883:34:2"
                 },
@@ -6702,7 +6702,7 @@
                     "arguments": [
                       {
                         "hexValue": "72656d6f7665436f6d70616e79",
-                        "id": 2018,
+                        "id": 2062,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6717,11 +6717,11 @@
                         "value": "removeCompany"
                       },
                       {
-                        "id": 2019,
+                        "id": 2063,
                         "name": "company",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2008,
+                        "referencedDeclaration": 2052,
                         "src": "1966:7:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -6730,7 +6730,7 @@
                       },
                       {
                         "hexValue": "52656d6f76616c206f6620436f6d70616e79",
-                        "id": 2020,
+                        "id": 2064,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -6760,18 +6760,18 @@
                           "typeString": "literal_string \"Removal of Company\""
                         }
                       ],
-                      "id": 2017,
+                      "id": 2061,
                       "name": "ValidationEvent",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1846,
+                      "referencedDeclaration": 1890,
                       "src": "1933:15:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory,string memory,string memory)"
                       }
                     },
-                    "id": 2021,
+                    "id": 2065,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -6787,14 +6787,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2022,
+                  "id": 2066,
                   "nodeType": "EmitStatement",
                   "src": "1928:68:2"
                 }
               ]
             },
             "functionSelector": "ffcee0a1",
-            "id": 2024,
+            "id": 2068,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -6802,17 +6802,17 @@
             "nameLocation": "1828:13:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2009,
+              "id": 2053,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2008,
+                  "id": 2052,
                   "mutability": "mutable",
                   "name": "company",
                   "nameLocation": "1856:7:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2024,
+                  "scope": 2068,
                   "src": "1842:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -6821,7 +6821,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 2007,
+                    "id": 2051,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1842:6:2",
@@ -6836,19 +6836,19 @@
               "src": "1841:23:2"
             },
             "returnParameters": {
-              "id": 2010,
+              "id": 2054,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1872:0:2"
             },
-            "scope": 2025,
+            "scope": 2069,
             "src": "1819:187:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 2026,
+        "scope": 2070,
         "src": "157:1852:2",
         "usedErrors": []
       }
@@ -6857,7 +6857,7 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.8.18+commit.87f61d96.Emscripten.clang"
+    "version": "0.8.19+commit.7dd6d404.Emscripten.clang"
   },
   "networks": {
     "5777": {
@@ -6868,7 +6868,7 @@
     }
   },
   "schemaVersion": "3.4.10",
-  "updatedAt": "2023-02-03T14:51:17.460Z",
+  "updatedAt": "2023-03-04T20:45:23.968Z",
   "devdoc": {
     "details": "Contract with abstraction for validation of entities",
     "kind": "dev",

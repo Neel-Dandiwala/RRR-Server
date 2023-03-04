@@ -11,6 +11,7 @@ import { web3, ValidationABI, RewardABI } from "../web3"
 import { calculateDistance, isNearby } from '../utils/SearchNearby';
 import { AgentDetails } from '../types/AgentDetails';
 import { AgentInfo } from '../types/AgentInfo';
+import { TokenAdminInfo } from '../types/TokenAdminInfo';
 import { UserAgentFormInfo } from '../types/UserAgentFormInfo';
 import UserAgentForm from '../models/UserAgentForm';
 import mongoose from 'mongoose';
@@ -691,6 +692,241 @@ const setUserAgentForm = async (req: Request, res: Response) => {
     }
 }
 
+const getAllTokens = async (req: Request, res: Response) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    const db = await connection.getDb();
+    const collection = db.collection('tokens');
+    let validUser: boolean = false;
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validUser = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
+
+    if (validUser) {
+        try {
+            let result;
+            let _tokens: TokenAdminInfo[] = [];
+
+            try {
+                result = await collection.find({ }).toArray();
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }]
+                    res.status(400).json({ logs });
+                    return { logs };
+
+                }
+                else {
+                    res.status(400).json({ err });
+
+                    throw new Error(err)
+                }
+            }
+            for (const token of result) {
+                // console.log('here')
+
+                let _token = {
+
+                    _id: token._id,
+
+                    tokenName: token.tokenName,
+                
+                    tokenSymbol: token.tokenSymbol,
+                
+                    tokenDescription: token.tokenDescription,
+                
+                    tokenValidity: token.tokenValidity,
+                
+                    tokenPrice: token.tokenPrice,
+    
+                    }
+                    console.log(_token)
+                    _tokens.push(
+                        _token
+                    );
+            }        
+            
+            console.log(_tokens)
+            res.status(200).json(_tokens);
+            return _tokens;
+        } catch (e) {
+            res.status(400).json({ e });
+            throw e;
+        }
+    } else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ]
+
+        res.status(400).json({ logs });
+        return;
+    }
+}
+
+const getUserTokens = async (req: Request, res: Response) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    const db = await connection.getDb();
+    const collection = db.collection('token');
+    let validUser: boolean = false;
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validUser = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
+
+    if (validUser) {
+        try {
+            let result;
+            let blockTimestamp;
+            let _tokens: any[] = [];
+            var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
+            await rewardContract.methods.blockTimestamp().send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
+                .then(async function (blockchain_result: any) {
+                    console.log(blockchain_result)
+                    blockTimestamp = parseInt((blockchain_result.events.BlockTimestamp.returnValues.timestamp).toString())
+                    
+                }).catch((err: any) => {
+                    console.log(err)
+                    logs = [
+                        {
+                            field: "Blockchain Error - Reward",
+                            message: err,
+                        }
+                    ]
+
+                    res.status(400).json({ logs });
+                    return { logs };
+                });
+
+            try {
+                result = await collection.find({ tokenUserId: req.session.authenticationID, tokenUsed: false }).toArray();
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }]
+                    res.status(400).json({ logs });
+                    return { logs };
+
+                }
+                else {
+                    res.status(400).json({ err });
+
+                    throw new Error(err)
+                }
+            }
+            for (const token of result) {
+                // console.log('here')
+
+                if(blockTimestamp && token.tokenExpires < blockTimestamp){
+
+                    let _token = {
+
+                        _id: token._id,
+
+                        tokenId: token.tokenId,
+
+                        tokenUserId: token.tokenUserId,
+    
+                        tokenName: token.tokenName,
+                    
+                        tokenSymbol: token.tokenSymbol,
+                    
+                        tokenExpires: token.tokenExpires,
+                    
+                        tokenExpiresDate: token.tokenExpiresDate,
+                    
+                        tokenUsed: token.tokenUsed,
+
+                        tokenAmount: token.tokenAmount,
+        
+                        }
+                        console.log(_token)
+                        _tokens.push(
+                            _token
+                        );
+
+                }
+            }        
+            
+            console.log(_tokens)
+            res.status(200).json(_tokens);
+            return _tokens;
+        } catch (e) {
+            res.status(400).json({ e });
+            throw e;
+        }
+    } else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ]
+
+        res.status(400).json({ logs });
+        return;
+    }
+}
+
+
+
 // @desc   Get User
 // @route  GET /user/login
 // @access Private
@@ -701,5 +937,5 @@ const updateUser = async (res: Response) => {
 
 
 module.exports = {
-    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings,
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings, getAllTokens, getUserTokens
 }

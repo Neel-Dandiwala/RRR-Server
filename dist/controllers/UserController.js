@@ -552,10 +552,202 @@ const setUserAgentForm = async (req, res) => {
         return;
     }
 };
+const getAllTokens = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('tokens');
+    let validUser = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validUser = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validUser) {
+        try {
+            let result;
+            let _tokens = [];
+            try {
+                result = await collection.find({}).toArray();
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            for (const token of result) {
+                let _token = {
+                    _id: token._id,
+                    tokenName: token.tokenName,
+                    tokenSymbol: token.tokenSymbol,
+                    tokenDescription: token.tokenDescription,
+                    tokenValidity: token.tokenValidity,
+                    tokenPrice: token.tokenPrice,
+                };
+                console.log(_token);
+                _tokens.push(_token);
+            }
+            console.log(_tokens);
+            res.status(200).json(_tokens);
+            return _tokens;
+        }
+        catch (e) {
+            res.status(400).json({ e });
+            throw e;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
+const getUserTokens = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    const db = await connection_1.connection.getDb();
+    const collection = db.collection('token');
+    let validUser = false;
+    var validationContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result) {
+        console.log(blockchain_result);
+        validUser = true;
+    }).catch((err) => {
+        console.log(err);
+        logs = [
+            {
+                field: "Blockchain Error - Validation",
+                message: err,
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    });
+    if (validUser) {
+        try {
+            let result;
+            let blockTimestamp;
+            let _tokens = [];
+            var rewardContract = new (web3_1.web3.getWeb3()).eth.Contract(web3_1.RewardABI.abi, process.env.REWARD_ADDRESS, {});
+            await rewardContract.methods.blockTimestamp().send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
+                .then(async function (blockchain_result) {
+                console.log(blockchain_result);
+                blockTimestamp = parseInt((blockchain_result.events.BlockTimestamp.returnValues.timestamp).toString());
+            }).catch((err) => {
+                console.log(err);
+                logs = [
+                    {
+                        field: "Blockchain Error - Reward",
+                        message: err,
+                    }
+                ];
+                res.status(400).json({ logs });
+                return { logs };
+            });
+            try {
+                result = await collection.find({ tokenUserId: req.session.authenticationID, tokenUsed: false }).toArray();
+            }
+            catch (err) {
+                if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err);
+                    logs = [{
+                            field: "Unexpected Mongo Error",
+                            message: "Default Message"
+                        }];
+                    res.status(400).json({ logs });
+                    return { logs };
+                }
+                else {
+                    res.status(400).json({ err });
+                    throw new Error(err);
+                }
+            }
+            for (const token of result) {
+                if (blockTimestamp && token.tokenExpires < blockTimestamp) {
+                    let _token = {
+                        _id: token._id,
+                        tokenId: token.tokenId,
+                        tokenUserId: token.tokenUserId,
+                        tokenName: token.tokenName,
+                        tokenSymbol: token.tokenSymbol,
+                        tokenExpires: token.tokenExpires,
+                        tokenExpiresDate: token.tokenExpiresDate,
+                        tokenUsed: token.tokenUsed,
+                        tokenAmount: token.tokenAmount,
+                    };
+                    console.log(_token);
+                    _tokens.push(_token);
+                }
+            }
+            console.log(_tokens);
+            res.status(200).json(_tokens);
+            return _tokens;
+        }
+        catch (e) {
+            res.status(400).json({ e });
+            throw e;
+        }
+    }
+    else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ];
+        res.status(400).json({ logs });
+        return;
+    }
+};
 const updateUser = async (res) => {
     res.status(200).json({ message: 'User Update' });
 };
 module.exports = {
-    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings,
+    getUsers, setUser, updateUser, validationUser, getNearbyAgents, getUserBalance, setUserAgentForm, getUserBookings, getAllTokens, getUserTokens
 };
 //# sourceMappingURL=UserController.js.map
