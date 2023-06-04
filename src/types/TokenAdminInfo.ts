@@ -12,4 +12,6 @@ export class TokenAdminInfo {
     tokenValidity?: number;
 
     tokenPrice?: number;
+
+    tokenImage? : string;
 }
