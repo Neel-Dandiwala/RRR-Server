@@ -888,9 +888,92 @@ const wasteComplete = async (req: Request, res: Response) => {
         });
 };
 
+const getWasteFullDetails = async (req: Request, res: Response) => {
+    const db = await connection.getDb();
+    const collection = db.collection("waste");
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+    const key = req.body.key;
+    var trackingContract = new (web3.getWeb3().eth.Contract)(
+        TrackingABI.abi,
+        process.env.TRACKING_ADDRESS,
+        {}
+    );
+
+    await trackingContract.methods
+        .getWaste(key)
+        .send({ from: process.env.OWNER_ADDRESS, gasPrice: "3000000" })
+        .then(async function (blockchain_result: any) {
+            console.log(blockchain_result);
+            let userCollection = db.collection("user");
+            let _user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(blockchain_result.events.WasteData.returnValues.user) })
+
+            let _agentName = "-";
+            let _companyName = "-";
+
+            if (blockchain_result.events.WasteData.returnValues.agent !== "-") {
+                let agentCollection = db.collection("agent");
+                let _agent = await agentCollection.findOne({ _id: new mongoose.Types.ObjectId(blockchain_result.events.WasteData.returnValues.agent) })
+                _agentName = _agent.agentName
+            }
+
+            if (blockchain_result.events.WasteData.returnValues.company !== "-") {
+                let companyCollection = db.collection("company");
+                let _company = await companyCollection.findOne({ _id: new mongoose.Types.ObjectId(blockchain_result.events.WasteData.returnValues.company) })
+                _companyName = _company.companyName
+            }
+
+            const wasteId = req.body.key;
+            let _waste = await collection.findOne({ _id: new mongoose.Types.ObjectId(wasteId) })
+
+            logs =
+                            {
+                                field: "Successful Insertion",
+                                wasteId: wasteId,
+                                wasteWeight: _waste.wasteWeight,
+                                wasteUser: _waste.wasteUser,
+                                wasteUserName: _user.userName,
+                                wasteUserDate: _waste.wasteUserDate,
+                                wasteAgent: _waste.wasteAgent,
+                                wasteAgentName:_agentName,
+                                wasteAgentDate: _waste.wasteAgentDate,
+                                wasteCompany: _waste.wasteCompany,
+                                wasteCompanyDate: _waste.wasteCompanyDate,
+                                wasteElectronicWeight: _waste.wasteElectronicWeight,
+                                wastePaperWeight: _waste.wastePaperWeight,
+                                wastePlasticWeight: _waste.wastePlasticWeight,
+                            }
+                        ;
+
+            res.status(200).json(logs);
+            return;
+        })
+        .catch(async (err: any) => {
+            console.log(err);
+
+            logs = [
+                {
+                    field: "Blockchain Error",
+                    message: err,
+                },
+            ];
+            res.status(400).json({ logs });
+            return;
+        });
+};
 
 
 module.exports = {
+    getWasteFullDetails,
     wasteUser,
     wasteAgent,
     wasteCompany,
