@@ -7,6 +7,7 @@ import { isNullableType } from 'graphql';
 import mongoose from 'mongoose';
 import Token from '../models/Token';
 import { TokenInfo } from '../types/TokenInfo';
+import { TokenAdminInfo } from 'src/types/TokenAdminInfo';
 
 const addDays = (days: number) => {
     var datetemp = new Date(Date.now());
@@ -510,6 +511,8 @@ const rewardMintToken = async (req: Request, res: Response) => {
         try {
             const tokenData = req.body as Pick<TokenInfo, "tokenName" | "tokenSymbol" | "tokenAmount" | "tokenExpires">
             console.log(tokenData);
+
+
             const _token: TokenInfo = new Token({
                 tokenId: '',
                 tokenUserId: req.session.authenticationID,
@@ -545,7 +548,7 @@ const rewardMintToken = async (req: Request, res: Response) => {
             if (result.acknowledged) {
                 console.log(result);
                 var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
-                await rewardContract.methods.mintToken(req.session.authenticationID, tokenData.tokenName, tokenData.tokenSymbol, tokenData.tokenAmount, result.insertedId, tokenData.tokenExpires).send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
+                await rewardContract.methods.mintToken(req.session.authenticationID, tokenData.tokenName, tokenData.tokenSymbol, tokenData.tokenAmount, result.insertedId.toString(), "100000000").send({ from: process.env.OWNER_ADDRESS, gas: '1000000', gasPrice: '3000000' })
                     .then(async function (blockchain_result: any) {
                         console.log(blockchain_result)
                         // blockchain_result.events.Transfer.returnValues.
@@ -753,6 +756,108 @@ const rewardBurnToken = async (req: Request, res: Response) => {
     }
 }
 
+
+const getMarketplaceTokens = async (req: Request, res: Response) => {
+    const db = await connection.getDb();
+    const collection = db.collection('tokens');
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    let validUser: boolean = false;
+
+    var validationContract = new (web3.getWeb3()).eth.Contract(ValidationABI.abi, process.env.VALIDATION_ADDRESS, {});
+    await validationContract.methods.validateUser(req.session.authenticationID).send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' })
+        .then(function (blockchain_result: any) {
+            console.log(blockchain_result)
+            validUser = true;
+        }).catch((err: any) => {
+            console.log(err)
+            logs = [
+                {
+                    field: "Blockchain Error - Validation",
+                    message: err,
+                }
+            ]
+
+            res.status(400).json({ logs });
+            return;
+        });
+
+    if (validUser) {
+        try {
+            let tokenData;
+            try {
+                tokenData = await collection.find({}).toArray();;
+                console.log(tokenData)
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = [{
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }]
+                    res.status(400).json({ logs });
+                    return { logs };
+
+                }
+                else {
+                    res.status(400).json({ err });
+
+                    throw new Error(err)
+                }
+            }
+            let _tokens: TokenAdminInfo[] = [];
+            console.log(tokenData);
+            for (const token of tokenData) {
+                let _token: any = {
+                    item_brand: token.tokenName,
+                    item_date: token.tokenValidity / 86400,
+                    item_description: token.tokenDescription,
+                    item_image: token.tokenImage,
+                    item_coins: token.tokenPrice
+                }
+
+                _tokens.push(
+                    _token
+                );
+
+            };
+            console.log(_tokens)
+            res.status(200).json(_tokens);
+            return _tokens;
+
+        } catch (e) {
+            res.status(400).json({ e });
+            throw e;
+        }
+    } else {
+        logs = [
+            {
+                field: "Invalid User",
+                message: "Better check with administrator",
+            }
+        ]
+        res.status(400).json({ logs });
+        return;
+    }
+}
+
+const getbs = async (req: Request, res: Response) => {
+    // let bs;
+    var rewardContract = new (web3.getWeb3()).eth.Contract(RewardABI.abi, process.env.REWARD_ADDRESS, {});
+    await rewardContract.methods.blockTimestamp().send({ from: process.env.OWNER_ADDRESS, gasPrice: '3000000' }).then(async function (blockchain_result: any) {
+        console.log(blockchain_result)})
+}
+
 module.exports = {
-    rewardTransferFrom, rewardMint, rewardBurn, rewardMintToken, rewardBurnToken
+    rewardTransferFrom, rewardMint, rewardBurn, rewardMintToken, rewardBurnToken, getMarketplaceTokens, getbs
 }
