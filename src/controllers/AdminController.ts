@@ -456,13 +456,17 @@ const setToken = async(req:Request, res: Response) => {
         const tokenDescription = req.body.tokenDescription;
         const tokenValidity = req.body.tokenValidity;
         const tokenPrice = req.body.tokenPrice;
-
+        let tokenImage = req.body.tokenImage
+        if(tokenImage == "" || tokenImage == null || tokenImage == undefined || !tokenImage) {
+             tokenImage = 'https://i.imgur.com/LGI4dq1.png';
+         }
         const _token: TokenAdminInfo = {
             tokenName: tokenName,
             tokenSymbol: tokenSymbol,
             tokenDescription: tokenDescription,
             tokenValidity: tokenValidity * 86400,
-            tokenPrice: tokenPrice
+            tokenPrice: tokenPrice,
+            tokenImage: tokenImage
         }
 
         let result;
