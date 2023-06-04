@@ -1,5 +1,5 @@
 import express from 'express';
-const { wasteUser, wasteAgent, wasteCompany, wasteBlockchain, wasteComplete, getWasteQRDetails, wasteGenerateQR, getWasteQR, getWasteDetails, getWasteTimestamps } = require('../controllers/WasteController')
+const { wasteUser, wasteAgent, wasteCompany, wasteBlockchain, wasteComplete, getWasteQRDetails, getWasteFullDetails, wasteGenerateQR, getWasteQR, getWasteDetails, getWasteTimestamps } = require('../controllers/WasteController')
 const { QRCodeGenerator } = require('../controllers/QRController')
 
 const router = express.Router();
@@ -19,6 +19,8 @@ router.post('/waste/imageLink', getWasteQR);
 router.get('/waste/:key', getWasteQRDetails);
 
 router.post('/waste/details', getWasteDetails);
+
+router.post('/waste/fulldetails', getWasteFullDetails);
 
 router.post('/waste/timestamps', getWasteTimestamps);
 
